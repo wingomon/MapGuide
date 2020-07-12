@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">MapGuide</string>
+
+
+
+    <!-- Colors -->
+    <color name="grey">#F0F0F0</color>
+</resources>
