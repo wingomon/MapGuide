@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "792657616414",
+    "firebase_url": "https://mapguide-f47ed.firebaseio.com",
+    "project_id": "mapguide-f47ed",
+    "storage_bucket": "mapguide-f47ed.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:792657616414:android:48af2cd4d208c3a5dbd80f",
+        "android_client_info": {
+          "package_name": "com.example.mapguide"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "792657616414-rn8if4ads766h04b1a4dbijg99btp734.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.mapguide",
+            "certificate_hash": "f7cd27f5e37b96d7f71a72227258ea0b7fe035f6"
+          }
+        },
+        {
+          "client_id": "792657616414-ekdmrp0l0mr30rjtkqpemargb0q86i18.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCCJxHgDxqRN8yxC43BOI2HXYC2W1UhUYA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "792657616414-ekdmrp0l0mr30rjtkqpemargb0q86i18.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
