@@ -1,27 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".StartCreateGuide_AddName">
+    tools:context=".StartCreateGuide_AddName"
+    android:orientation="vertical">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Home"
-        android:textSize="50dp"
-        android:textStyle="bold"
-        android:layout_centerInParent="true"/>
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottom_navigation"
+
+
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:itemBackground="@color/red"
-        app:itemIconTint="@drawable/selector"
-        app:itemTextColor="@drawable/selector"
-        app:menu="@menu/menu_navigation"
-        android:layout_alignParentBottom="true"/>
+        android:layout_marginBottom="20dp">
 
-</RelativeLayout>
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="match_parent"
+            android:layout_height="350dp"
+            android:background="@drawable/rounded_corners_blue_gradient"/>
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="224dp"
+            android:layout_height="wrap_content"
+            android:text="Verpass deinem Guide einen aussagekräftigen Namen."
+            android:layout_margin="20dp"
+            android:fontFamily="@font/amiko_bold"
+            android:textSize="30dp"
+            android:textColor="@color/white"
+            />
+    </RelativeLayout>
+
+
+    <EditText
+        android:id="@+id/etName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Titel deines Guides"
+        android:padding="10dp"
+        android:layout_margin="20dp"
+        android:background="@drawable/edit_text_rounded"/>
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="Weiter"
+        android:textColor="@color/white"
+        android:fontFamily="@font/amiko_bold"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/rounded_corners_blue_gradient"/>
+
+
+
+</LinearLayout>

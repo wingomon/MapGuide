@@ -4,27 +4,27 @@
     <item
         android:id="@+id/home"
         android:title="Home"
-        android:icon="@drawable/ic_baseline_home"/>
+        android:icon="@drawable/ic_door"/>
 
     <item
         android:id="@+id/guidesNear"
         android:title="Near Guides"
-        android:icon="@drawable/ic_baseline_location_on_24"/>
+        android:icon="@drawable/ic_position"/>
 
     <item
         android:id="@+id/guideAdd"
         android:title="AddGuide"
-        android:icon="@drawable/ic_baseline_add"/>
+        android:icon="@drawable/ic_add"/>
 
     <item
         android:id="@+id/myGuides"
         android:title="myGuides"
-        android:icon="@drawable/ic_baseline_person_24"/>
+        android:icon="@drawable/ic_user"/>
 
     <item
         android:id="@+id/info"
         android:title="Information"
-        android:icon="@drawable/ic_baseline_info_24"/>
+        android:icon="@drawable/ic_info"/>
 
 
 

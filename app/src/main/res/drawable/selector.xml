@@ -3,11 +3,11 @@
 
         <item
             android:state_selected="true"
-            android:drawable="@android:color/holo_red_dark"/>
+            android:color="#B0DAB9"/>
 
         <item
            android:state_selected="false"
-            android:color="@color/Lightgrey" />
+            android:color="@color/Darkgrey" />
 
 
 </selector>

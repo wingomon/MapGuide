@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".StartCreateGuide"
+    tools:context=".StartCreateGuide_AddDescription"
     android:orientation="vertical">
 
     <RelativeLayout
@@ -13,17 +13,17 @@
         android:layout_marginBottom="20dp">
 
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="match_parent"
-        android:layout_height="350dp"
-        android:background="@drawable/rounded_corners_blue_gradient"/>
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="match_parent"
+            android:layout_height="350dp"
+            android:background="@drawable/rounded_corners_blue_gradient"/>
 
         <TextView
             android:id="@+id/textView"
             android:layout_width="224dp"
             android:layout_height="wrap_content"
-            android:text="Erstelle deinen eigenen Multimedia-Guide. Ganz einfach und nur in wenigen Schritten."
+            android:text="Eine kurze Beschreibung darf ebenfalls nicht fehlen."
             android:layout_margin="20dp"
             android:fontFamily="@font/amiko_bold"
             android:textSize="30dp"
@@ -31,26 +31,47 @@
             />
     </RelativeLayout>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Erzähle deine Geschichten auf eine ganz neue Art und Weise."
-        android:layout_margin="20dp"
-        android:textAlignment="center"
-        android:gravity="center"
-        android:fontFamily="@font/amiko"
-        android:textSize="16dp"/>
 
+    <EditText
+        android:id="@+id/etDescription"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:hint="Füge eine Beschreibung hinzu."
+        android:gravity="start"
+        android:padding="10dp"
+        android:layout_margin="20dp"
+        android:background="@drawable/edit_text_rounded"
+        android:inputType="textMultiLine"
+        android:fontFamily="@font/amiko"/>
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/button2"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:text="Los gehts!"
+        android:text="Weiter"
         android:textColor="@color/white"
         android:fontFamily="@font/amiko_bold"
         android:layout_gravity="center_horizontal"
         android:background="@drawable/rounded_corners_blue_gradient"/>
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        tools:layout_editor_absoluteX="176dp"
+        tools:layout_editor_absoluteY="31dp"
+        android:layout_gravity="center"/>
+
+
+
+
+
+
+
+
+
+
 
 
 
