@@ -4,11 +4,13 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
+import android.Manifest;
 import android.content.ClipData;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -42,6 +44,7 @@ public class StartCreateGuide_AddImage extends AppCompatActivity {
     String description;
     String currentPhotoPath;
     Uri currentUri;
+    ImageView addimageicon;
 
     ContentValues values;
     Uri imageUri;
@@ -52,18 +55,20 @@ public class StartCreateGuide_AddImage extends AppCompatActivity {
         setContentView(R.layout.activity_start_create_guide__add_image);
 
         imageView = (ImageView) findViewById(R.id.imageView2);
-        button = (Button)findViewById(R.id.button3);
-        button.setOnClickListener(new View.OnClickListener() {
+        addimageicon = (ImageView)findViewById(R.id.addimageicon);
+        addimageicon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                selectImage(StartCreateGuide_AddImage.this);
-
             }
         });
 
 
         //Weitergabe der Informationen (Name, Description, Image) an die nächste Activity beim Klicken des "Weiter"-Buttons
         next = (Button)findViewById(R.id.button4);
+        next.setAlpha(.5f);
+        next.setEnabled(false);
+
         next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -84,17 +89,17 @@ public class StartCreateGuide_AddImage extends AppCompatActivity {
     }
 
     private void selectImage(Context context) {
-        final CharSequence[] options = { "Take Photo", "Choose from Gallery","Cancel" };
+        final CharSequence[] options = { "Foto aufnehmen", "Aus Bibliothek auswählen","Abbrechen" };
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Choose your profile picture");
+        AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.CustomAlertDialog);
+        builder.setTitle("Füge ein Foto hinzu");
 
         builder.setItems(options, new DialogInterface.OnClickListener() {
 
             @Override
             public void onClick(DialogInterface dialog, int item) {
 
-                if (options[item].equals("Take Photo")) {
+                if (options[item].equals("Foto aufnehmen")) {
                    Intent takePicture = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
                   //  startActivityForResult(takePicture, 0);
                     Log.i("------You-------","------------Clicked on TAKE PHOTO---------" + currentPhotoPath);
@@ -129,11 +134,11 @@ public class StartCreateGuide_AddImage extends AppCompatActivity {
                         }
                     }
 
-                } else if (options[item].equals("Choose from Gallery")) {
+                } else if (options[item].equals("Aus Bibliothek auswählen")) {
                     Intent pickPhoto = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                     startActivityForResult(pickPhoto , 1);
 
-                } else if (options[item].equals("Cancel")) {
+                } else if (options[item].equals("Abbrechen")) {
                     dialog.dismiss();
                 }
             }
@@ -153,6 +158,13 @@ public class StartCreateGuide_AddImage extends AppCompatActivity {
             switch (requestCode) {
                 case 0:
                     if (resultCode == RESULT_OK) {
+
+                        //Wenn Bild ausgewählt wurde, dann aktiviere den "Weiter"-Button
+                        next = (Button) findViewById(R.id.button4);
+                        next.setEnabled(true);
+                        next.setAlpha(1f);
+                        // und blende das "Hinzufügen" Icon aus
+                        addimageicon.setAlpha(0f);
 
 
                         //Bitmap selectedImage = (Bitmap) data.getExtras().get("data");
@@ -174,6 +186,13 @@ public class StartCreateGuide_AddImage extends AppCompatActivity {
                         currentUri = selectedImage;
                         Log.i("----FilePath----",getRealPathFromURI(currentUri));
 
+                        //Wenn Bild ausgewählt wurde, dann aktiviere den "Weiter"-Button
+                        next = (Button) findViewById(R.id.button4);
+                        next.setEnabled(true);
+                        next.setAlpha(1f);
+                        // und blende das "Hinzufügen" Icon aus
+                        addimageicon.setAlpha(0f);
+
                         String[] filePathColumn = {MediaStore.Images.Media.DATA};
                         if (selectedImage != null) {
                             Cursor cursor = getContentResolver().query(selectedImage,
@@ -189,6 +208,10 @@ public class StartCreateGuide_AddImage extends AppCompatActivity {
 
                                 int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
                                 String picturePath = cursor.getString(columnIndex);
+
+
+                                //Berechtigungen für Zugriff auf den Speicher
+
                                 imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath));
                                 cursor.close();
                             }

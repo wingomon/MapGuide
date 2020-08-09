@@ -25,11 +25,16 @@ public class StartCreateGuide_AddName extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                name=(EditText)findViewById(R.id.etName);
-                Intent intent = new Intent (getBaseContext(),StartCreateGuide_AddDescription.class);
-                intent.putExtra("name",name.getText().toString());
-                startActivity(intent);
 
+                name=(EditText)findViewById(R.id.etName);
+                if(name.length()==0){
+                    name.setError("Dieses Feld darf nicht leer sein.");
+                }
+                else {
+                    Intent intent = new Intent(getBaseContext(), StartCreateGuide_AddDescription.class);
+                    intent.putExtra("name", name.getText().toString());
+                    startActivity(intent);
+                }
             }
         });
 

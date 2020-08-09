@@ -32,10 +32,17 @@ public class StartCreateGuide_AddDescription extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 description= (EditText)findViewById(R.id.etDescription);
-                Intent intent = new Intent (getBaseContext(),StartCreateGuide_AddImage.class);
-                intent.putExtra("name",name);
-                intent.putExtra("description",description.getText().toString());
-                startActivity(intent);
+
+                if(description.length()==0){
+                    description.setError("Dieses Feld darf nicht leer sein.");
+                }
+
+                else {
+                    Intent intent = new Intent(getBaseContext(), StartCreateGuide_AddImage.class);
+                    intent.putExtra("name", name);
+                    intent.putExtra("description", description.getText().toString());
+                    startActivity(intent);
+                }
 
             }
         });
