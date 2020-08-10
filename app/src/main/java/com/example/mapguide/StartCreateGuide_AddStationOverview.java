@@ -2,6 +2,9 @@ package com.example.mapguide;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.location.Location;
 import android.os.Bundle;
@@ -12,6 +15,7 @@ import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.location.LocationComponent;
 import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions;
 import com.mapbox.mapboxsdk.location.modes.CameraMode;
@@ -22,6 +26,8 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class StartCreateGuide_AddStationOverview extends AppCompatActivity implements OnMapReadyCallback, PermissionsListener {
@@ -31,6 +37,12 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
    //Für Berechtigungen für Zugriff zum Standort
     private MapboxMap mapboxMap;
     private PermissionsManager permissionsManager;
+
+    //Liste der Stationen | RecyclerView Variablen
+    List<Station> stationList;
+    RecyclerView recyclerView;
+    StationAdapter stationAdapter;
+    Station tempStation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,9 +58,17 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
 
         mapView = (MapView) findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
-
-
         mapView.getMapAsync(this);
+
+        //StationListe initialisieren
+        stationList = new ArrayList<Station>();
+
+        recyclerView = (RecyclerView) findViewById(R.id.stationRecyclerView);
+        stationAdapter =new StationAdapter(stationList);
+        RecyclerView.LayoutManager sLayoutManager = new LinearLayoutManager(getApplicationContext());
+        recyclerView.setLayoutManager(sLayoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(stationAdapter);
 
     } //end OnCreate()
 
@@ -65,6 +85,21 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
 
                         enableLocationComponent(style);
                         Log.d("--MAPREADY,ONSTYLELOADED--","OnMapReady - OnSTyleloaded");
+
+                        //Interaktion bei Klick auf die Karte
+                        mapboxMap.addOnMapClickListener(new MapboxMap.OnMapClickListener() {
+                            @Override
+                            public boolean onMapClick(@NonNull LatLng point) {
+
+                                Toast.makeText(StartCreateGuide_AddStationOverview.this, String.format("User clicked at: %s", point.toString()), Toast.LENGTH_LONG).show();
+                                tempStation = new Station(stationList.size()+1, point.getLongitude(), point.getLatitude(),"Titel der Station","null","null","Beschreibung der Station");
+                                stationList.add(tempStation);
+                                stationAdapter.notifyDataSetChanged();
+
+
+                                return true;
+                            }
+                        });
                     }
                 });
     }

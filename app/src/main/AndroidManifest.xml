@@ -10,7 +10,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:requestLegacyExternalStorage="true">
-        <activity android:name=".StartCreateGuide_AddStationOverview"></activity>
+        <activity android:name=".StartCreateGuide_AddStationOverview"
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"/>
+        
         <activity android:name=".StartCreateGuide_Overview"
             android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"/>
         <activity

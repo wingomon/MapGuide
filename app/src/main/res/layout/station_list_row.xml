@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+android:orientation="vertical">
+
+<androidx.cardview.widget.CardView
+    android:layout_width="match_parent"
+    android:layout_height="100dp"
+    android:layout_margin="10dp"
+    app:cardCornerRadius="5dp"
+    app:cardElevation="1dp"
+    >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center">
+
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_margin="10dp"
+            android:background="@drawable/circle"
+            android:layout_centerVertical="true"
+            android:text="1"
+            android:gravity="center"
+            android:fontFamily="@font/amiko_bold"
+            android:textSize="25dp"/>
+
+        <TextView
+            android:id="@+id/textViewTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_toRightOf="@id/textView"
+            android:fontFamily="@font/amiko_bold"
+            android:text="TextView" />
+
+        <TextView
+            android:id="@+id/textViewDescription"
+            android:layout_width="178dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/textViewTitle"
+            android:layout_marginEnd="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            android:layout_toRightOf="@id/textView"
+            android:fontFamily="@font/amiko"
+            android:text="Short Description Text Hallo Text lol dead was machen Sachen"
+            android:textSize="12dp" />
+
+
+        <ImageView
+            android:id="@+id/edit"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_toRightOf="@id/textViewDescription"
+            android:src="@drawable/ic_add"
+            android:layout_centerVertical="true"/>
+
+        <ImageView
+            android:id="@+id/delete"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_toRightOf="@id/edit"
+            android:src="@drawable/ic_023_next"
+            android:layout_centerVertical="true"/>
+
+
+    </RelativeLayout>
+</androidx.cardview.widget.CardView>
+
+
+</LinearLayout>
