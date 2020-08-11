@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,6 +16,7 @@ import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.location.LocationComponent;
 import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions;
@@ -24,11 +26,20 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
+import com.mapbox.mapboxsdk.plugins.annotation.Symbol;
+import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager;
+import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions;
 import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin;
+
+import com.mapbox.geojson.Feature;
+import com.mapbox.geojson.FeatureCollection;
+import com.mapbox.geojson.Point;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.mapbox.mapboxsdk.style.layers.Property.ICON_ROTATION_ALIGNMENT_VIEWPORT;
 
 public class StartCreateGuide_AddStationOverview extends AppCompatActivity implements OnMapReadyCallback, PermissionsListener {
 
@@ -75,6 +86,9 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
 
     @Override
     public void onMapReady(@NonNull final MapboxMap mapboxMap) {
+
+        final List<Feature> symbolLayerIconFeatureList = new ArrayList<>();
+
         StartCreateGuide_AddStationOverview.this.mapboxMap = mapboxMap;
 
         Log.d("--MAPREADY--","OnMapReady was loaded");
@@ -82,6 +96,14 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
                 new Style.OnStyleLoaded() {
                     @Override
                     public void onStyleLoaded(@NonNull Style style) {
+
+                        style.addImage("markerIcon",getResources().getDrawable(R.drawable.marker));
+
+                        SymbolManager symbolManager = new SymbolManager(mapView,mapboxMap,style);
+                        // set non-data-driven properties, such as:
+                        symbolManager.setIconAllowOverlap(true);
+                        symbolManager.setIconTranslate(new Float[]{-4f,5f});
+                        symbolManager.setIconRotationAlignment(ICON_ROTATION_ALIGNMENT_VIEWPORT);
 
                         enableLocationComponent(style);
                         Log.d("--MAPREADY,ONSTYLELOADED--","OnMapReady - OnSTyleloaded");
@@ -96,6 +118,15 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
                                 stationList.add(tempStation);
                                 stationAdapter.notifyDataSetChanged();
 
+                                //Nachdem die Stationen der Liste hinzugefügt werden, soll jede Station auch einen Marker auf der Karte erhalten
+                                // Add symbol at specified lat/lon
+                                Symbol symbol = symbolManager.create(new SymbolOptions()
+                                        .withLatLng(point)
+                                        .withIconImage("markerIcon")
+                                        .withIconSize(0.3f));
+                                
+
+                                //Wenn in der StationListe ein Eintrag vorher herrsscht, dann nimm diesen und zeichne eine Route von diesem Punkt zum aktuell geklickten Punkt
 
                                 return true;
                             }

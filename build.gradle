@@ -30,6 +30,8 @@ allprojects {
                 password = 'sk.eyJ1Ijoid2luZ2V4IiwiYSI6ImNrZGx0Njl1NTExOGMyc3JvejlidXhjMmMifQ.8gTP8GdA9bluNwFWxVR9lw'
             }
         }
+
+        maven { url "http://oss.sonatype.org/content/repositories/snapshots/" }
     }
 }
 
