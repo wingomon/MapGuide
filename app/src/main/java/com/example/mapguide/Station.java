@@ -1,9 +1,13 @@
 package com.example.mapguide;
 
-public class Station {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class Station implements Parcelable {
 
     public int number;
-    public double longitude, latitude;
+    public double longitude;
+    public double latitude;
     public String title;
     public String audioSrcPath;
     public String imgSrcPath;
@@ -76,4 +80,46 @@ public class Station {
     public void setDescription(String description) {
         this.description = description;
     }
+
+
+    protected Station(Parcel in) {
+        number = in.readInt();
+        longitude = in.readDouble();
+        latitude = in.readDouble();
+        title = in.readString();
+        audioSrcPath = in.readString();
+        imgSrcPath = in.readString();
+        description = in.readString();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(number);
+        dest.writeDouble(longitude);
+        dest.writeDouble(latitude);
+        dest.writeString(title);
+        dest.writeString(audioSrcPath);
+        dest.writeString(imgSrcPath);
+        dest.writeString(description);
+    }
+
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<Station> CREATOR = new Parcelable.Creator<Station>() {
+        @Override
+        public Station createFromParcel(Parcel in) {
+            return new Station(in);
+        }
+
+        @Override
+        public Station[] newArray(int size) {
+            return new Station[size];
+        }
+    };
+
+
 }

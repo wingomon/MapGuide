@@ -1,5 +1,7 @@
 package com.example.mapguide;
 
+import android.content.Context;
+import android.content.Intent;
 import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,13 +24,24 @@ public class StationAdapter extends RecyclerView.Adapter<StationAdapter.StationV
 
         public TextView number, title,  description;
         public ImageView img;
+        public ImageView deleteIcon;
+        public ImageView editIcon;
+
+
+
 
         public StationViewHolder(View view){
             super(view);
             number = (TextView) view.findViewById(R.id.textView);
             title = (TextView) view.findViewById(R.id.textViewTitle);
             description = (TextView) view.findViewById(R.id.textViewDescription);
+
+            deleteIcon = (ImageView) view.findViewById(R.id.delete);
+            editIcon = (ImageView) view.findViewById(R.id.edit);
+
         }
+
+
     }
 
     public StationAdapter(List<Station> stationList){
@@ -51,6 +64,18 @@ public class StationAdapter extends RecyclerView.Adapter<StationAdapter.StationV
         holder.number.setText(Integer.toString(station.getNumber()));
         holder.title.setText(station.getTitle());
         holder.description.setText(station.getDescription());
+
+        holder.editIcon.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(view.getContext(), StationEdit_Activity.class);
+                intent.putExtra("station",stationList.get(position));
+               view.getContext().startActivity(intent);
+            }
+
+        });
+
 
     }
 

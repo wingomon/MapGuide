@@ -6,10 +6,13 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import com.mapbox.android.core.location.LocationEngine;
@@ -41,7 +44,7 @@ import java.util.List;
 
 import static com.mapbox.mapboxsdk.style.layers.Property.ICON_ROTATION_ALIGNMENT_VIEWPORT;
 
-public class StartCreateGuide_AddStationOverview extends AppCompatActivity implements OnMapReadyCallback, PermissionsListener {
+public class StartCreateGuide_AddStationOverview extends AppCompatActivity implements OnMapReadyCallback, PermissionsListener{
 
    private MapView mapView;
 
@@ -97,8 +100,9 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
                     @Override
                     public void onStyleLoaded(@NonNull Style style) {
 
-                        style.addImage("markerIcon",getResources().getDrawable(R.drawable.marker));
 
+                        //Manager für Icons auf der Karte
+                        style.addImage("markerIcon",getResources().getDrawable(R.drawable.marker));
                         SymbolManager symbolManager = new SymbolManager(mapView,mapboxMap,style);
                         // set non-data-driven properties, such as:
                         symbolManager.setIconAllowOverlap(true);
@@ -124,7 +128,7 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
                                         .withLatLng(point)
                                         .withIconImage("markerIcon")
                                         .withIconSize(0.3f));
-                                
+
 
                                 //Wenn in der StationListe ein Eintrag vorher herrsscht, dann nimm diesen und zeichne eine Route von diesem Punkt zum aktuell geklickten Punkt
 
@@ -192,6 +196,11 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
         }
     }
 
+
+
+
+
+
     @Override
     @SuppressWarnings( {"MissingPermission"})
     protected void onStart() {
@@ -235,7 +244,6 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
         super.onDestroy();
         mapView.onDestroy();
     }
-
 
 
 }

@@ -29,7 +29,7 @@ android:orientation="vertical">
             android:layout_centerVertical="true"
             android:text="1"
             android:gravity="center"
-            android:fontFamily="@font/amiko_bold"
+            android:fontFamily="@font/montserrat_bold"
             android:textSize="25dp"/>
 
         <TextView
@@ -67,7 +67,8 @@ android:orientation="vertical">
             android:layout_height="35dp"
             android:layout_toRightOf="@id/textViewDescription"
             android:src="@drawable/ic_add"
-            android:layout_centerVertical="true"/>
+            android:layout_centerVertical="true"
+            android:clickable="true"/>
 
         <ImageView
             android:id="@+id/delete"
@@ -75,7 +76,8 @@ android:orientation="vertical">
             android:layout_height="35dp"
             android:layout_toRightOf="@id/edit"
             android:src="@drawable/ic_023_next"
-            android:layout_centerVertical="true"/>
+            android:layout_centerVertical="true"
+            android:clickable="true"/>
 
 
     </RelativeLayout>
