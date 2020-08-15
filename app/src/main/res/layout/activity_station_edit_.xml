@@ -15,9 +15,26 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <ImageView
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="200dp"/>
+                android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/stationImage"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:scaleType="centerCrop"/>
+
+            <ImageView
+                android:id="@+id/addimageicon"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_centerInParent="true"
+                android:src="@drawable/ic_add"
+                android:clickable="true"/>
+
+            </RelativeLayout>
+
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -52,13 +69,13 @@
                         android:layout_marginLeft="10dp"
                         android:layout_centerInParent="true">
 
-                        <TextView
+                        <EditText
                             android:id="@+id/textViewStationTitle"
-                            android:layout_width="wrap_content"
+                            android:layout_width="250dp"
                             android:layout_height="wrap_content"
-                            android:text="Titel der Station"
-                            android:textSize="20dp"
-                            android:fontFamily="@font/amiko_bold"/>
+                            android:hint="Titel der Station"
+                            android:textSize="16dp"
+                            android:fontFamily="@font/amiko"/>
 
                         <TextView
                             android:id="@+id/textViewLocation"
@@ -78,20 +95,71 @@
                     android:fontFamily="@font/amiko_bold"
                     android:textSize="16dp"/>
 
-                <TextView
+                <EditText
                     android:id="@+id/stationDescription"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Lorem ipsum dolor sit amet, consetetur adipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At veroeos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet."
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:hint="Füge eine Beschreibung hinzu."
                     android:fontFamily="@font/amiko"
-                    android:layout_marginBottom="10dp"/>
+                    android:gravity="start"
+                    android:padding="10dp"
+                    android:background="@drawable/edit_text_rounded"
+                    android:inputType="textMultiLine"
+                    android:layout_marginBottom="20dp"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Weitere Medien"
+                    android:text="Audiodatei"
                     android:fontFamily="@font/amiko_bold"
                     android:textSize="16dp"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/playButton"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:src = "@drawable/ic_025_play"
+                        android:clickable="true"/>
+
+                <SeekBar
+                    android:id="@+id/seekBar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                </LinearLayout>
+
+                <Chronometer
+                    android:id="@+id/record_timer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:textAlignment="center"/>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_gravity="center">
+
+                <ImageView
+                    android:id="@+id/recordButton"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:src="@drawable/microphone_off"
+                    android:clickable="true"/>
+
+                <ImageView
+                    android:id="@+id/uploadButton"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:src="@drawable/ic_position"
+                    android:clickable="true"/>
+                </LinearLayout>
 
             </LinearLayout>
 
