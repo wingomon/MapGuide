@@ -4,16 +4,24 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".GuideViewActivity">
+    tools:context=".GuideViewActivity"
+    android:focusableInTouchMode="true"
+    android:focusable="true">
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardElevation="5dp">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -22,18 +30,35 @@
             <ImageView
                 android:id="@+id/stationImage"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:scaleType="centerCrop"/>
+                android:layout_height="250dp"
+                android:scaleType="centerCrop"
+                android:background="@color/Lightgrey"/>
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:layout_centerInParent="true">
             <ImageView
                 android:id="@+id/addimageicon"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:layout_centerInParent="true"
                 android:src="@drawable/ic_add"
-                android:clickable="true"/>
+                android:clickable="true"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="10dp"/>
 
+                <TextView
+                    android:id="@+id/addImageText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:text="Klicke um ein Bild hinzuzufügen"
+                    android:layout_gravity="center_horizontal" />
+                </LinearLayout>
             </RelativeLayout>
+
+            </androidx.cardview.widget.CardView>
 
 
             <LinearLayout
@@ -70,7 +95,7 @@
                         android:layout_centerInParent="true">
 
                         <EditText
-                            android:id="@+id/textViewStationTitle"
+                            android:id="@+id/stationTitle"
                             android:layout_width="250dp"
                             android:layout_height="wrap_content"
                             android:hint="Titel der Station"
@@ -98,14 +123,15 @@
                 <EditText
                     android:id="@+id/stationDescription"
                     android:layout_width="match_parent"
-                    android:layout_height="200dp"
+                    android:layout_height="100dp"
                     android:hint="Füge eine Beschreibung hinzu."
                     android:fontFamily="@font/amiko"
                     android:gravity="start"
                     android:padding="10dp"
                     android:background="@drawable/edit_text_rounded"
                     android:inputType="textMultiLine"
-                    android:layout_marginBottom="20dp"/>
+                    android:layout_marginBottom="20dp"
+                    android:textSize="16dp"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -113,6 +139,16 @@
                     android:text="Audiodatei"
                     android:fontFamily="@font/amiko_bold"
                     android:textSize="16dp"/>
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="10dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -123,13 +159,13 @@
                         android:id="@+id/playButton"
                         android:layout_width="50dp"
                         android:layout_height="50dp"
-                        android:src = "@drawable/ic_025_play"
-                        android:clickable="true"/>
+                        android:src = "@drawable/ic_baseline_play_arrow_24"/>
 
                 <SeekBar
                     android:id="@+id/seekBar"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"/>
 
                 </LinearLayout>
 
@@ -138,32 +174,47 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:textAlignment="center"/>
+                    android:textAlignment="center"
+                    android:fontFamily="@font/amiko"
+                    />
 
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_gravity="center">
+                    android:layout_gravity="center"
+                    android:layout_margin="20dp">
 
                 <ImageView
                     android:id="@+id/recordButton"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:src="@drawable/microphone_off"
-                    android:clickable="true"/>
+                    android:clickable="true"
+                    android:layout_marginRight="10dp"/>
 
                 <ImageView
                     android:id="@+id/uploadButton"
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
-                    android:src="@drawable/ic_position"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:src="@drawable/ic_031_upload"
                     android:clickable="true"/>
                 </LinearLayout>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <Button
+                    android:id="@+id/button_save"
+                    android:layout_width="200dp"
+                    android:layout_height="wrap_content"
+                    android:text="Speichern"
+                    android:textColor="@color/white"
+                    android:fontFamily="@font/amiko_bold"
+                    android:layout_gravity="center_horizontal"
+                    android:background="@drawable/rounded_corners_blue_gradient"
+                    android:layout_margin="20dp"/>
 
             </LinearLayout>
-
-
         </LinearLayout>
 
 

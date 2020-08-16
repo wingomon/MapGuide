@@ -57,10 +57,13 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
     RecyclerView recyclerView;
     StationAdapter stationAdapter;
     Station tempStation;
+    SymbolManager symbolManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
         //Initialize MapBox View
 
         Log.d("----MY MAPBOX TOKEN IS------", getString(R.string.mapbox_access_token));
@@ -78,7 +81,7 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
         stationList = new ArrayList<Station>();
 
         recyclerView = (RecyclerView) findViewById(R.id.stationRecyclerView);
-        stationAdapter =new StationAdapter(stationList);
+        stationAdapter =new StationAdapter(stationList,this);
         RecyclerView.LayoutManager sLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(sLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -90,8 +93,6 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
     @Override
     public void onMapReady(@NonNull final MapboxMap mapboxMap) {
 
-        final List<Feature> symbolLayerIconFeatureList = new ArrayList<>();
-
         StartCreateGuide_AddStationOverview.this.mapboxMap = mapboxMap;
 
         Log.d("--MAPREADY--","OnMapReady was loaded");
@@ -100,10 +101,12 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
                     @Override
                     public void onStyleLoaded(@NonNull Style style) {
 
+                        //Liste für Marker-Symbole
+                        List<Symbol> symbolList = new ArrayList<>();
 
                         //Manager für Icons auf der Karte
                         style.addImage("markerIcon",getResources().getDrawable(R.drawable.marker));
-                        SymbolManager symbolManager = new SymbolManager(mapView,mapboxMap,style);
+                        symbolManager = new SymbolManager(mapView,mapboxMap,style);
                         // set non-data-driven properties, such as:
                         symbolManager.setIconAllowOverlap(true);
                         symbolManager.setIconTranslate(new Float[]{-4f,5f});
@@ -117,18 +120,22 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
                             @Override
                             public boolean onMapClick(@NonNull LatLng point) {
 
-                                Toast.makeText(StartCreateGuide_AddStationOverview.this, String.format("User clicked at: %s", point.toString()), Toast.LENGTH_LONG).show();
+                                //Wenn auf die Karte geklickt wird, werden alle vorherigen Symbole/Marker gelöscht! Danach durch die Liste iteriert und neu generiert
+                                symbolManager.deleteAll();
+                                LatLng tempPoint;
                                 tempStation = new Station(stationList.size()+1, point.getLongitude(), point.getLatitude(),"Titel der Station","null","null","Beschreibung der Station");
                                 stationList.add(tempStation);
-                                stationAdapter.notifyDataSetChanged();
-
                                 //Nachdem die Stationen der Liste hinzugefügt werden, soll jede Station auch einen Marker auf der Karte erhalten
-                                // Add symbol at specified lat/lon
-                                Symbol symbol = symbolManager.create(new SymbolOptions()
-                                        .withLatLng(point)
-                                        .withIconImage("markerIcon")
-                                        .withIconSize(0.3f));
+                                // Add symbol to symbolList at specified lat/lon
 
+                                for (Station s : stationList) {
+                                    tempPoint = new LatLng(s.getLatitude(),s.getLongitude());
+                                    Symbol symbol = symbolManager.create(new SymbolOptions()
+                                            .withLatLng(tempPoint)
+                                            .withIconImage("markerIcon")
+                                            .withIconSize(0.3f));
+                                }
+                                stationAdapter.notifyDataSetChanged();
 
                                 //Wenn in der StationListe ein Eintrag vorher herrsscht, dann nimm diesen und zeichne eine Route von diesem Punkt zum aktuell geklickten Punkt
 
@@ -137,7 +144,7 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
                         });
                     }
                 });
-    }
+    } //End onMapReady()
 
     @SuppressWarnings( {"MissingPermission"})
     private void enableLocationComponent(@NonNull Style loadedMapStyle) {
@@ -243,6 +250,20 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
     protected void onDestroy() {
         super.onDestroy();
         mapView.onDestroy();
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == 1){
+            if (resultCode == RESULT_OK){
+                Station stationEdited = data.getExtras().getParcelable("station");
+                stationList.set((stationEdited.getNumber()-1),stationEdited);
+                stationAdapter.notifyDataSetChanged();
+            }
+        }
     }
 
 

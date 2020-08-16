@@ -1,5 +1,6 @@
 package com.example.mapguide;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.text.Layout;
@@ -8,6 +9,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.plugins.annotation.Symbol;
+import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager;
+import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions;
 
 import org.w3c.dom.Text;
 
@@ -19,6 +25,7 @@ import androidx.recyclerview.widget.RecyclerView;
 public class StationAdapter extends RecyclerView.Adapter<StationAdapter.StationViewHolder> {
 
     private List<Station> stationList;
+    private Context mContext;
 
     public class StationViewHolder extends RecyclerView.ViewHolder{
 
@@ -35,7 +42,6 @@ public class StationAdapter extends RecyclerView.Adapter<StationAdapter.StationV
             number = (TextView) view.findViewById(R.id.textView);
             title = (TextView) view.findViewById(R.id.textViewTitle);
             description = (TextView) view.findViewById(R.id.textViewDescription);
-
             deleteIcon = (ImageView) view.findViewById(R.id.delete);
             editIcon = (ImageView) view.findViewById(R.id.edit);
 
@@ -44,8 +50,9 @@ public class StationAdapter extends RecyclerView.Adapter<StationAdapter.StationV
 
     }
 
-    public StationAdapter(List<Station> stationList){
+    public StationAdapter(List<Station> stationList, Context mContext){
         this.stationList = stationList;
+        this.mContext = mContext;
     }
 
 
@@ -61,7 +68,7 @@ public class StationAdapter extends RecyclerView.Adapter<StationAdapter.StationV
     @Override
     public void onBindViewHolder(@NonNull StationViewHolder holder, int position) {
         Station station = stationList.get(position);
-        holder.number.setText(Integer.toString(station.getNumber()));
+        holder.number.setText(Integer.toString(position+1));
         holder.title.setText(station.getTitle());
         holder.description.setText(station.getDescription());
 
@@ -69,18 +76,46 @@ public class StationAdapter extends RecyclerView.Adapter<StationAdapter.StationV
 
             @Override
             public void onClick(View view) {
+
+                Activity origin = (Activity) mContext;
+                Intent intent = new Intent(mContext, StationEdit_Activity.class);
+                intent.putExtra("station",stationList.get(position));
+                origin.startActivityForResult(intent,1);
+                /**
                 Intent intent = new Intent(view.getContext(), StationEdit_Activity.class);
                 intent.putExtra("station",stationList.get(position));
-               view.getContext().startActivity(intent);
+               view.getContext().startActivity(intent);**/
+
             }
 
         });
 
 
+        holder.deleteIcon.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                stationList.remove(position);
+                updateStationNumbers(position);
+                notifyDataSetChanged();
+            }
+        });
+
+
+
+    }
+
+
+    public void updateStationNumbers(int position){
+        for (Station s : stationList){
+            s.setNumber(position+1);
+        }
     }
 
     @Override
     public int getItemCount() {
         return stationList.size();
     }
+
+
+
 }

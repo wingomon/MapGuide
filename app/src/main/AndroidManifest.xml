@@ -10,7 +10,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".StationEdit_Activity"></activity>
+        <activity android:name=".StationEdit_Activity"
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"/>
         <activity
             android:name=".StartCreateGuide_AddStationOverview"
             android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" />

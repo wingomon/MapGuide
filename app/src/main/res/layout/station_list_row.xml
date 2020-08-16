@@ -12,6 +12,7 @@ android:orientation="vertical">
     android:layout_margin="10dp"
     app:cardCornerRadius="5dp"
     app:cardElevation="1dp"
+    android:padding="10dp"
     >
 
     <RelativeLayout
@@ -66,16 +67,17 @@ android:orientation="vertical">
             android:layout_width="35dp"
             android:layout_height="35dp"
             android:layout_toRightOf="@id/textViewDescription"
-            android:src="@drawable/ic_add"
+            android:src="@drawable/ic_baseline_edit_24"
             android:layout_centerVertical="true"
-            android:clickable="true"/>
+            android:clickable="true"
+            android:layout_marginRight="10dp"/>
 
         <ImageView
             android:id="@+id/delete"
             android:layout_width="35dp"
             android:layout_height="35dp"
             android:layout_toRightOf="@id/edit"
-            android:src="@drawable/ic_023_next"
+            android:src="@drawable/ic_baseline_delete_24"
             android:layout_centerVertical="true"
             android:clickable="true"/>
 

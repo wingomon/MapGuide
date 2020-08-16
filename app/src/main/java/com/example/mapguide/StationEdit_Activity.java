@@ -24,9 +24,11 @@ import android.os.Handler;
 import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Chronometer;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -40,11 +42,14 @@ import java.util.Locale;
 public class StationEdit_Activity extends AppCompatActivity {
 
     TextView stationnumber;
-    TextView description;
+    EditText description;
+    EditText title;
     Station station;
     ImageView addimageicon;
+    TextView addimagetext;
     String currentPhotoPath;
     Uri currentUri;
+    Button saveButton;
     ImageView stationImage;
     ImageView recordButton;
     boolean isRecording = false;
@@ -59,12 +64,22 @@ public class StationEdit_Activity extends AppCompatActivity {
     private SeekBar seekbar;
     private ImageView playButton;
     private MediaPlayer mPlayer;
-    private Handler mHandler;
-    private Runnable mRunnable;
+    private Handler mHandler = new Handler();
+    private Runnable updater = new Runnable() {
+        @Override
+        public void run() {
+            updateSeekBar();
+            long currentDuration = mPlayer.getCurrentPosition();
+            //Text hier setzen
+            //textCurrentTime.setText(milliSecondsToTimer(currentDuration));
+        }
+    };
 
     private String tempAudioPath;
     private Uri tempAudioUri;
     private Context context;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,72 +88,129 @@ public class StationEdit_Activity extends AppCompatActivity {
 
         context = getApplicationContext();
 
+        //Speichern und Stations Werte setzen, dann zurück zur anderen Activity springen
+        saveButton = (Button) findViewById(R.id.button_save);
+        saveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                station.setImgSrcPath(currentPhotoPath);
+                station.setTitle(title.getText().toString());
+                station.setDescription(description.getText().toString());
+                station.setAudioSrcPath(tempAudioPath);
+
+                Intent resultIntent = new Intent();
+                resultIntent.putExtra("station",station);
+                setResult(RESULT_OK, resultIntent);
+                finish();
+            }
+        });
+
         //Station Werte aus Intent rausholen und in die "View" einfügen
         station = getIntent().getExtras().getParcelable("station");
 
         stationnumber = (TextView) findViewById(R.id.textViewStationNumber);
         stationnumber.setText(Integer.toString(station.getNumber()));
 
-        description = (TextView) findViewById(R.id.stationDescription);
+        description = (EditText) findViewById(R.id.stationDescription);
         description.setText(station.getDescription());
 
+        title = (EditText) findViewById(R.id.stationTitle);
+        title.setText(station.getTitle());
+
+
+
         stationImage = (ImageView) findViewById(R.id.stationImage);
+        if(station.getImgSrcPath() != null){
+            stationImage.setImageBitmap(BitmapFactory.decodeFile(station.getImgSrcPath()));
+        }
+
+        addimageicon = (ImageView) findViewById(R.id.addimageicon);
+        addimageicon.setOnClickListener(this::onClick);
+        addimagetext = (TextView) findViewById(R.id.addImageText);
+        if(addimageicon.getDrawable() == null){ addimageicon.setAlpha(0f); addimagetext.setAlpha(0f);}
 
         //Recorder
         recordButton = (ImageView)findViewById(R.id.recordButton);
-        addimageicon = (ImageView) findViewById(R.id.addimageicon);
-        addimageicon.setOnClickListener(this::onClick);
         recordButton.setOnClickListener(this::onClick);
         timer = findViewById(R.id.record_timer);
 
         //MediaPlayer
+        mPlayer = new MediaPlayer();
         playButton = (ImageView) findViewById(R.id.playButton);
         seekbar = (SeekBar) findViewById(R.id.seekBar);
         mHandler = new Handler();
+        seekbar.setMax(100);
 
         playButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               Log.d("MediaPlayer", "Playbutton pressed.");
-                // If media player another instance already running then stop it first
-                stopPlaying();
 
-                // Initialize media player
-                mPlayer = MediaPlayer.create(context, tempAudioUri);
+                if(mPlayer.isPlaying()){
+                    mHandler.removeCallbacks(updater);
+                    mPlayer.pause();
+                    playButton.setImageResource(R.drawable.ic_baseline_play_arrow_24);
+                }
+                else {
+                    // Initialize media player with new audio
+                    mPlayer = MediaPlayer.create(context, tempAudioUri);
+                    // Start the media player
+                    mPlayer.start();
 
-                // Start the media player
-                mPlayer.start();
-                // Get the current audio stats
-                getAudioStats();
-                // Initialize the seek bar
-                initializeSeekBar();
+                    mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                        @Override
+                        public void onCompletion(MediaPlayer mp) {
+                            seekbar.setProgress(0);
+                            playButton.setImageResource(R.drawable.ic_baseline_play_arrow_24);
+                            mPlayer.reset();
+                            prepareMediaPlayer();
+                            Log.d("MediaPlayer", "Completed");
+
+                        }
+                    });
+
+                    playButton.setImageResource(R.drawable.ic_baseline_pause_24);
+                    updateSeekBar();
+                }
             }
         });
 
         //Listener für die Seekbar initialisieren
-        seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){
-
+        seekbar.setOnTouchListener(new View.OnTouchListener(){
             @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                seekBar.setMax(mPlayer.getDuration() / 1000);
-                if(mPlayer!=null && fromUser){
-                    mPlayer.seekTo(progress*1000);
-                }
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
+            public boolean onTouch(View view, MotionEvent motionEvent){
+                SeekBar seekBar = (SeekBar) view;
+                int playPosition = (mPlayer.getDuration()/100) * seekBar.getProgress();
+                mPlayer.seekTo((playPosition));
+                return false;
             }
         });
 
+        mPlayer.setOnBufferingUpdateListener(new MediaPlayer.OnBufferingUpdateListener() {
+            @Override
+            public void onBufferingUpdate(MediaPlayer mp, int percent) {
+                seekbar.setSecondaryProgress(percent);
+            }
+        });
+
+
+    }// Ende OnCreate()
+
+
+    private  void prepareMediaPlayer(){
+        try {
+            mPlayer.setDataSource(context, tempAudioUri);
+            mPlayer.prepare();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
+    private void updateSeekBar(){
+        if(mPlayer.isPlaying()){
+            seekbar.setProgress((int) (((float) mPlayer.getCurrentPosition() / mPlayer.getDuration())*100));
+            mHandler.postDelayed(updater, 1000);
+        }
+    }
 
     //Button Kontroller
     public void onClick(View v){
@@ -153,14 +225,14 @@ public class StationEdit_Activity extends AppCompatActivity {
                     //Stop Recording
                     stopRecording();
                     //Wenn er aufnimmt, dann Button blinkend anzeigen
-                    recordButton.setBackgroundResource(R.drawable.microphone_off);
+                    recordButton.setImageResource(R.drawable.microphone_off);
                     isRecording=false;
                 }
                 else {
                     //StartRecording
                     if(checkPermissions()){
                         startRecording();
-                        recordButton.setBackgroundResource(R.drawable.microphone_on);
+                        recordButton.setImageResource(R.drawable.microphone_on);
                         isRecording=true;
                     }
                 }
@@ -168,46 +240,6 @@ public class StationEdit_Activity extends AppCompatActivity {
 
         }
     }//ende onClick()
-
-    protected void stopPlaying(){
-        // If media player is not null then try to stop it
-        if(mPlayer!=null){
-            mPlayer.stop();
-            mPlayer.release();
-            mPlayer = null;
-            if(mHandler!=null){
-                mHandler.removeCallbacks(mRunnable);
-            }
-        }
-    }
-
-    protected void getAudioStats(){
-        int duration  = mPlayer.getDuration()/1000; // In milliseconds
-        int due = (mPlayer.getDuration() - mPlayer.getCurrentPosition())/1000;
-        int pass = duration - due;
-
-        /**
-        mPass.setText("" + pass + " seconds");
-        mDuration.setText("" + duration + " seconds");
-        mDue.setText("" + due + " seconds");
-         **/
-    }
-
-    protected void initializeSeekBar(){
-        seekbar.setMax(mPlayer.getDuration()/1000);
-        mRunnable = new Runnable() {
-            @Override
-            public void run() {
-                if(mPlayer!=null){
-                    int mCurrentPosition = mPlayer.getCurrentPosition()/1000; // In milliseconds
-                    seekbar.setProgress(mCurrentPosition);
-                    getAudioStats();
-                }
-                mHandler.postDelayed(mRunnable,1000);
-            }
-        };
-        mHandler.postDelayed(mRunnable,1000);
-    }
 
 
     private void stopRecording(){
@@ -226,9 +258,10 @@ public class StationEdit_Activity extends AppCompatActivity {
         timer.start();
 
         String recordPath = this.getExternalFilesDir("/").getAbsolutePath();
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MM_dd_hh_ss", Locale.GERMAN);
-        Date now = new Date();
-        recordFile = "MAPGUIDE_REC"+formatter.format(now)+".3gp";
+
+       // SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MM_dd_hh_ss", Locale.GERMAN);
+        //Date now = new Date();
+        recordFile = "MAPGUIDE_REC_STATION_"+Integer.toString(station.getNumber())+".3gp";
         mediarecorder = new MediaRecorder();
         mediarecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         mediarecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
@@ -343,7 +376,7 @@ public class StationEdit_Activity extends AppCompatActivity {
                          **/
                         // und blende das "Hinzufügen" Icon aus
                         addimageicon.setAlpha(0f);
-
+                        addimagetext.setAlpha(0f);
 
                         //Bitmap selectedImage = (Bitmap) data.getExtras().get("data");
                         //String imgPath = createImageFromBitmap(selectedImage);
@@ -372,6 +405,7 @@ public class StationEdit_Activity extends AppCompatActivity {
                          **/
                         // und blende das "Hinzufügen" Icon aus
                         addimageicon.setAlpha(0f);
+                        addimagetext.setAlpha(0f);
 
                         String[] filePathColumn = {MediaStore.Images.Media.DATA};
                         if (selectedImage != null) {
