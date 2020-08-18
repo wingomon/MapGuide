@@ -56,7 +56,7 @@ dependencies {
     implementation ('com.mapbox.mapboxsdk:mapbox-android-sdk:9.3.0'){
         transitive = true
     }
-
+    implementation 'com.mapbox.mapboxsdk:mapbox-sdk-services:5.4.1'
     implementation 'com.mapbox.mapboxsdk:mapbox-android-plugin-locationlayer:0.11.0'
     implementation 'com.mapbox.mapboxsdk:mapbox-android-plugin-annotation-v9:0.8.0'
 }
