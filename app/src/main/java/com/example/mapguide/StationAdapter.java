@@ -95,7 +95,7 @@ public class StationAdapter extends RecyclerView.Adapter<StationAdapter.StationV
             @Override
             public void onClick(View view) {
                 stationList.remove(position);
-                updateStationNumbers(position);
+                updateStationNumbers();
                 notifyDataSetChanged();
             }
         });
@@ -105,9 +105,10 @@ public class StationAdapter extends RecyclerView.Adapter<StationAdapter.StationV
     }
 
 
-    public void updateStationNumbers(int position){
+    public void updateStationNumbers(){
         for (Station s : stationList){
-            s.setNumber(position+1);
+            s.setNumber(stationList.indexOf(s)+1);
+            //s.setNumber(position+1);
         }
     }
 
