@@ -3,7 +3,9 @@ package com.example.mapguide;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class Station implements Parcelable {
+import java.io.Serializable;
+
+public class Station implements Parcelable, Serializable {
 
     public int number;
     public double longitude;

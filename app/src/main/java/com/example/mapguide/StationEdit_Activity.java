@@ -21,6 +21,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Parcelable;
 import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -99,7 +100,7 @@ public class StationEdit_Activity extends AppCompatActivity {
                 station.setAudioSrcPath(tempAudioPath);
 
                 Intent resultIntent = new Intent();
-                resultIntent.putExtra("station",station);
+                resultIntent.putExtra("station", (Parcelable) station);
                 setResult(RESULT_OK, resultIntent);
                 finish();
             }

@@ -90,9 +90,22 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
+
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/stationRecyclerView1"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="200dp"/>
+
+                <Button
+                    android:id="@+id/buttonSave"
+                    android:layout_width="200dp"
+                    android:layout_height="wrap_content"
+                    android:text="Weiter"
+                    android:textColor="@color/white"
+                    android:fontFamily="@font/amiko_bold"
+                    android:layout_gravity="center_horizontal"
+                    android:background="@drawable/rounded_corners_blue_gradient"/>
+
 
             </LinearLayout>
 

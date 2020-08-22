@@ -19,12 +19,15 @@ import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.api.directions.v5.DirectionsCriteria;
+import com.mapbox.api.directions.v5.MapboxDirections;
+import com.mapbox.api.directions.v5.models.DirectionsResponse;
 import com.mapbox.api.directions.v5.models.DirectionsRoute;
 import com.mapbox.api.optimization.v1.MapboxOptimization;
 import com.mapbox.api.optimization.v1.models.OptimizationResponse;
@@ -49,9 +52,12 @@ import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.style.layers.LineLayer;
+import com.mapbox.mapboxsdk.style.layers.Property;
+import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -81,6 +87,8 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
     Station tempStation;
     SymbolManager symbolManager;
 
+    Button saveButton;
+
 
     private DirectionsRoute optimizedRoute;
     private MapboxOptimization optimizedClient;
@@ -91,10 +99,19 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
     private static final String ANY = "any";
     private static final String TEAL_COLOR = "#FF0000";
     private static final float POLYLINE_WIDTH = 4;
+    private static final String ROUTE_SOURCE_ID = "route-source-id";
+
+    private DirectionsRoute currentRoute;
+    MapboxDirections client;
+    private List<DirectionsRoute> directionsRouteList;
+    private final List<Feature> featureList = new ArrayList<>();
+
+    boolean responseReady;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
 
 
         //Initialize MapBox View
@@ -120,6 +137,22 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(stationAdapter);
 
+
+        //Speichern und Stations Werte setzen, dann zurück zur anderen Activity springen
+        saveButton = (Button) findViewById(R.id.buttonSave);
+        saveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent resultIntent = new Intent();
+                resultIntent.putExtra("stationList",(Serializable) stationList);
+                Log.d("--MAPGUIDE--AddstationOverview",stationList.toString());
+                setResult(RESULT_OK, resultIntent);
+                finish();
+            }
+        });
+
+
     } //end OnCreate()
 
 
@@ -132,7 +165,7 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
             public void onStyleLoaded(@NonNull Style style) {
                 // Add origin and destination to the mapboxMap
                 initMarkerIconSymbolLayer(style);
-                initOptimizedRouteLineLayer(style);
+                initRouteLineLayer(style);
                 mapboxMap.addOnMapClickListener(StartCreateGuide_AddStationOverview.this);
                 enableLocationComponent(style);
             }
@@ -161,9 +194,9 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
             ));
         }
 
-    private void initOptimizedRouteLineLayer(@NonNull Style loadedMapStyle) {
-        loadedMapStyle.addSource(new GeoJsonSource("optimized-route-source-id"));
-        loadedMapStyle.addLayerBelow(new LineLayer("optimized-route-layer-id", "optimized-route-source-id")
+    private void initRouteLineLayer(@NonNull Style loadedMapStyle) {
+        loadedMapStyle.addSource(new GeoJsonSource("route-source-id"));
+        loadedMapStyle.addLayerBelow(new LineLayer("line-layer-id", "route-source-id")
                 .withProperties(
                         lineColor(Color.parseColor(TEAL_COLOR)),
                         lineWidth(POLYLINE_WIDTH)
@@ -174,12 +207,9 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
     @Override
     public boolean onMapClick(@NonNull LatLng point) {
 
-        clearMap();
+        FeatureCollection featureCollection;
 
-    // Optimization API is limited to 12 coordinate sets
-        if (alreadyTwelveMarkersOnMap()) {
-            Toast.makeText(this, "nur zwölf erlaubt", Toast.LENGTH_LONG).show();
-        } else {
+        clearMap();
 
             //ADD NEW STATION
             tempStation = new Station(stationList.size()+1, point.getLongitude(), point.getLatitude(),"Titel der Station","null","null","Beschreibung der Station");
@@ -189,6 +219,42 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
             Style style = mapboxMap.getStyle();
             if (style != null) {
                 addDestinationMarker(style, point);
+
+
+                Point origin;
+                Point destination;
+
+                if(stationList.size() >= 2) {
+
+                    Log.d("MAPBOXDEBUG","StationListe ist größer als 2");
+
+                    for (int i = stationList.size()-1; i > 0; i--) {
+
+                        Log.d("MAPBOXDEBUG","StationList-Size:"+stationList.size());
+                        destination = Point.fromLngLat((stationList.get(i).getLongitude()), (stationList.get(i).getLatitude()));
+                        Log.d("MAPBOXDEBUG",destination.toString());
+
+                        origin = Point.fromLngLat((stationList.get(i-1).getLongitude()), (stationList.get(i-1).getLatitude()));
+                        Log.d("MAPBOXDEBUG",origin.toString());
+
+                        getRoute(mapboxMap, origin, destination);
+
+                        Log.d("MAPBOXDEBUG", "For INT I="+i+"---"+currentRoute);
+
+                    }
+                    FeatureCollection tempFeatureCollection = FeatureCollection.fromFeatures(featureList);
+                    drawLines(tempFeatureCollection);
+                    Log.d("MAPBOXDEBUG","FeatureCollection:"+FeatureCollection.fromFeatures(featureList).features().size());
+
+
+                /**
+                    FeatureCollection tempFeatureCollection = FeatureCollection.fromFeatures(featureList);
+                    drawLines(tempFeatureCollection);
+                    Log.d("MAPBOXDEBUG","FeatureCollection:"+FeatureCollection.fromFeatures(featureList).features().size());
+**/
+                }
+
+                /**
                 //Ich brauche für getOptimizedRoute eine Liste mit Punkten von der Stationsliste
                 List<Point> stationPointList = new ArrayList<>();
                 for(Station s: stationList) {
@@ -196,11 +262,11 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
                 }
                 if(stationList.size()>=2) {
                     getOptimizedRoute(style, stationPointList);
-                }
+                } **/
             }
-        }
+
         return true;
-    }
+}
 
 
     private void clearMap() {
@@ -210,30 +276,30 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
             Style style = mapboxMap.getStyle();
             if (style != null) {
                 resetDestinationMarkers(style);
-                removeOptimizedRoute(style);
+                removeRoute(style);
             }
         }
     }
 
     private void resetDestinationMarkers(@NonNull Style style) {
-        GeoJsonSource optimizedLineSource = style.getSourceAs(ICON_GEOJSON_SOURCE_ID);
+        GeoJsonSource lineSource = style.getSourceAs(ICON_GEOJSON_SOURCE_ID);
         /**
         if (optimizedLineSource != null) {
             optimizedLineSource.setGeoJson(Point.fromLngLat(origin.longitude(), origin.latitude()));
         }**/
     }
 
-    private void removeOptimizedRoute(@NonNull Style style) {
-        GeoJsonSource optimizedLineSource = style.getSourceAs("optimized-route-source-id");
+
+
+    private void removeRoute(@NonNull Style style) {
+        GeoJsonSource lineSource = style.getSourceAs("route-source-id");
         /**
-        if (optimizedLineSource != null) {
-            optimizedLineSource.setGeoJson(FeatureCollection.fromFeatures(new Feature[] {}));
-        }**/
+         if (optimizedLineSource != null) {
+         optimizedLineSource.setGeoJson(FeatureCollection.fromFeatures(new Feature[] {}));
+         }**/
     }
 
-    private boolean alreadyTwelveMarkersOnMap() {
-        return stationList.size() == 12;
-    }
+
 
     private void addDestinationMarker(@NonNull Style style, LatLng point) {
         List<Feature> destinationMarkerList = new ArrayList<>();
@@ -250,57 +316,87 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
     }
 
 
-    private void getOptimizedRoute(@NonNull final Style style, List<Point> coordinates) {
-        optimizedClient = MapboxOptimization.builder()
-                .source(FIRST)
-                .destination(ANY)
-                .coordinates(coordinates)
+    private void getRoute(MapboxMap mapboxMap, Point origin, Point destination) {
+
+        Log.d("MAPBOXDEBUG","Get Route");
+        client = MapboxDirections.builder()
+                .origin(origin)
+                .destination(destination)
                 .overview(DirectionsCriteria.OVERVIEW_FULL)
                 .profile(DirectionsCriteria.PROFILE_WALKING)
-                .accessToken(Mapbox.getAccessToken() != null ? Mapbox.getAccessToken() : getString(R.string.mapbox_access_token))
+                .accessToken(getString(R.string.mapbox_access_token))
                 .build();
 
-        optimizedClient.enqueueCall(new Callback<OptimizationResponse>() {
+        client.enqueueCall(new Callback<DirectionsResponse>() {
             @Override
-            public void onResponse(Call<OptimizationResponse> call, Response<OptimizationResponse> response) {
-                if (!response.isSuccessful()) {
-                    Timber.d("no success");
+            public void onResponse(Call<DirectionsResponse> call, Response<DirectionsResponse> response) {
+        // You can get the generic HTTP info about the response
+                Timber.d("Response code: " + response.code());
+                if (response.body() == null) {
+                    Timber.e("No routes found, make sure you set the right user and access token.");
+                    Log.d("MAPBOXDEBUG","No route found");
+                    return;
+                } else if (response.body().routes().size() < 1) {
+                    Timber.e("No routes found");
+                    Log.d("MAPBOXDEBUG","No route found < 1");
+                    return;
+                }   else {
+                    // Get the directions route
 
-                } else {
-                    if (response.body() != null) {
-                        List<DirectionsRoute> routes = response.body().trips();
-                        if (routes != null) {
-                            if (routes.isEmpty()) {
-                                Timber.d("%s size = %s", "Successfull but no routes", routes.size());
-                            } else {
-                    // Get most optimized route from API response
-                                optimizedRoute = routes.get(0);
-                                drawOptimizedRoute(style, optimizedRoute);
-                            }
-                        } else {
-                            Timber.d("list of routes in the response is null");
+                    currentRoute = response.body().routes().get(0);
+                    featureList.add(Feature.fromGeometry(
+                            LineString.fromPolyline(currentRoute.geometry(), PRECISION_6)));
 
-                        }
-                    } else {
-                        Timber.d("response.body() is null");
-                    }
+                    FeatureCollection tempFeatureCollection = FeatureCollection.fromFeatures(featureList);
+
+                    Log.d("MAPBOXDEBUG", "GET ROUTE " + currentRoute);
+                    Log.d("MAPBOXDEBUG", "FeatureList-size is" + featureList.size());
+                    Log.d("MAPBOXDEBUG", "FeatureList FEATURE COLLECTION-size is" + FeatureCollection.fromFeatures(featureList).features().size());
                 }
             }
-
             @Override
-            public void onFailure(Call<OptimizationResponse> call, Throwable throwable) {
-                Timber.d("Error: %s", throwable.getMessage());
+            public void onFailure(Call<DirectionsResponse> call, Throwable throwable) {
+                Timber.e("Error: " + throwable.getMessage());
             }
-        });
-    }
+                });
 
-    private void drawOptimizedRoute(@NonNull Style style, DirectionsRoute route) {
-        GeoJsonSource optimizedLineSource = style.getSourceAs("optimized-route-source-id");
-        if (optimizedLineSource != null) {
-            optimizedLineSource.setGeoJson(FeatureCollection.fromFeature(Feature.fromGeometry(
-                    LineString.fromPolyline(route.geometry(), PRECISION_6))));
+
+            }
+
+
+    private void drawLines(@NonNull FeatureCollection featureCollection) {
+        Log.d("MAPBOXDEBUG","Feature - draw Lines" + featureCollection.features().size());
+
+        if (mapboxMap != null) {
+            mapboxMap.getStyle(style -> {
+                if (featureCollection.features() != null) {
+                    if (featureCollection.features().size() > 0) {
+
+
+                        GeoJsonSource source = style.getSourceAs("route-source-id");
+
+                        if(source!=null) {
+                            source.setGeoJson(featureCollection);
+                        }
+
+                        /**
+                        style.addLayer(new LineLayer("linelayer", "line-source")
+                                .withProperties(PropertyFactory.lineCap(Property.LINE_CAP_SQUARE),
+                                        PropertyFactory.lineJoin(Property.LINE_JOIN_MITER),
+                                        PropertyFactory.lineOpacity(.7f),
+                                        PropertyFactory.lineWidth(7f),
+                                        PropertyFactory.lineColor(Color.parseColor("#3bb2d0"))));
+**/
+                        Log.d("MAPBOXDEBUG","DRAW LINES");
+                    }
+                }
+            });
+        }
+        if (featureList != null) {
+            featureList.clear();
         }
     }
+
 /**
         StartCreateGuide_AddStationOverview.this.mapboxMap = mapboxMap;
 

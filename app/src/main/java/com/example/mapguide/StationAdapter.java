@@ -3,6 +3,7 @@ package com.example.mapguide;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Parcelable;
 import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -79,13 +80,8 @@ public class StationAdapter extends RecyclerView.Adapter<StationAdapter.StationV
 
                 Activity origin = (Activity) mContext;
                 Intent intent = new Intent(mContext, StationEdit_Activity.class);
-                intent.putExtra("station",stationList.get(position));
+                intent.putExtra("station",(Parcelable)stationList.get(position));
                 origin.startActivityForResult(intent,1);
-                /**
-                Intent intent = new Intent(view.getContext(), StationEdit_Activity.class);
-                intent.putExtra("station",stationList.get(position));
-               view.getContext().startActivity(intent);**/
-
             }
 
         });
