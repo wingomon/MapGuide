@@ -37,6 +37,7 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
 
     ImageView imageView;
     String imgPath;
+    Uri imgUri;
     EditText title;
     EditText description;
     Button save;
@@ -99,6 +100,7 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
 
 
         imgPath = getIntent().getStringExtra("imgPath");
+        imgUri = Uri.parse(getIntent().getStringExtra("imgUri"));
         imageView = (ImageView) findViewById(R.id.imageViewTitle);
         imageView.setImageURI(Uri.parse(imgPath));
 
@@ -130,21 +132,32 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+                Log.d("--DOWNLOAD--"," SAVE BUTTON WAS CLICKED");
                 String title_ = title.getText().toString();
                 String description_ = description.getText().toString();
 
                 //Upload picture to FirebaseStorage
                 Uri file = Uri.fromFile(new File(imgPath));
-                StorageReference riversRef = mStorageRef.child("images");
+                Log.d("--DOWNLOAD--","imgpath:"+imgPath);
+                StorageReference riversRef = mStorageRef.child("images").child(System.currentTimeMillis()+".jpg");
 
                 riversRef.putFile(file)
                         .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                             @Override
                             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                                 // Get a URL to the uploaded content
-                                Task<Uri> downloadUrl = taskSnapshot.getStorage().getDownloadUrl();
-                                downloadImgUrl = downloadUrl.getResult().toString();
-                                Log.d("--DOWNLOAD--",downloadImgUrl);
+                                Task<Uri> downloadUrl = taskSnapshot.getStorage().getDownloadUrl()
+                                        .addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                            @Override
+                                            public void onSuccess(Uri uri) {
+                                                //uri = downloadUrl.getResult().toString();
+                                                Multimediaguide m = new Multimediaguide(title_, description_, uri.toString(), 5, "Beispiel_Kategorie");
+                                                Log.d("--DOWNLOAD URI",uri.toString());
+                                                ref.push().setValue(m);
+
+                                            }
+                                        });
+
                             }
                         })
                         .addOnFailureListener(new OnFailureListener() {
@@ -152,6 +165,7 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
                             public void onFailure(@NonNull Exception exception) {
                                 // Handle unsuccessful uploads
                                 // ...
+                                Log.d("--DOWNLOAD--","FAILED");
                             }
                         });
 

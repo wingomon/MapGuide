@@ -81,6 +81,7 @@ public class StartCreateGuide_AddImage extends AppCompatActivity {
                 intent.putExtra("name",name);
                 intent.putExtra("description",description);
                 intent.putExtra("imgPath",currentPhotoPath);
+                intent.putExtra("imgUri",currentUri.toString());
                 startActivity(intent);
                 Log.i("hallo","ich wurde geklickt" + intent.getDataString());
             }
@@ -200,7 +201,7 @@ public class StartCreateGuide_AddImage extends AppCompatActivity {
 
                             //Wenn Bild ausgewählt ist, dann speichere den Pfad in die Variable "currentPhotoPath"
                             currentPhotoPath=getRealPathFromURI(currentUri);
-
+                            Log.d("--DOWNLOAD URI--",currentUri.toString());
 
 
                             if (cursor != null) {
