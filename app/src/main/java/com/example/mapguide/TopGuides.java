@@ -45,7 +45,7 @@ public class TopGuides extends AppCompatActivity {
         //initializing the productlist
         multimediaguideList = new ArrayList<>();
 
-        multimediaguideList.add(new Multimediaguide("Rom bei Nacht", "Erleben Sie Roms wunderschönes Nachtleben", "https://www.travelbook.de/data/uploads/2017/06/17978759_95907d892c.jpg", 5, "Sightseeing"));
+       // multimediaguideList.add(new Multimediaguide("Rom bei Nacht", "Erleben Sie Roms wunderschönes Nachtleben", "https://www.travelbook.de/data/uploads/2017/06/17978759_95907d892c.jpg", 5, "Sightseeing"));
 
     }
 

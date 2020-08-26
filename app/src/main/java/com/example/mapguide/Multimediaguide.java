@@ -19,12 +19,13 @@ public class Multimediaguide {
     public Multimediaguide() {
     }
 
-    public Multimediaguide(String name_, String description_, String imgPath_, int km_, String category_){
+    public Multimediaguide(String name_, String description_, String imgPath_, int km_, String category_, List<Station> stationList_){
         this.name = name_;
         this.description = description_;
         this. imgPath = imgPath_;
         this.km = km_;
         this.category = category_;
+        this.stationList = stationList_;
     }
 
     public void setName(String name) {
@@ -47,6 +48,8 @@ public class Multimediaguide {
         this.imgPath = imgPath;
     }
 
+    public void setStationList(List<Station> stationList) {this.stationList = stationList;}
+
     public String getDescription() {
         return description;
     }
@@ -68,21 +71,8 @@ public class Multimediaguide {
         return imgPath;
     }
 
+    public void getStationList(List<Station> stationList) {this.stationList = stationList;}
 
 
-
-    /**
-     * A Point of Interest contains values such as
-     *
-     */
-    /**
-    private class pointOfInterest{
-
-        private String name;
-        private String description;
-        private String imgPath;
-
-    }
-**/
 
 }

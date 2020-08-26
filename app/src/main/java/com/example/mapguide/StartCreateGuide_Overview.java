@@ -104,6 +104,8 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
         imageView = (ImageView) findViewById(R.id.imageViewTitle);
         imageView.setImageURI(Uri.parse(imgPath));
 
+       // stationList = (List<Station>) getIntent().getSerializableExtra("stationList");
+
 
 
         //On Button Click to the "Create Station" Activity
@@ -132,9 +134,16 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+                for(Station s: stationList) {
+                    uploadStationFilesToFirebaseStorage(s.getImgSrcPath(),s,"image");
+                    uploadStationFilesToFirebaseStorage(s.getAudioSrcPath(),s,"audio");
+                }
+
                 Log.d("--DOWNLOAD--"," SAVE BUTTON WAS CLICKED");
                 String title_ = title.getText().toString();
                 String description_ = description.getText().toString();
+
+
 
                 //Upload picture to FirebaseStorage
                 Uri file = Uri.fromFile(new File(imgPath));
@@ -151,8 +160,9 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
                                             @Override
                                             public void onSuccess(Uri uri) {
                                                 //uri = downloadUrl.getResult().toString();
-                                                Multimediaguide m = new Multimediaguide(title_, description_, uri.toString(), 5, "Beispiel_Kategorie");
+                                                Multimediaguide m = new Multimediaguide(title_, description_, uri.toString(), 5, "Beispiel_Kategorie", stationList);
                                                 Log.d("--DOWNLOAD URI",uri.toString());
+                                                Log.d("--DOWNLOAD URI",stationList.toString());
                                                 ref.push().setValue(m);
 
                                             }
@@ -169,12 +179,67 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
                             }
                         });
 
+                /**
                 Multimediaguide m = new Multimediaguide(title_, description_, downloadImgUrl, 5, "Beispiel_Kategorie");
-                ref.push().setValue(m);
+                ref.push().setValue(m); **/
             }
         });
 
     }
+
+    private void uploadStationFilesToFirebaseStorage(String filePath, Station station, String type){
+
+
+        StorageReference riversRef = mStorageRef.child("Files").child(System.currentTimeMillis()+".jpg");
+
+        switch(type){
+            case "image":  riversRef = mStorageRef.child("StationImages").child(System.currentTimeMillis()+".jpg");
+                            break;
+            case "audio": riversRef = mStorageRef.child("StationAudio").child(System.currentTimeMillis()+".3gp");
+                        break;
+
+        }
+
+        Uri file = Uri.fromFile(new File(filePath));
+        Log.d("--UPLOAD STATION--","filepath:"+filePath);
+        Log.d("--UPLOAD STATION--","uri" + file.toString());
+
+
+        riversRef.putFile(file)
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        // Get a URL to the uploaded content
+                        Task<Uri> downloadUrl = taskSnapshot.getStorage().getDownloadUrl()
+                                .addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                    @Override
+                                    public void onSuccess(Uri uri) {
+                                        //uri = downloadUrl.getResult().toString();
+                                        switch(type){
+                                            case "image":
+                                                station.setImgSrcPath(uri.toString());
+                                                break;
+                                            case "audio":
+                                                station.setAudioSrcPath(uri.toString());
+                                                break;
+                                        }
+                                    }
+                                });
+
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Handle unsuccessful uploads
+                        // ...
+                        Log.d("--DOWNLOAD--","FAILED for Station" + station.getNumber() + " TYPE " +type);
+                    }
+                });
+
+
+    }
+
 
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
@@ -184,13 +249,15 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
             if (resultCode == RESULT_OK){
 
                 List<Station> arrayList = (List<Station>) data.getSerializableExtra("stationList");
+                Log.d("--MAPGUIDE--OverviewLoadStationsToOverview","Folgende Stationen wurden der nächsten Activity übergeben"+ arrayList.toString());
 
-                stationList.clear();
+                if(stationList != null){ stationList.clear();}
 
                 for(Station s : arrayList){
-                    stationList.add(s);
+                    if(stationList != null){stationList.add(s); }
                 }
                 stationAdapter.notifyDataSetChanged();
+
                 /**
 
                 stationList = (List<Station>) data.getSerializableExtra("stationList");

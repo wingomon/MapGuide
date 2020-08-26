@@ -98,6 +98,8 @@ public class StationEdit_Activity extends AppCompatActivity {
                 station.setTitle(title.getText().toString());
                 station.setDescription(description.getText().toString());
                 station.setAudioSrcPath(tempAudioPath);
+                Log.d("--AUDIO--","Saved Audiosourcepfad:"+tempAudioPath);
+                Log.d("--AUDIO--","Saved Audiosourcepfad:"+tempAudioUri);
 
                 Intent resultIntent = new Intent();
                 resultIntent.putExtra("station", (Parcelable) station);
@@ -153,7 +155,11 @@ public class StationEdit_Activity extends AppCompatActivity {
                 }
                 else {
                     // Initialize media player with new audio
-                    mPlayer = MediaPlayer.create(context, tempAudioUri);
+                    if(station.getAudioSrcPath() == null || station.getAudioSrcPath().equals("null")) {
+                        mPlayer = MediaPlayer.create(context, Uri.fromFile(new File(tempAudioPath)));
+                    } else{
+                        mPlayer = MediaPlayer.create(context, Uri.fromFile(new File(station.getAudioSrcPath())));
+                    }
                     // Start the media player
                     mPlayer.start();
 
@@ -199,7 +205,11 @@ public class StationEdit_Activity extends AppCompatActivity {
 
     private  void prepareMediaPlayer(){
         try {
-            mPlayer.setDataSource(context, tempAudioUri);
+            if(station.getAudioSrcPath() == null || station.getAudioSrcPath().equals("null")){
+            mPlayer.setDataSource(context, Uri.fromFile(new File(tempAudioPath)));
+            } else {
+                mPlayer.setDataSource(context, Uri.fromFile(new File(station.getAudioSrcPath())));
+            }
             mPlayer.prepare();
         } catch (IOException e) {
             e.printStackTrace();
