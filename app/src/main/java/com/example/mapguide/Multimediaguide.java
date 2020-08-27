@@ -1,10 +1,11 @@
 package com.example.mapguide;
 
+import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Multimediaguide {
+public class Multimediaguide implements Serializable {
 
    public int id;
     public String name;
@@ -71,8 +72,6 @@ public class Multimediaguide {
         return imgPath;
     }
 
-    public void getStationList(List<Station> stationList) {this.stationList = stationList;}
-
-
+    public List<Station> getStationList() {return stationList;}
 
 }

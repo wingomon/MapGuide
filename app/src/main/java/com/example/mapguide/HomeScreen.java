@@ -25,6 +25,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -125,6 +126,18 @@ public class HomeScreen extends AppCompatActivity {
                 holder.setDescription(desc);
                 holder.setTitle(model.getName());
                 holder.setKilometer(model.getKm());
+
+                holder.imageView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(getApplicationContext(), GuideViewActivity.class);
+                        intent.putExtra("Multimediaguide",(Serializable) model);
+                        startActivity(intent);
+                        Log.d("--KLICK--","Multimediaguide wurde geklickt");
+                    }
+                });
+
+
             }
 
             @NonNull

@@ -1,6 +1,7 @@
 package com.example.mapguide;
 
 import android.content.Context;
+import android.content.Intent;
 import android.media.Image;
 import android.util.Log;
 import android.view.View;
@@ -15,10 +16,12 @@ import androidx.recyclerview.widget.RecyclerView;
 class MultimediaguideViewHolder extends RecyclerView.ViewHolder {
 
     View mView;
+    ImageView imageView;
 
     public MultimediaguideViewHolder(@NonNull View itemView) {
         super(itemView);
         mView=itemView;
+        imageView = (ImageView) mView.findViewById(R.id.imageView);
     }
 
     public void setImage(String image)

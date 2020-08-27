@@ -25,6 +25,7 @@ public class Station implements Parcelable, Serializable {
         this.description = description;
     }
 
+    public Station(){}
 
     public int getNumber() {
         return number;
