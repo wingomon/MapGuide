@@ -112,8 +112,6 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
-
         //Initialize MapBox View
 
         Log.d("----MY MAPBOX TOKEN IS------", getString(R.string.mapbox_access_token));
@@ -137,6 +135,16 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(stationAdapter);
 
+        List<Station> stationListTemp = (List<Station>) getIntent().getSerializableExtra("stationList");
+        if (stationListTemp != null){
+            if(stationListTemp.size() > 0) {
+                for (Station s : stationListTemp){
+                    stationList.add(s);
+                }
+               stationAdapter.notifyDataSetChanged();
+            }
+
+        }
 
         //Speichern und Stations Werte setzen, dann zurück zur anderen Activity springen
         saveButton = (Button) findViewById(R.id.buttonSave);
@@ -166,6 +174,7 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
                 // Add origin and destination to the mapboxMap
                 initMarkerIconSymbolLayer(style);
                 initRouteLineLayer(style);
+                initMapIfStationsExistent(style);
                 mapboxMap.addOnMapClickListener(StartCreateGuide_AddStationOverview.this);
                 enableLocationComponent(style);
             }
@@ -203,6 +212,54 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
                 ), "icon-layer-id");
     }
 
+
+
+
+    public void initMapIfStationsExistent(@NonNull Style style){
+
+        if (style != null) {
+
+            Point origin;
+            Point destination;
+
+            if (stationList != null) {
+                if (stationList.size() == 1) {
+                    addDestinationMarker(style, new LatLng(stationList.get(0).getLongitude(), stationList.get(0).getLatitude()));
+                }
+
+
+                if (stationList.size() >= 2) {
+
+                    Log.d("MAPBOXDEBUG", "StationListe ist größer als 2");
+
+                    for (int i = stationList.size() - 1; i > 0; i--) {
+
+                        if(i >=1) {
+                            addDestinationMarker(style, new LatLng(stationList.get(i).getLongitude(), stationList.get(i).getLatitude()));
+                        }
+
+                        Log.d("MAPBOXDEBUG", "StationList-Size:" + stationList.size());
+                        destination = Point.fromLngLat((stationList.get(i).getLongitude()), (stationList.get(i).getLatitude()));
+                        Log.d("MAPBOXDEBUG", destination.toString());
+
+                        origin = Point.fromLngLat((stationList.get(i - 1).getLongitude()), (stationList.get(i - 1).getLatitude()));
+                        Log.d("MAPBOXDEBUG", origin.toString());
+
+                        getRoute(mapboxMap, origin, destination);
+
+                        Log.d("MAPBOXDEBUG", "For INT I=" + i + "---" + currentRoute);
+
+                    }
+                    FeatureCollection tempFeatureCollection = FeatureCollection.fromFeatures(featureList);
+                    drawLines(tempFeatureCollection);
+                    Log.d("MAPBOXDEBUG", "FeatureCollection:" + FeatureCollection.fromFeatures(featureList).features().size());
+
+                }
+            }
+
+        }
+
+    }
 
     @Override
     public boolean onMapClick(@NonNull LatLng point) {
@@ -393,7 +450,9 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
             });
         }
         if (featureList != null) {
-            featureList.clear();
+            if(featureList.size() > 0) {
+                featureList.clear();
+            }
         }
     }
 

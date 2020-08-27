@@ -30,6 +30,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -121,6 +122,11 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
 
                 Activity origin = (Activity)mContext;
                 Intent intent = new Intent(mContext, StartCreateGuide_AddStationOverview.class);
+                if(stationList != null){
+                    if(stationList.size() > 0) {
+                        intent.putExtra("stationList", (Serializable) stationList);
+                    }
+                }
                 origin.startActivityForResult(intent,1);
 
             }
