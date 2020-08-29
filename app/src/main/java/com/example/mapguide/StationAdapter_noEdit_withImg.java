@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.io.Serializable;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -67,6 +68,7 @@ public class StationAdapter_noEdit_withImg extends RecyclerView.Adapter<StationA
                 Activity origin = (Activity) mContext;
                 Intent intent = new Intent(mContext, StationViewActivity.class);
                 intent.putExtra("station",(Parcelable)stationList.get(position));
+                intent.putExtra("stationList",(Serializable) stationList);
                 origin.startActivity(intent);
             }
 

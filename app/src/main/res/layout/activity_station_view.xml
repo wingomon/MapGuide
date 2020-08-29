@@ -84,11 +84,9 @@
                         android:layout_width="30dp"
                         android:layout_height="30dp"
                         android:src="@drawable/ic_outline_map_24"
-                        android:fontFamily="@font/amiko_bold"
-                        android:layout_gravity="end"
-                        android:layout_marginLeft="70dp"
                         android:layout_centerInParent="true"
-                        android:layout_toRightOf="@id/LayoutTitle"
+                        android:layout_alignParentRight="true"
+                        android:clickable="true"
                         />
 
 

@@ -530,9 +530,10 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
             // Enable to make component visible
             locationComponent.setLocationComponentEnabled(true);
 
+            /**
             // Set the component's camera mode
             locationComponent.setCameraMode(CameraMode.TRACKING);
-
+             **/
             // Set the component's render mode
             locationComponent.setRenderMode(RenderMode.COMPASS);
         } else {

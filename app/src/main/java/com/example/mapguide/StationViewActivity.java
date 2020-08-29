@@ -3,10 +3,12 @@ package com.example.mapguide;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -19,11 +21,13 @@ import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
+import java.util.List;
 
 public class StationViewActivity extends AppCompatActivity {
 
     TextView title, description, number;
-    ImageView image;
+    ImageView image, cardIcon;
     Button playButton;
     private Context context;
 
@@ -46,7 +50,6 @@ public class StationViewActivity extends AppCompatActivity {
 
     Station station;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,7 +59,17 @@ public class StationViewActivity extends AppCompatActivity {
         title = (TextView) findViewById(R.id.textViewStationTitle);
         description = (TextView) findViewById(R.id.textViewDescription);
         image = (ImageView) findViewById(R.id.img);
+        cardIcon = (ImageView) findViewById(R.id.imageViewCardIcon);
 
+        cardIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getBaseContext(), StationMapView.class);
+                intent.putExtra("station",(Parcelable)station);
+                intent.putExtra("stationList", getIntent().getSerializableExtra("stationList"));
+                startActivity(intent);
+            }
+        });
 
 
         //Stations-Objekt aus vorheriger Activity entnehmen
