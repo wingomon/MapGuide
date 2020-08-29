@@ -54,7 +54,9 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="3dp"
                     android:text="Klicke um ein Bild hinzuzufügen"
-                    android:layout_gravity="center_horizontal" />
+                    android:layout_gravity="center_horizontal"
+                    android:fontFamily="@font/airbnbcereallight"/>
+
                 </LinearLayout>
             </RelativeLayout>
 
@@ -82,7 +84,8 @@
                         android:textAlignment="center"
                         android:gravity="center"
                         android:fontFamily="@font/montserrat_bold"
-                        android:textSize="25dp"/>
+                        android:textSize="25dp"
+                        android:textColor="@color/colorPrimary"/>
 
 
                     <LinearLayout
@@ -100,15 +103,18 @@
                             android:layout_height="wrap_content"
                             android:hint="Titel der Station"
                             android:textSize="16dp"
-                            android:fontFamily="@font/amiko"/>
+                            android:fontFamily="@font/airbnbcereallight"
+                            android:textColor="@color/colorPrimary"/>
 
                         <TextView
                             android:id="@+id/textViewLocation"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Stadt, genauere Ortsangabe"
-                            android:fontFamily="@font/amiko"
+                            android:fontFamily="@font/airbnbcereallight"
+                            android:textColor="@color/colorPrimary"
                             />
+
                     </LinearLayout>
 
                 </RelativeLayout>
@@ -117,28 +123,33 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Beschreibung"
-                    android:fontFamily="@font/amiko_bold"
-                    android:textSize="16dp"/>
+                    android:fontFamily="@font/airbnbcerealmedium"
+                    android:textSize="17dp"
+                    android:layout_marginBottom="10dp"
+                    android:textColor="@color/colorPrimary"/>
 
                 <EditText
                     android:id="@+id/stationDescription"
                     android:layout_width="match_parent"
                     android:layout_height="100dp"
                     android:hint="Füge eine Beschreibung hinzu."
-                    android:fontFamily="@font/amiko"
+                    android:fontFamily="@font/airbnbcereallight"
                     android:gravity="start"
                     android:padding="10dp"
                     android:background="@drawable/edit_text_rounded"
                     android:inputType="textMultiLine"
                     android:layout_marginBottom="20dp"
-                    android:textSize="16dp"/>
+                    android:textSize="16dp"
+                    android:textColor="@color/colorPrimary"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Audiodatei"
-                    android:fontFamily="@font/amiko_bold"
-                    android:textSize="16dp"/>
+                    android:fontFamily="@font/airbnbcerealmedium"
+                    android:textSize="17dp"
+                    android:layout_marginBottom="10dp"
+                    android:textColor="@color/colorPrimary"/>
 
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"

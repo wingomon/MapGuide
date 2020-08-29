@@ -30,6 +30,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -152,7 +153,22 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
 
 
                 //Upload picture to FirebaseStorage
-                Uri file = Uri.fromFile(new File(imgPath));
+
+                //But compressing before
+
+                int compressionRatio = 4;
+                File origfile = new File(imgPath);
+
+                try {
+                    Bitmap bitmap = BitmapFactory.decodeFile (origfile.getPath());
+                    bitmap.compress (Bitmap.CompressFormat.JPEG, compressionRatio, new FileOutputStream(origfile));
+                }
+                catch (Throwable t) {
+                    Log.e("--ERROR--", "Error compressing file." + t.toString ());
+                    t.printStackTrace ();
+                }
+
+                Uri file = Uri.fromFile(origfile);
                 Log.d("--DOWNLOAD--","imgpath:"+imgPath);
                 StorageReference riversRef = mStorageRef.child("images").child(System.currentTimeMillis()+".jpg");
 

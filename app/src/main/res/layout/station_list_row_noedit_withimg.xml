@@ -31,6 +31,14 @@
                 android:layout_margin="5dp"
                 />
 
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_toRightOf="@id/imageView"
+                android:layout_centerVertical="true"
+                android:id="@+id/textView"
+                android:clickable="true">
             <TextView
                 android:id="@+id/textViewTitle"
                 android:layout_width="match_parent"
@@ -47,8 +55,8 @@
 
             <TextView
                 android:id="@+id/textViewDescription"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_width="180dp"
+                android:layout_height="50dp"
                 android:layout_below="@id/textViewTitle"
                 android:layout_marginEnd="10dp"
                 android:layout_marginLeft="10dp"
@@ -61,20 +69,14 @@
                 android:textColor="@color/colorPrimary"
                 android:text="Short Description Text Hallo Text lol dead was machen Sachen" />
 
-            <TextView
-                android:id="@+id/textViewKm"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/textViewDescription"
-                android:layout_marginEnd="10dp"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:layout_marginTop="3dp"
-                android:layout_toRightOf="@id/imageView"
-                android:fontFamily="@font/amiko_bold"
-                android:gravity="end"
-                android:text="XY KM"
-                android:textAlignment="textEnd" />
+            </LinearLayout>
+
+            <ImageView
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/ic_baseline_play_arrow_24"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@id/textView"/>
 
         </RelativeLayout>
     </androidx.cardview.widget.CardView>

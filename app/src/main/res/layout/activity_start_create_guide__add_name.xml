@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             android:text="Verpass deinem Guide einen aussagekräftigen Namen."
             android:layout_margin="20dp"
-            android:fontFamily="@font/amiko_bold"
+            android:fontFamily="@font/airbnbcerealmedium"
             android:textSize="30dp"
             android:textColor="@color/white"
             />
@@ -39,6 +39,7 @@
         android:hint="Titel deines Guides"
         android:padding="10dp"
         android:layout_margin="20dp"
+        android:fontFamily="@font/airbnbcereallight"
         android:background="@drawable/edit_text_rounded"
         android:inputType="text"
         android:maxLines="1"/>
@@ -49,7 +50,7 @@
         android:layout_height="wrap_content"
         android:text="Weiter"
         android:textColor="@color/white"
-        android:fontFamily="@font/amiko_bold"
+        android:fontFamily="@font/airbnbcerealmedium"
         android:layout_gravity="center_horizontal"
         android:background="@drawable/rounded_corners_blue_gradient"/>
 

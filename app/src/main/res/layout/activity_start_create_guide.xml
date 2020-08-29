@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             android:text="Erstelle deinen eigenen Multimedia-Guide. Ganz einfach und nur in wenigen Schritten."
             android:layout_margin="20dp"
-            android:fontFamily="@font/amiko_bold"
+            android:fontFamily="@font/airbnbcerealmedium"
             android:textSize="30dp"
             android:textColor="@color/white"
             />
@@ -38,8 +38,9 @@
         android:layout_margin="20dp"
         android:textAlignment="center"
         android:gravity="center"
-        android:fontFamily="@font/amiko"
-        android:textSize="16dp"/>
+        android:fontFamily="@font/airbnbcereallight"
+        android:textSize="16dp"
+        android:textColor="@color/colorPrimary"/>
 
 
     <Button

@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             android:text="Eine kurze Beschreibung darf ebenfalls nicht fehlen."
             android:layout_margin="20dp"
-            android:fontFamily="@font/amiko_bold"
+            android:fontFamily="@font/airbnbcerealmedium"
             android:textSize="30dp"
             android:textColor="@color/white"
             />
@@ -42,7 +42,7 @@
         android:layout_margin="20dp"
         android:background="@drawable/edit_text_rounded"
         android:inputType="textMultiLine"
-        android:fontFamily="@font/amiko"/>
+        android:fontFamily="@font/airbnbcereallight"/>
 
     <Button
         android:id="@+id/button2"

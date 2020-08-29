@@ -22,7 +22,7 @@
             android:layout_height="wrap_content"
             android:text="Wähle ein Titelbild für deinen Guide aus"
             android:layout_margin="20dp"
-            android:fontFamily="@font/amiko_bold"
+            android:fontFamily="@font/airbnbcerealmedium"
             android:textSize="30dp"
             android:textColor="@color/white"/>
     </RelativeLayout>

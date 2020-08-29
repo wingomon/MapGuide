@@ -237,6 +237,7 @@ public class StartCreateGuide_AddImage extends AppCompatActivity {
 
         // Save a file: path for use with ACTION_VIEW intents
         currentPhotoPath = image.getAbsolutePath();
+        currentUri = Uri.parse(image.getAbsolutePath());
         return image;
     }
 
