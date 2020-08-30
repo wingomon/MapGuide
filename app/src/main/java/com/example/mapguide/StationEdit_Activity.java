@@ -6,6 +6,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.ClipData;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -34,10 +35,16 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.kbeanie.multipicker.api.AudioPicker;
+import com.kbeanie.multipicker.api.Picker;
+import com.kbeanie.multipicker.api.callbacks.AudioPickerCallback;
+import com.kbeanie.multipicker.api.entity.ChosenAudio;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public class StationEdit_Activity extends AppCompatActivity {
@@ -51,10 +58,13 @@ public class StationEdit_Activity extends AppCompatActivity {
     String currentPhotoPath;
     Uri currentUri;
     Button saveButton;
+    ImageView uploadButton;
     ImageView stationImage;
     ImageView recordButton;
     boolean isRecording = false;
     private int PERMISSION_CODE=11;
+
+    List<View> mediaViewList;
 
     //Für Audio-Recorder
     private MediaRecorder mediarecorder;
@@ -80,6 +90,8 @@ public class StationEdit_Activity extends AppCompatActivity {
     private Uri tempAudioUri;
     private Context context;
 
+   AudioPicker audioPicker;
+
 
 
     @Override
@@ -89,6 +101,39 @@ public class StationEdit_Activity extends AppCompatActivity {
 
         context = getApplicationContext();
 
+        audioPicker = new AudioPicker(this);
+        uploadButton = (ImageView) findViewById(R.id.uploadButton);
+        uploadButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                audioPicker.setAudioPickerCallback(new AudioPickerCallback() {
+                    @Override
+                    public void onAudiosChosen(List<ChosenAudio> list) {
+                        ChosenAudio c1 = list.get(0);
+                        tempAudioPath = c1.getOriginalPath();
+                        Log.d("--AUDIPFAD FILEPICKER--",c1.getOriginalPath());
+                        tempAudioUri = Uri.parse(tempAudioPath);
+
+                    }
+
+                    @Override
+                    public void onError(String s) {
+                        Log.d("Error","Error picking audio");
+                    }
+                });
+
+                audioPicker.pickAudio();
+
+
+            }
+        });
+
+
+        //Station Werte aus Intent rausholen und in die "View" einfügen
+        station = getIntent().getExtras().getParcelable("station");
+
         //Speichern und Stations Werte setzen, dann zurück zur anderen Activity springen
         saveButton = (Button) findViewById(R.id.button_save);
         saveButton.setOnClickListener(new View.OnClickListener() {
@@ -97,9 +142,12 @@ public class StationEdit_Activity extends AppCompatActivity {
                 station.setImgSrcPath(currentPhotoPath);
                 station.setTitle(title.getText().toString());
                 station.setDescription(description.getText().toString());
-                station.setAudioSrcPath(tempAudioPath);
-                Log.d("--AUDIO--","Saved Audiosourcepfad:"+tempAudioPath);
-                Log.d("--AUDIO--","Saved Audiosourcepfad:"+tempAudioUri);
+
+                if(station.getAudioSrcPath() != null) {
+                    station.setAudioSrcPath(tempAudioPath);
+                    Log.d("--AUDIO--", "Saved Audiosourcepfad:" + tempAudioPath);
+                    Log.d("--AUDIO--", "Saved Audiosourcepfad:" + tempAudioUri);
+                }
 
                 Intent resultIntent = new Intent();
                 resultIntent.putExtra("station", (Parcelable) station);
@@ -107,9 +155,6 @@ public class StationEdit_Activity extends AppCompatActivity {
                 finish();
             }
         });
-
-        //Station Werte aus Intent rausholen und in die "View" einfügen
-        station = getIntent().getExtras().getParcelable("station");
 
         stationnumber = (TextView) findViewById(R.id.textViewStationNumber);
         stationnumber.setText(Integer.toString(station.getNumber()));
@@ -125,6 +170,12 @@ public class StationEdit_Activity extends AppCompatActivity {
         stationImage = (ImageView) findViewById(R.id.stationImage);
         if(station.getImgSrcPath() != null){
             stationImage.setImageBitmap(BitmapFactory.decodeFile(station.getImgSrcPath()));
+            currentPhotoPath = station.getImgSrcPath();
+        }
+
+        if(station.getAudioSrcPath() != null){
+            tempAudioPath = station.getAudioSrcPath();
+            tempAudioUri = Uri.parse(tempAudioPath);
         }
 
         addimageicon = (ImageView) findViewById(R.id.addimageicon);
@@ -372,6 +423,9 @@ public class StationEdit_Activity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         Log.i("-------111111HAKLO----","---RESULTCODE:" + resultCode + "-------REQUESTCODE:" + requestCode+"------DATA"+data+ "-DAS BILD SOLLTE AUF DEN PFAD GESETZT WERDEN:" + currentPhotoPath );
 
+        if (requestCode == Picker.PICK_AUDIO && resultCode == RESULT_OK) {
+            audioPicker.submit(data);
+        }
 
         if (resultCode != RESULT_CANCELED) {
             switch (requestCode) {

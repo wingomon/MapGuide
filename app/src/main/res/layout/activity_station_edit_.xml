@@ -214,6 +214,13 @@
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
 
+
+                <Button
+                    android:id="@+id/addmedia"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Weitere Medien hinzufügen"
+                    android:layout_margin="20dp"/>
                 <Button
                     android:id="@+id/button_save"
                     android:layout_width="200dp"
