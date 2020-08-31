@@ -4,8 +4,10 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
+import androidx.core.content.res.ResourcesCompat;
 
 import android.Manifest;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.Context;
@@ -14,6 +16,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
+import android.graphics.Typeface;
 import android.media.Image;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
@@ -25,20 +28,31 @@ import android.os.Handler;
 import android.os.Parcelable;
 import android.os.SystemClock;
 import android.provider.MediaStore;
+import android.text.InputType;
+import android.text.Layout;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.kbeanie.multipicker.api.AudioPicker;
+import com.kbeanie.multipicker.api.ImagePicker;
 import com.kbeanie.multipicker.api.Picker;
 import com.kbeanie.multipicker.api.callbacks.AudioPickerCallback;
+import com.kbeanie.multipicker.api.callbacks.ImagePickerCallback;
 import com.kbeanie.multipicker.api.entity.ChosenAudio;
+import com.kbeanie.multipicker.api.entity.ChosenImage;
+import com.mapbox.mapboxsdk.plugins.annotation.Line;
+import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.IOException;
@@ -64,7 +78,13 @@ public class StationEdit_Activity extends AppCompatActivity {
     boolean isRecording = false;
     private int PERMISSION_CODE=11;
 
+
+    //Add more media content
+    Button addMedia;
     List<View> mediaViewList;
+    LinearLayout linearLayout;
+    ImagePicker imagePicker;
+
 
     //Für Audio-Recorder
     private MediaRecorder mediarecorder;
@@ -100,6 +120,16 @@ public class StationEdit_Activity extends AppCompatActivity {
         setContentView(R.layout.activity_station_edit_);
 
         context = getApplicationContext();
+        imagePicker = new ImagePicker(StationEdit_Activity.this);
+
+        linearLayout = (LinearLayout) findViewById(R.id.add_mediaContent);
+        addMedia = (Button) findViewById(R.id.addmedia);
+        addMedia.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                addNewMedia(StationEdit_Activity.this);
+            }
+        });
 
         audioPicker = new AudioPicker(this);
         uploadButton = (ImageView) findViewById(R.id.uploadButton);
@@ -357,6 +387,65 @@ public class StationEdit_Activity extends AppCompatActivity {
         }
     }
 
+    private void addNewMedia(Context context){
+        final CharSequence[] mediaOptions = {"Text", "Foto", "Video"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.CustomAlertDialog);
+        builder.setTitle("Füge weitere Medien hinzu");
+
+        builder.setItems(mediaOptions, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                if(mediaOptions[which].equals("Text")){
+                    //Create a EditText programmatically as Child of a Linear Layout
+
+                    EditText textfield = new EditText(getBaseContext());
+                    final ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,300);
+                    textfield.setLayoutParams(layoutParams);
+                    textfield.setHint("Füge einen Text hinzu");
+                    textfield.setId(R.id.edittext);
+                    //textfield.setText("HAAAALLO");
+                    textfield.setTextColor(getResources().getColor(R.color.colorPrimary));
+                    textfield.setBackgroundResource(R.drawable.edit_text_rounded);
+                    textfield.setInputType(InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+                    textfield.setPadding(10,10,10,10);
+                    textfield.setGravity(Gravity.START);
+                    Typeface type = ResourcesCompat.getFont(getApplicationContext(),R.font.airbnbcereallight);
+                    textfield.setTypeface(type);
+                    textfield.setTextSize(TypedValue.COMPLEX_UNIT_DIP,16);
+                    linearLayout.addView(textfield);
+
+                } else if(mediaOptions[which].equals("Foto")){
+                    imagePicker = new ImagePicker(StationEdit_Activity.this);
+                    imagePicker.setImagePickerCallback(new ImagePickerCallback() {
+                        @Override
+                        public void onImagesChosen(List<ChosenImage> list) {
+                            ChosenImage c1 = list.get(0);
+                            String imagePath = c1.getOriginalPath();
+                            Log.d("--AUDIPFAD FILEPICKER--",c1.getOriginalPath());
+                            Uri imgUri = Uri.parse(imagePath);
+
+                            ImageView imgView = new ImageView(StationEdit_Activity.this);
+                            final ViewGroup.LayoutParams layoutParams1 = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,500);
+                            imgView.setLayoutParams(layoutParams1);
+                            imgView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                            linearLayout.addView(imgView);
+                            Picasso.get().load(new File(imagePath)).into(imgView);
+                        }
+
+                        @Override
+                        public void onError(String s) {
+
+                        }
+                    });
+                    imagePicker.pickImage();
+                }
+
+            }
+        });
+        builder.show();
+    }
+
 
     private void selectImage(Context context) {
         final CharSequence[] options = { "Foto aufnehmen", "Aus Bibliothek auswählen","Abbrechen" };
@@ -425,6 +514,10 @@ public class StationEdit_Activity extends AppCompatActivity {
 
         if (requestCode == Picker.PICK_AUDIO && resultCode == RESULT_OK) {
             audioPicker.submit(data);
+        }
+
+        if (requestCode == Picker.PICK_IMAGE_DEVICE && resultCode == RESULT_OK){
+            imagePicker.submit(data);
         }
 
         if (resultCode != RESULT_CANCELED) {
