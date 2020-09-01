@@ -154,7 +154,8 @@
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:cardCornerRadius="10dp">
+                    app:cardCornerRadius="10dp"
+                    android:layout_marginBottom="20dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -214,6 +215,14 @@
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Weitere Medien"
+                    android:fontFamily="@font/airbnbcerealmedium"
+                    android:textSize="17dp"
+                    android:layout_marginBottom="10dp"
+                    android:textColor="@color/colorPrimary"/>
 
                 <LinearLayout
                     android:id="@+id/add_mediaContent"

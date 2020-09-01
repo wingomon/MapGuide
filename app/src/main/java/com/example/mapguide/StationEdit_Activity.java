@@ -5,8 +5,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.core.view.ViewCompat;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.ClipData;
@@ -57,6 +59,7 @@ import com.squareup.picasso.Picasso;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -81,7 +84,8 @@ public class StationEdit_Activity extends AppCompatActivity {
 
     //Add more media content
     Button addMedia;
-    List<View> mediaViewList;
+    List<View> viewList;
+    List<MediaElement> mediaElementList;
     LinearLayout linearLayout;
     ImagePicker imagePicker;
 
@@ -110,6 +114,7 @@ public class StationEdit_Activity extends AppCompatActivity {
     private Uri tempAudioUri;
     private Context context;
 
+    //Picking Audio from Gallery, Drive Variable
    AudioPicker audioPicker;
 
 
@@ -122,6 +127,9 @@ public class StationEdit_Activity extends AppCompatActivity {
         context = getApplicationContext();
         imagePicker = new ImagePicker(StationEdit_Activity.this);
 
+
+
+        mediaElementList = new ArrayList<>();
         linearLayout = (LinearLayout) findViewById(R.id.add_mediaContent);
         addMedia = (Button) findViewById(R.id.addmedia);
         addMedia.setOnClickListener(new View.OnClickListener(){
@@ -169,6 +177,7 @@ public class StationEdit_Activity extends AppCompatActivity {
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //Set Station Values to pass to next intent
                 station.setImgSrcPath(currentPhotoPath);
                 station.setTitle(title.getText().toString());
                 station.setDescription(description.getText().toString());
@@ -178,6 +187,35 @@ public class StationEdit_Activity extends AppCompatActivity {
                     Log.d("--AUDIO--", "Saved Audiosourcepfad:" + tempAudioPath);
                     Log.d("--AUDIO--", "Saved Audiosourcepfad:" + tempAudioUri);
                 }
+
+                //Iterating through the "More Media Content"-View (linearLayout with id addmediacontent) to get all Views and save them in a list
+                if(mediaElementList.size()>0) {
+                    mediaElementList.clear();
+                }
+
+                    for(int i=0; i < linearLayout.getChildCount(); i++){
+                        ViewGroup vg = (ViewGroup) linearLayout.getChildAt(i);
+                        //The first Element of the respective linearLayout has ImageView or EditText as first child
+                        if(vg.getChildAt(0) instanceof EditText){
+
+                            //Get Text of EditText-Element
+                            String text = ((EditText) vg.getChildAt(0)).getText().toString();
+                            MediaElement mText = new MediaElement("TEXT",text);
+                            mediaElementList.add(mText);
+                        }
+                        //If it is not a EditText-Element, it has to be an "IMAGE"
+                        else {
+                            String imgPath = ((ImageView)vg.getChildAt(0)).getTag().toString();
+                            MediaElement mImage = new MediaElement("IMAGE",imgPath);
+                            mediaElementList.add(mImage);
+                            Log.d("--FOR-LOOP--MediaElements", "Saved ImagePath is:" +imgPath);
+                        }
+                    }
+
+                    if(mediaElementList.size()>0){
+                        station.setMediaElementList(mediaElementList);
+                    }
+
 
                 Intent resultIntent = new Intent();
                 resultIntent.putExtra("station", (Parcelable) station);
@@ -208,6 +246,11 @@ public class StationEdit_Activity extends AppCompatActivity {
             tempAudioUri = Uri.parse(tempAudioPath);
         }
 
+        if(station.getMediaElementList() != null) {
+            if(station.getMediaElementList().size()>0)
+            initMediaContentView(station.getMediaElementList());
+        }
+        
         addimageicon = (ImageView) findViewById(R.id.addimageicon);
         addimageicon.setOnClickListener(this::onClick);
         addimagetext = (TextView) findViewById(R.id.addImageText);
@@ -264,6 +307,7 @@ public class StationEdit_Activity extends AppCompatActivity {
 
         //Listener für die Seekbar initialisieren
         seekbar.setOnTouchListener(new View.OnTouchListener(){
+            @SuppressLint("ClickableViewAccessibility")
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent){
                 SeekBar seekBar = (SeekBar) view;
@@ -334,6 +378,9 @@ public class StationEdit_Activity extends AppCompatActivity {
     }//ende onClick()
 
 
+    /**
+     * Stop the Recording
+     */
     private void stopRecording(){
         timer.stop();
         mediarecorder.stop();
@@ -341,6 +388,10 @@ public class StationEdit_Activity extends AppCompatActivity {
         mediarecorder = null;
         Log.d("MediaRecorder", "Stopped");
     }
+
+    /**
+     * Start Recording
+     */
 
     private void startRecording(){
 
@@ -377,6 +428,10 @@ public class StationEdit_Activity extends AppCompatActivity {
 
     }
 
+    /**
+     * Check Permissions for Recording Audio
+     * @return
+     */
     private boolean checkPermissions(){
         if(ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
             return true;
@@ -387,6 +442,13 @@ public class StationEdit_Activity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Add multiple Media Views to the Station
+     * It is possible to add an EditText View or Image View by
+     * selecting the corresponding option
+     * @param context
+     */
+
     private void addNewMedia(Context context){
         final CharSequence[] mediaOptions = {"Text", "Foto", "Video"};
         AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.CustomAlertDialog);
@@ -396,9 +458,14 @@ public class StationEdit_Activity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
+                int viewId = ViewCompat.generateViewId();
+                Log.d("--Generate View ID--",Integer.toString(viewId));
+
                 if(mediaOptions[which].equals("Text")){
                     //Create a EditText programmatically as Child of a Linear Layout
 
+                    LinearLayout linearLayoutText = new LinearLayout(context);
+                    linearLayoutText.setOrientation(LinearLayout.VERTICAL);
                     EditText textfield = new EditText(getBaseContext());
                     final ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,300);
                     textfield.setLayoutParams(layoutParams);
@@ -413,24 +480,59 @@ public class StationEdit_Activity extends AppCompatActivity {
                     Typeface type = ResourcesCompat.getFont(getApplicationContext(),R.font.airbnbcereallight);
                     textfield.setTypeface(type);
                     textfield.setTextSize(TypedValue.COMPLEX_UNIT_DIP,16);
-                    linearLayout.addView(textfield);
+                    linearLayoutText.addView(textfield);
+                    linearLayout.addView(linearLayoutText);
+
+                    //Also add a Button to delete this EditText View again
+                    Button btnDelete = new Button(getBaseContext());
+                    btnDelete.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 200));
+                    btnDelete.setText("Löschen");
+                    linearLayoutText.addView(btnDelete);
+                    btnDelete.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            linearLayout.removeView(linearLayoutText);
+                        }
+                    });
+
+                    //Add this View to the ViewList
+                  //  MediaElement m = new MediaElement(viewId, "TEXT", null);
 
                 } else if(mediaOptions[which].equals("Foto")){
                     imagePicker = new ImagePicker(StationEdit_Activity.this);
                     imagePicker.setImagePickerCallback(new ImagePickerCallback() {
                         @Override
                         public void onImagesChosen(List<ChosenImage> list) {
+
+                            LinearLayout linearLayoutImage = new LinearLayout(context);
+                            linearLayoutImage.setOrientation(LinearLayout.VERTICAL);
+
+                            //Create new ImageView programmatically with picked image
                             ChosenImage c1 = list.get(0);
                             String imagePath = c1.getOriginalPath();
-                            Log.d("--AUDIPFAD FILEPICKER--",c1.getOriginalPath());
+                            Log.d("--ImageFilePicker-Path:--",c1.getOriginalPath());
                             Uri imgUri = Uri.parse(imagePath);
-
                             ImageView imgView = new ImageView(StationEdit_Activity.this);
-                            final ViewGroup.LayoutParams layoutParams1 = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,500);
+                            imgView.setTag(imagePath);
+                            final LinearLayout.LayoutParams layoutParams1 = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,500);
+                            layoutParams1.setMargins(20,20,20,20);
                             imgView.setLayoutParams(layoutParams1);
                             imgView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                            linearLayout.addView(imgView);
+                            linearLayoutImage.addView(imgView);
+                            linearLayout.addView(linearLayoutImage);
                             Picasso.get().load(new File(imagePath)).into(imgView);
+
+                            //Also add a Button to delete this EditText View again
+                            Button btnDelete = new Button(getBaseContext());
+                            btnDelete.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 200));
+                            btnDelete.setText("Löschen");
+                            linearLayoutImage.addView(btnDelete);
+                            btnDelete.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    linearLayout.removeView(linearLayoutImage);
+                                }
+                            });
                         }
 
                         @Override
@@ -447,6 +549,12 @@ public class StationEdit_Activity extends AppCompatActivity {
     }
 
 
+    /**
+     * Select Image
+     * Possible to choose between
+     * Gallery or Camera
+     * @param context
+     */
     private void selectImage(Context context) {
         final CharSequence[] options = { "Foto aufnehmen", "Aus Bibliothek auswählen","Abbrechen" };
 
@@ -486,7 +594,6 @@ public class StationEdit_Activity extends AppCompatActivity {
                                 takePicture.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION|Intent.FLAG_GRANT_READ_URI_PERMISSION);
                             }
 
-
                             Log.i("------YOOO---",currentPhotoPath);
 
                             startActivityForResult(takePicture, 0);
@@ -506,7 +613,14 @@ public class StationEdit_Activity extends AppCompatActivity {
     }
 
 
-
+    /**
+     * On Activity Result
+     * After e.g. Picking Audio or Image return to current Activity and
+     * submit data
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -624,6 +738,71 @@ public class StationEdit_Activity extends AppCompatActivity {
             cursor.close();
         }
         return result;
+    }
+
+
+    private void initMediaContentView(List<MediaElement> mediaElementList){
+        for(MediaElement m : mediaElementList){
+            if(m.getType().equals("TEXT")){
+                LinearLayout linearLayoutText = new LinearLayout(context);
+                linearLayoutText.setOrientation(LinearLayout.VERTICAL);
+                EditText textfield = new EditText(getBaseContext());
+                final ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,300);
+                textfield.setLayoutParams(layoutParams);
+                textfield.setHint("Füge einen Text hinzu");
+                textfield.setId(R.id.edittext);
+                textfield.setText(m.getStore());
+                textfield.setTextColor(getResources().getColor(R.color.colorPrimary));
+                textfield.setBackgroundResource(R.drawable.edit_text_rounded);
+                textfield.setInputType(InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+                textfield.setPadding(10,10,10,10);
+                textfield.setGravity(Gravity.START);
+                Typeface type = ResourcesCompat.getFont(getApplicationContext(),R.font.airbnbcereallight);
+                textfield.setTypeface(type);
+                textfield.setTextSize(TypedValue.COMPLEX_UNIT_DIP,16);
+                linearLayoutText.addView(textfield);
+                linearLayout.addView(linearLayoutText);
+
+                //Also add a Button to delete this EditText View again
+                Button btnDelete = new Button(getBaseContext());
+                btnDelete.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 200));
+                btnDelete.setText("Löschen");
+                linearLayoutText.addView(btnDelete);
+                btnDelete.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        linearLayout.removeView(linearLayoutText);
+                    }
+                });
+            } else {
+                LinearLayout linearLayoutImage = new LinearLayout(context);
+                linearLayoutImage.setOrientation(LinearLayout.VERTICAL);
+                //Create new ImageView programmatically with picked image
+                String imagePath = m.getStore();
+                Uri imgUri = Uri.parse(imagePath);
+                ImageView imgView = new ImageView(StationEdit_Activity.this);
+                imgView.setTag(imagePath);
+                final LinearLayout.LayoutParams layoutParams1 = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,500);
+                layoutParams1.setMargins(20,20,20,20);
+                imgView.setLayoutParams(layoutParams1);
+                imgView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                linearLayoutImage.addView(imgView);
+                linearLayout.addView(linearLayoutImage);
+                Picasso.get().load(new File(imagePath)).into(imgView);
+                //Also add a Button to delete this EditText View again
+                Button btnDelete = new Button(getBaseContext());
+                btnDelete.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 200));
+                btnDelete.setText("Löschen");
+                linearLayoutImage.addView(btnDelete);
+                btnDelete.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        linearLayout.removeView(linearLayoutImage);
+                    }
+                });
+
+            }
+        }
     }
 
 }

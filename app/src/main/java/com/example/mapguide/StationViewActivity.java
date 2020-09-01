@@ -85,8 +85,6 @@ public class StationViewActivity extends AppCompatActivity {
         }
 
 
-
-
         //MediaPlayer
         mPlayer = new MediaPlayer();
         playButton= (Button) findViewById(R.id.controlPlay);

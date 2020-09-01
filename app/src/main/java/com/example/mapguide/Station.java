@@ -4,6 +4,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Station implements Parcelable, Serializable {
 
@@ -14,8 +16,9 @@ public class Station implements Parcelable, Serializable {
     public String audioSrcPath;
     public String imgSrcPath;
     public String description;
+    private List<MediaElement> mediaElementList = new ArrayList<>();
 
-    public Station(int number, double longitude, double latitude, String title, String audioSrcPath, String imgSrcPath, String description) {
+    public Station(int number, double longitude, double latitude, String title, String audioSrcPath, String imgSrcPath, String description, List<MediaElement> mediaElementList) {
         this.number = number;
         this.longitude = longitude;
         this.latitude = latitude;
@@ -23,6 +26,7 @@ public class Station implements Parcelable, Serializable {
         this.audioSrcPath = audioSrcPath;
         this.imgSrcPath = imgSrcPath;
         this.description = description;
+        this.mediaElementList = mediaElementList;
     }
 
     public Station(){}
@@ -84,6 +88,13 @@ public class Station implements Parcelable, Serializable {
         this.description = description;
     }
 
+    public List<MediaElement> getMediaElementList() {
+        return mediaElementList;
+    }
+
+    public void setMediaElementList(List<MediaElement> mediaElementList) {
+        this.mediaElementList = mediaElementList;
+    }
 
     protected Station(Parcel in) {
         number = in.readInt();
@@ -93,6 +104,12 @@ public class Station implements Parcelable, Serializable {
         audioSrcPath = in.readString();
         imgSrcPath = in.readString();
         description = in.readString();
+        if (in.readByte() == 0x01) {
+            mediaElementList = new ArrayList<MediaElement>();
+            in.readList(mediaElementList, MediaElement.class.getClassLoader());
+        } else {
+            mediaElementList = null;
+        }
     }
 
     @Override
@@ -109,6 +126,12 @@ public class Station implements Parcelable, Serializable {
         dest.writeString(audioSrcPath);
         dest.writeString(imgSrcPath);
         dest.writeString(description);
+        if (mediaElementList == null) {
+            dest.writeByte((byte) (0x00));
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeList(mediaElementList);
+        }
     }
 
     @SuppressWarnings("unused")

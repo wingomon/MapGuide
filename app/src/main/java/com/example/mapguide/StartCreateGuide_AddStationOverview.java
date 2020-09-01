@@ -269,7 +269,7 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
         clearMap();
 
             //ADD NEW STATION
-            tempStation = new Station(stationList.size()+1, point.getLongitude(), point.getLatitude(),"Titel der Station","null","null","Beschreibung der Station");
+            tempStation = new Station(stationList.size()+1, point.getLongitude(), point.getLatitude(),"Titel der Station","null","null","Beschreibung der Station", new ArrayList<>());
             stationList.add(tempStation);
             stationAdapter.notifyDataSetChanged();
 
