@@ -1,6 +1,8 @@
 package com.example.mapguide;
 
 
+import android.provider.MediaStore;
+
 import java.io.Serializable;
 
 /** This Class is for storing information for each Media-Element.
@@ -20,6 +22,7 @@ public class MediaElement implements Serializable {
         this.store = store;
     }
 
+    public MediaElement(){}
 
     public String getStore() {
         return store;

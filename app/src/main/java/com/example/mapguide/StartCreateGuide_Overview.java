@@ -46,12 +46,16 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
     ImageView addStation_overview;
     String downloadImgUrl;
 
+    BitmapResizer bitmapResizer;
+    int maxwidth = 1000;
+    int maxHeight = 1000;
+
 
 
     //Liste der Stationen | RecyclerView Variablen
     List<Station> stationList;
     RecyclerView recyclerView;
-    StationAdapter stationAdapter;
+    StationAdapter_noEdit stationAdapter;
     Station tempStation;
     Context mContext;
 
@@ -75,12 +79,14 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
         mContext = (Context) this;
 
 
+        //BitmaResizer initialisieren
+        bitmapResizer = new BitmapResizer(maxwidth,maxHeight);
 
         //StationListe initialisieren
         stationList = new ArrayList<Station>();
 
         recyclerView = (RecyclerView) findViewById(R.id.stationRecyclerView1);
-        stationAdapter =new StationAdapter(stationList,this);
+        stationAdapter =new StationAdapter_noEdit(stationList,this);
         RecyclerView.LayoutManager sLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(sLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -116,11 +122,6 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                /**
-                Intent intent= new Intent(getBaseContext(), StartCreateGuide_AddStationOverview.class);
-                startActivity(intent);
-                 **/
-
                 Activity origin = (Activity)mContext;
                 Intent intent = new Intent(mContext, StartCreateGuide_AddStationOverview.class);
                 if(stationList != null){
@@ -142,8 +143,20 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
             public void onClick(View v) {
 
                 for(Station s: stationList) {
+                    //Upload of Picture and Audio of Station
                     uploadStationFilesToFirebaseStorage(s.getImgSrcPath(),s,"image");
                     uploadStationFilesToFirebaseStorage(s.getAudioSrcPath(),s,"audio");
+                    //Upload of "More Media"-List Images
+                    if(s.getMediaElementList() != null) {
+                        if (s.getMediaElementList().size() > 0) {
+                            for (int i = 0; i < s.getMediaElementList().size(); i++) {
+                                if (s.getMediaElementList().get(i).getType().equals("IMAGE")) {
+                                    uploadStationMediaListImagesToFirebaseStorage(s, i);
+                                }
+                            }
+                        }
+                    }
+
                 }
 
                 Log.d("--DOWNLOAD--"," SAVE BUTTON WAS CLICKED");
@@ -153,15 +166,13 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
 
 
                 //Upload picture to FirebaseStorage
-
                 //But compressing before
-
-                int compressionRatio = 4;
                 File origfile = new File(imgPath);
 
                 try {
-                    Bitmap bitmap = BitmapFactory.decodeFile (origfile.getPath());
-                    bitmap.compress (Bitmap.CompressFormat.JPEG, compressionRatio, new FileOutputStream(origfile));
+                   // Bitmap bitmap = BitmapFactory.decodeFile (origfile.getPath());
+                    Bitmap bitmap = bitmapResizer.transform(BitmapFactory.decodeFile(origfile.getPath()));
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, new FileOutputStream(origfile));
                 }
                 catch (Throwable t) {
                     Log.e("--ERROR--", "Error compressing file." + t.toString ());
@@ -201,9 +212,6 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
                             }
                         });
 
-                /**
-                Multimediaguide m = new Multimediaguide(title_, description_, downloadImgUrl, 5, "Beispiel_Kategorie");
-                ref.push().setValue(m); **/
             }
         });
 
@@ -222,7 +230,22 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
 
         }
 
-        Uri file = Uri.fromFile(new File(filePath));
+        File origfile = new File(filePath);
+
+        if(type.equals("IMAGE")) {
+
+            try {
+                // Bitmap bitmap = BitmapFactory.decodeFile (origfile.getPath());
+                Bitmap bitmap = bitmapResizer.transform(BitmapFactory.decodeFile(origfile.getPath()));
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, new FileOutputStream(origfile));
+            } catch (Throwable t) {
+                Log.e("--ERROR--", "Error compressing file." + t.toString());
+                t.printStackTrace();
+            }
+
+        }
+
+        Uri file = Uri.fromFile(origfile);
         Log.d("--UPLOAD STATION--","filepath:"+filePath);
         Log.d("--UPLOAD STATION--","uri" + file.toString());
 
@@ -263,6 +286,56 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
     }
 
 
+    private void uploadStationMediaListImagesToFirebaseStorage(Station station, int indexMediaFile){
+
+
+        StorageReference riversRef = mStorageRef.child("Files").child(System.currentTimeMillis()+".jpg");
+        riversRef = mStorageRef.child("StationImages").child(System.currentTimeMillis()+".jpg");
+
+        File origfile = new File(station.getMediaElementList().get(indexMediaFile).getStore());
+
+        try {
+            // Bitmap bitmap = BitmapFactory.decodeFile (origfile.getPath());
+            Bitmap bitmap = bitmapResizer.transform(BitmapFactory.decodeFile(origfile.getPath()));
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, new FileOutputStream(origfile));
+        } catch (Throwable t) {
+            Log.e("--ERROR--", "Error compressing file." + t.toString());
+            t.printStackTrace();
+        }
+
+        Uri file = Uri.fromFile(origfile);
+        Log.d("--UPLOAD STATION Media--","filepath:"+station.getMediaElementList().get(indexMediaFile).getStore());
+        Log.d("--UPLOAD STATION Media--","uri" + file.toString());
+
+
+        riversRef.putFile(file)
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        // Get a URL to the uploaded content
+                        Task<Uri> downloadUrl = taskSnapshot.getStorage().getDownloadUrl()
+                                .addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                    @Override
+                                    public void onSuccess(Uri uri) {
+                                                //Replace URL with uploaded URL
+                                                station.setMediaElementListStorage(indexMediaFile, uri.toString());
+                                    }
+                                });
+
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Handle unsuccessful uploads
+                        // ...
+                        Log.d("--DOWNLOAD--","FAILED for Station Media List Element" + station.getNumber());
+                    }
+                });
+
+
+    }
+
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
         super.onActivityResult(requestCode, resultCode, data);
@@ -280,17 +353,6 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
                 }
                 stationAdapter.notifyDataSetChanged();
 
-                /**
-
-                stationList = (List<Station>) data.getSerializableExtra("stationList");
-                Log.d("----MAPGUIDE--Guide_Overview",stationList.toString());
-               stationAdapter.notifyDataSetChanged();
-                Log.d("----MAPGUIDE--Guide_Overview","NOTIFY DATA SET CHANGED");
-                tempStation = new Station(stationList.size()+1, 6.982851545508879, 51.02212194428202 ,"Titel der Station","null","null","Beschreibung der Station");
-                stationList.add(tempStation);
-                Log.d("----MAPGUIDE--Guide_Overview",stationList.get(0).getTitle().toString());
-                stationAdapter.notifyDataSetChanged();
-                 **/
             }
         }
 

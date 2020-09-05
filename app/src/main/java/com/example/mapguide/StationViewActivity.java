@@ -1,22 +1,31 @@
 package com.example.mapguide;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.res.ResourcesCompat;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
+import android.text.InputType;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.kbeanie.multipicker.api.entity.ChosenImage;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -33,7 +42,7 @@ public class StationViewActivity extends AppCompatActivity {
 
     //Für Audio-Player
     private SeekBar seekbar;
-    private MediaPlayer mPlayer;
+    private static MediaPlayer mPlayer;
     private Handler mHandler = new Handler();
     private Runnable updater = new Runnable() {
         @Override
@@ -49,6 +58,7 @@ public class StationViewActivity extends AppCompatActivity {
     private Uri tempAudioUri;
 
     Station station;
+    LinearLayout linearLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +69,9 @@ public class StationViewActivity extends AppCompatActivity {
         title = (TextView) findViewById(R.id.textViewStationTitle);
         description = (TextView) findViewById(R.id.textViewDescription);
         image = (ImageView) findViewById(R.id.img);
+
+        linearLayout = (LinearLayout) findViewById(R.id.add_mediaContent);
+
         cardIcon = (ImageView) findViewById(R.id.imageViewCardIcon);
 
         cardIcon.setOnClickListener(new View.OnClickListener() {
@@ -84,9 +97,9 @@ public class StationViewActivity extends AppCompatActivity {
             Picasso.get().load(station.getImgSrcPath()).into(image);
         }
 
+        loadMediaContent();
+        mPlayer = MediaPlayerSingle.getInstance();
 
-        //MediaPlayer
-        mPlayer = new MediaPlayer();
         playButton= (Button) findViewById(R.id.controlPlay);
         seekbar = (SeekBar) findViewById(R.id.seekBar);
         mHandler = new Handler();
@@ -96,14 +109,24 @@ public class StationViewActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
+                //MediaPlayer
                 if(mPlayer.isPlaying()){
                     mHandler.removeCallbacks(updater);
                     mPlayer.pause();
                     //playButton.setImageResource(R.drawable.ic_baseline_play_arrow_24);
                 }
                 else {
-                    mPlayer = MediaPlayer.create(context, Uri.parse(tempAudioPath));
-                    mPlayer.start();
+
+                    try {
+                        mPlayer.reset();
+                        mPlayer.setDataSource(context, Uri.parse(tempAudioPath));
+                        mPlayer.prepare();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                        mPlayer.start();
+
 
                     mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                         @Override
@@ -144,12 +167,61 @@ public class StationViewActivity extends AppCompatActivity {
     }
 
 
+    private void loadMediaContent(){
+
+        if(station != null){
+            if(station.getMediaElementList() != null){
+                if(station.getMediaElementList().size() > 0){
+
+                    //Set Header "Weitere Medien" if media files exists
+                    TextView textViewMedia = (TextView) findViewById(R.id.textViewMedia);
+                    textViewMedia.setVisibility(View.VISIBLE);
+
+                    for(int i=0; i<station.getMediaElementList().size(); i++){
+                        if(station.getMediaElementList().get(i).getType().equals("IMAGE")){
+                            //Create new ImageView programmatically with picked image
+                            String imagePath = station.getMediaElementList().get(i).getStore();
+                            Log.d("--ImageFilePicker-Path:--",imagePath);
+                            Uri imgUri = Uri.parse(imagePath);
+                            ImageView imgView = new ImageView(StationViewActivity.this);
+                            final LinearLayout.LayoutParams layoutParams1 = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,500);
+                            layoutParams1.setMargins(20,20,20,20);
+                            imgView.setLayoutParams(layoutParams1);
+                            imgView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                            linearLayout.addView(imgView);
+                            Picasso.get().load(imagePath).into(imgView);
+                        }
+                        else {
+                            String text = station.getMediaElementList().get(i).getStore();
+                            if (text != null && !(text.equals("null"))){
+                                TextView textfield = new TextView(getBaseContext());
+                                final ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,300);
+                                textfield.setLayoutParams(layoutParams);
+                                textfield.setText(text);
+                                textfield.setTextColor(getResources().getColor(R.color.colorPrimary));
+                                textfield.setPadding(10,10,10,10);
+                                textfield.setGravity(Gravity.CENTER);
+                                Typeface type = ResourcesCompat.getFont(getApplicationContext(),R.font.airbnbcereallight);
+                                textfield.setTypeface(type);
+                                textfield.setTextSize(TypedValue.COMPLEX_UNIT_DIP,16);
+                                linearLayout.addView(textfield);
+                            }
+
+                        }
+
+                    }
+                }
+            }
+        }
+
+    }
+
     private  void prepareMediaPlayer(){
         try {
             if(station.getAudioSrcPath() == null || station.getAudioSrcPath().equals("null")){
-                mPlayer.setDataSource(context, Uri.fromFile(new File(tempAudioPath)));
+                mPlayer.setDataSource(context, Uri.parse(tempAudioPath));
             } else {
-                mPlayer.setDataSource(context, Uri.fromFile(new File(station.getAudioSrcPath())));
+                mPlayer.setDataSource(context, Uri.parse(station.getAudioSrcPath()));
             }
             mPlayer.prepare();
         } catch (IOException e) {

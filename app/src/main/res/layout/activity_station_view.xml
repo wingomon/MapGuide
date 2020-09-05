@@ -162,6 +162,25 @@
                     android:layout_marginBottom="10dp"
                     android:textColor="@color/colorPrimary"/>
 
+                <TextView
+                    android:id="@+id/textViewMedia"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Weitere Medien"
+                    android:fontFamily="@font/airbnbcerealmedium"
+                    android:textSize="16dp"
+                    android:textColor="@color/colorPrimary"
+                    android:visibility="gone"/>
+
+                <LinearLayout
+                    android:id="@+id/add_mediaContent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+
+                </LinearLayout>
+
 
             </LinearLayout>
 

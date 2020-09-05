@@ -82,6 +82,10 @@ public class StationEdit_Activity extends AppCompatActivity {
     private int PERMISSION_CODE=11;
 
 
+    int bitmapMaxWidth = 1000;
+    int bitmapMaxHeight = 1000;
+
+
     //Add more media content
     Button addMedia;
     List<View> viewList;
@@ -98,7 +102,7 @@ public class StationEdit_Activity extends AppCompatActivity {
     //Für Audio-Player
     private SeekBar seekbar;
     private ImageView playButton;
-    private MediaPlayer mPlayer;
+    private static MediaPlayer mPlayer;
     private Handler mHandler = new Handler();
     private Runnable updater = new Runnable() {
         @Override
@@ -154,6 +158,13 @@ public class StationEdit_Activity extends AppCompatActivity {
                         Log.d("--AUDIPFAD FILEPICKER--",c1.getOriginalPath());
                         tempAudioUri = Uri.parse(tempAudioPath);
 
+                        //Enabling Click-Button
+                        if(tempAudioPath == null && !(tempAudioPath.equals("null"))){
+                            playButton.setAlpha(1f);
+                            playButton.setClickable(true);
+                            playButton.setEnabled(true);
+                        }
+
                     }
 
                     @Override
@@ -177,6 +188,23 @@ public class StationEdit_Activity extends AppCompatActivity {
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                if(title.length() == 0 || description.length() == 0|| tempAudioPath.equals("null") || currentPhotoPath.equals("null")){
+
+                    if(title.length() == 0) {
+                        title.setError("Dieses Feld darf nicht leer sein");
+                    }
+
+                    if(description.length() == 0 ){
+                        description.setError("Dieses Feld darf nicht leer sein");
+                    }
+
+                    if(tempAudioPath.equals("null"))
+                }
+
+
+
+
                 //Set Station Values to pass to next intent
                 station.setImgSrcPath(currentPhotoPath);
                 station.setTitle(title.getText().toString());
@@ -250,11 +278,17 @@ public class StationEdit_Activity extends AppCompatActivity {
             if(station.getMediaElementList().size()>0)
             initMediaContentView(station.getMediaElementList());
         }
-        
+
         addimageicon = (ImageView) findViewById(R.id.addimageicon);
         addimageicon.setOnClickListener(this::onClick);
         addimagetext = (TextView) findViewById(R.id.addImageText);
-        if(addimageicon.getDrawable() == null){ addimageicon.setAlpha(0f); addimagetext.setAlpha(0f);}
+        if(station.getImgSrcPath() != null){
+            if(!(station.getImgSrcPath().equals("null"))) {
+                addimageicon.setAlpha(0f);
+                addimagetext.setAlpha(0f);
+            }
+
+        }
 
         //Recorder
         recordButton = (ImageView)findViewById(R.id.recordButton);
@@ -262,8 +296,13 @@ public class StationEdit_Activity extends AppCompatActivity {
         timer = findViewById(R.id.record_timer);
 
         //MediaPlayer
-        mPlayer = new MediaPlayer();
+        mPlayer = MediaPlayerSingle.getInstance();
         playButton = (ImageView) findViewById(R.id.playButton);
+        if(station.getAudioSrcPath() == null && station.getAudioSrcPath().equals("null")){
+            playButton.setAlpha(0.5f);
+            playButton.setClickable(false);
+            playButton.setEnabled(false);
+        }
         seekbar = (SeekBar) findViewById(R.id.seekBar);
         mHandler = new Handler();
         seekbar.setMax(100);
@@ -363,6 +402,13 @@ public class StationEdit_Activity extends AppCompatActivity {
                     //Wenn er aufnimmt, dann Button blinkend anzeigen
                     recordButton.setImageResource(R.drawable.microphone_off);
                     isRecording=false;
+
+                    //Enabling PlayButton
+                    if(tempAudioPath == null && !(tempAudioPath.equals("null"))){
+                        playButton.setAlpha(1f);
+                        playButton.setClickable(true);
+                        playButton.setEnabled(true);
+                    }
                 }
                 else {
                     //StartRecording
@@ -471,7 +517,6 @@ public class StationEdit_Activity extends AppCompatActivity {
                     textfield.setLayoutParams(layoutParams);
                     textfield.setHint("Füge einen Text hinzu");
                     textfield.setId(R.id.edittext);
-                    //textfield.setText("HAAAALLO");
                     textfield.setTextColor(getResources().getColor(R.color.colorPrimary));
                     textfield.setBackgroundResource(R.drawable.edit_text_rounded);
                     textfield.setInputType(InputType.TYPE_TEXT_FLAG_MULTI_LINE);
@@ -520,7 +565,9 @@ public class StationEdit_Activity extends AppCompatActivity {
                             imgView.setScaleType(ImageView.ScaleType.CENTER_CROP);
                             linearLayoutImage.addView(imgView);
                             linearLayout.addView(linearLayoutImage);
-                            Picasso.get().load(new File(imagePath)).into(imgView);
+                            Picasso.get().load(new File(imagePath))
+                                    .transform(new BitmapResizer(bitmapMaxWidth,bitmapMaxHeight))
+                                    .into(imgView);
 
                             //Also add a Button to delete this EditText View again
                             Button btnDelete = new Button(getBaseContext());
@@ -653,7 +700,10 @@ public class StationEdit_Activity extends AppCompatActivity {
                         //Bitmap selectedImage = (Bitmap) data.getExtras().get("data");
                         //String imgPath = createImageFromBitmap(selectedImage);
                         //imageView.setImageBitmap(selectedImage);
-                        stationImage.setImageURI(Uri.parse(currentPhotoPath));
+                        //stationImage.setImageURI(Uri.parse(currentPhotoPath));
+                        Picasso.get().load(Uri.parse(currentPhotoPath))
+                                .transform(new BitmapResizer(bitmapMaxWidth,bitmapMaxHeight))
+                                .into(stationImage);
                         Log.i("---HAKLO----","-----------------------DAS BILD SOLLTE AUF DEN PFAD GESETZT WERDEN:" + currentPhotoPath);
                         /**
                          Bundle extras = data.getExtras();
@@ -699,6 +749,9 @@ public class StationEdit_Activity extends AppCompatActivity {
                                 //Berechtigungen für Zugriff auf den Speicher
 
                                 stationImage.setImageBitmap(BitmapFactory.decodeFile(picturePath));
+                               /** Picasso.get().load(Uri.parse(picturePath))
+                                        .transform(new BitmapResizer(bitmapMaxWidth,getBitmapMaxHeight))
+                                        .into(stationImage); **/
                                 cursor.close();
                             }
                         }

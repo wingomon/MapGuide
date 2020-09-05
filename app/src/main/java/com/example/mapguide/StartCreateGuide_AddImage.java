@@ -110,7 +110,7 @@ public class StartCreateGuide_AddImage extends AppCompatActivity {
                         File photoFile = null;
                         try {
                             photoFile = createImageFile();
-                            Log.i("---TRy---","---TO CREATE IMAGE");
+                            Log.i("---TRY---","---TO CREATE IMAGE");
                         } catch (IOException ex) {
                             // Error occurred while creating the File
                             Log.i("---FAIL---","FILE COULD NOT BE CREATED");
@@ -167,16 +167,9 @@ public class StartCreateGuide_AddImage extends AppCompatActivity {
                         // und blende das "Hinzufügen" Icon aus
                         addimageicon.setAlpha(0f);
 
-
-                        //Bitmap selectedImage = (Bitmap) data.getExtras().get("data");
-                       //String imgPath = createImageFromBitmap(selectedImage);
-                        //imageView.setImageBitmap(selectedImage);
                         imageView.setImageURI(Uri.parse(currentPhotoPath));
-                        Log.i("---HAKLO----","-----------------------DAS BILD SOLLTE AUF DEN PFAD GESETZT WERDEN:" + currentPhotoPath);
-                        /**
-                        Bundle extras = data.getExtras();
-                        Bitmap imageBitmap = (Bitmap) extras.get("data");
-                        imageView.setImageBitmap(imageBitmap);**/
+                        Log.i("---Camera,AddImageView---","-----------------------DAS BILD SOLLTE AUF DEN PFAD GESETZT WERDEN:" + currentPhotoPath);
+
 
                     }
 
@@ -210,9 +203,7 @@ public class StartCreateGuide_AddImage extends AppCompatActivity {
                                 int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
                                 String picturePath = cursor.getString(columnIndex);
 
-
                                 //Berechtigungen für Zugriff auf den Speicher
-
                                 imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath));
                                 cursor.close();
                             }

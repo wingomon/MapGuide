@@ -41,7 +41,11 @@ public class GuideViewActivity extends AppCompatActivity {
         setContentView(R.layout.activity_guide_view);
         multimediaguide = (Multimediaguide) getIntent().getSerializableExtra("Multimediaguide");
 
-        List<Station> stationListTemp = multimediaguide.getStationList();
+        List<Station> stationListTemp = new ArrayList<>();
+
+        if(multimediaguide.getStationList() != null) {
+            stationListTemp = multimediaguide.getStationList();
+        }
         guideTitle = (TextView) findViewById(R.id.guideTitle);
         guideTitle.setText(multimediaguide.getName());
         guideDescription = (TextView) findViewById(R.id.guideDescription);
@@ -70,10 +74,11 @@ public class GuideViewActivity extends AppCompatActivity {
             stationList.clear();
         }
 
-        for(Station s: stationListTemp){
-            stationList.add(s);
+        if(stationListTemp != null) {
+            for (Station s : stationListTemp) {
+                stationList.add(s);
+            }
         }
-
         stationAdapter.notifyDataSetChanged();
 
     }

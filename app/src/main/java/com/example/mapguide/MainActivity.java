@@ -4,7 +4,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -13,6 +15,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+
+import java.io.File;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -27,6 +31,26 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //Delete all Files from Directory (preventing that out of Memory is happening)
+        File dirMusic = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+"/MapGuide/MapGuide Music");
+
+        if(dirMusic.isDirectory()){
+            String[] children = dirMusic.list();
+            for (int i = 0; i<children.length; i++){
+                new File(dirMusic, children[i]).delete();
+            }
+        }
+
+        File dirPhoto = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+"/MapGuide/MapGuide Pictures");
+
+        if(dirPhoto.isDirectory()){
+            String[] children = dirPhoto.list();
+            for (int i = 0; i<children.length; i++){
+                new File(dirPhoto, children[i]).delete();
+            }
+        }
+
 
         //Splash Screen Code
 

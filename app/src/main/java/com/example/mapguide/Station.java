@@ -96,6 +96,10 @@ public class Station implements Parcelable, Serializable {
         this.mediaElementList = mediaElementList;
     }
 
+    public void setMediaElementListStorage (int index, String store){
+        this.mediaElementList.get(index).setStore(store);
+    }
+
     protected Station(Parcel in) {
         number = in.readInt();
         longitude = in.readDouble();

@@ -55,7 +55,8 @@
                     android:layout_marginTop="3dp"
                     android:text="Klicke um ein Bild hinzuzufügen"
                     android:layout_gravity="center_horizontal"
-                    android:fontFamily="@font/airbnbcereallight"/>
+                    android:fontFamily="@font/airbnbcereallight"
+                    android:textColor="@color/colorPrimary"/>
 
                 </LinearLayout>
             </RelativeLayout>
