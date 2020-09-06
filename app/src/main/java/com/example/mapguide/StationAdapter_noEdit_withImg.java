@@ -11,6 +11,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -21,6 +23,8 @@ public class StationAdapter_noEdit_withImg extends RecyclerView.Adapter<StationA
 
     private List<Station> stationList;
     private Context mContext;
+    private final int MAX_TITLE_LENGTH = 20;
+    private final int MAX_DESCRIPTION_LENGTH = 75;
 
     public class StationViewHolder extends RecyclerView.ViewHolder{
 
@@ -33,6 +37,7 @@ public class StationAdapter_noEdit_withImg extends RecyclerView.Adapter<StationA
             super(view);
             title = (TextView) view.findViewById(R.id.textViewTitle);
             description = (TextView) view.findViewById(R.id.textViewDescription);
+            img = (ImageView) view.findViewById(R.id.imageView);
             ly = (LinearLayout) view.findViewById(R.id.textView);
         }
 
@@ -57,9 +62,23 @@ public class StationAdapter_noEdit_withImg extends RecyclerView.Adapter<StationA
     @Override
     public void onBindViewHolder(@NonNull StationViewHolder holder, int position) {
         Station station = stationList.get(position);
-        holder.title.setText(Integer.toString(position+1)+". " + station.getTitle());
-        holder.description.setText(station.getDescription());
 
+        String titleTemp = station.getTitle();
+        if(titleTemp.length()>MAX_TITLE_LENGTH){
+            titleTemp =titleTemp.substring(0,MAX_TITLE_LENGTH);
+            titleTemp+="...";
+        }
+        holder.title.setText(Integer.toString(position+1)+". " + station.getTitle());
+
+
+        String desc = station.getDescription();
+        //Shorten Description Text for the View if necessary
+        if(desc.length()>MAX_DESCRIPTION_LENGTH){
+            desc=desc.substring(0,MAX_DESCRIPTION_LENGTH);
+            desc+="...";
+        }
+        holder.description.setText(desc);
+        Picasso.get().load(station.getImgSrcPath()).fit().centerCrop().into(holder.img);
         holder.ly.setOnClickListener(new View.OnClickListener(){
 
             @Override

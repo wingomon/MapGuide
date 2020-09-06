@@ -3,6 +3,7 @@ package com.example.mapguide;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.graphics.BitmapFactory;
 import android.graphics.Camera;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,6 +14,7 @@ import android.widget.Toast;
 
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
+import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.Mapbox;
@@ -27,8 +29,17 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
+import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
+import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconAllowOverlap;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconIgnorePlacement;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconOffset;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconSize;
 
 public class StationMapView extends AppCompatActivity implements OnMapReadyCallback, PermissionsListener, MapboxMap.OnMapClickListener {
 
@@ -39,6 +50,7 @@ public class StationMapView extends AppCompatActivity implements OnMapReadyCallb
     List<Station> stationList;
 
     private MapView mapView;
+    private static final String ICON_GEOJSON_SOURCE_ID = "icon-source-id";
 
     //Für Berechtigungen für Zugriff zum Standort
     private MapboxMap mapboxMap;
@@ -65,14 +77,25 @@ public class StationMapView extends AppCompatActivity implements OnMapReadyCallb
         number.setText(Integer.toString(selectedStation.getNumber()));
 
         next = (ImageView) findViewById(R.id.nextButton);
+
+        if(selectedStation.getNumber() == stationList.size()){
+            next.setEnabled(false);
+            next.setVisibility(View.INVISIBLE);
+        }
+
+
         back = (ImageView) findViewById(R.id.backButton);
 
-        next.setOnClickListener(new View.OnClickListener() {
+        if(selectedStation.getNumber() == 1){
+            back.setEnabled(false);
+            back.setVisibility(View.INVISIBLE);
+        }
+
+        back.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-
                 int currentPosition = selectedStation.getNumber()-1;
-                selectedStation = stationList.get(currentPosition+1);
+                selectedStation = stationList.get(currentPosition-1);
 
                 title.setText(selectedStation.getTitle());
                 number.setText(Integer.toString(selectedStation.getNumber()));
@@ -86,6 +109,70 @@ public class StationMapView extends AppCompatActivity implements OnMapReadyCallb
                         .build();
 
                 mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 10);
+
+                //Check Visibility of Back-Button
+                if(selectedStation.getNumber() == 1){
+                    back.setEnabled(false);
+                    back.setVisibility(View.INVISIBLE);
+                } else {
+                    back.setEnabled(true);
+                    back.setVisibility(View.VISIBLE);
+                }
+
+                //Check Visibility of Next-Button
+                if(selectedStation.getNumber() == stationList.size()){
+                    next.setEnabled(false);
+                    next.setVisibility(View.INVISIBLE);
+                } else{
+                    next.setEnabled(true);
+                    next.setVisibility(View.VISIBLE);
+                }
+
+
+            }
+        });
+
+        next.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                int currentPosition = selectedStation.getNumber()-1;
+                selectedStation = stationList.get(currentPosition+1);
+
+                Log.d("--NEXT-Button--", "Current Position:" + currentPosition + "|" + "StationList-Size"+ stationList.size());
+
+
+                //Check Visibility of Next-Button
+                if(selectedStation.getNumber() == stationList.size()){
+                    next.setEnabled(false);
+                    next.setVisibility(View.INVISIBLE);
+                } else{
+                    next.setEnabled(true);
+                    next.setVisibility(View.VISIBLE);
+                }
+                //Check Visibility of Back-Button
+                if(selectedStation.getNumber() == 1){
+                    back.setEnabled(false);
+                    back.setVisibility(View.INVISIBLE);
+                } else {
+                    back.setEnabled(true);
+                    back.setVisibility(View.VISIBLE);
+                }
+
+                title.setText(selectedStation.getTitle());
+                number.setText(Integer.toString(selectedStation.getNumber()));
+
+                Log.d("--CLICK--","NextButton Clicked");
+
+                CameraPosition cameraPosition = new CameraPosition.Builder()
+                        .target(new LatLng(selectedStation.getLatitude(),selectedStation.getLongitude()))
+                        .zoom(15)
+                        .tilt(20)
+                        .build();
+
+                mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 10);
+
+
 
             }
         });
@@ -110,6 +197,8 @@ public class StationMapView extends AppCompatActivity implements OnMapReadyCallb
                 initMapIfStationsExistent(style);
                 mapboxMap.addOnMapClickListener(StartCreateGuide_AddStationOverview.this);
                 enableLocationComponent(style);**/
+
+                initMarkerIconSymbolLayer(style);
 
 
                 CameraPosition cameraPosition = new CameraPosition.Builder()
@@ -173,6 +262,46 @@ public class StationMapView extends AppCompatActivity implements OnMapReadyCallb
     }
 
 
+    private void initMarkerIconSymbolLayer(Style style){
+        // Add the marker image to map
+        style.addImage("icon-image", BitmapFactory.decodeResource(
+                this.getResources(), R.drawable.marker));
+
+        style.addSource(new GeoJsonSource(ICON_GEOJSON_SOURCE_ID));
+
+        style.addLayer(new SymbolLayer("icon-layer-id", ICON_GEOJSON_SOURCE_ID).withProperties(
+                iconImage("icon-image"),
+                iconSize(0.3f),
+                iconAllowOverlap(true),
+                iconIgnorePlacement(true),
+                iconOffset(new Float[] {0f, -7f})
+        ));
+
+        if(stationList!=null){
+            if(stationList.size()>0){
+                addDestinationMarker(style);
+            }
+        }
+
+    }
+
+    private void addDestinationMarker(@NonNull Style style) {
+        List<Feature> destinationMarkerList = new ArrayList<>();
+        for (Station s : stationList) {
+            destinationMarkerList.add(Feature.fromGeometry(
+                    Point.fromLngLat(s.getLongitude(), s.getLatitude())));
+            Log.d("MAPBOX", "AddDestinationMarker: Iteration durch stationList, Hinzufügen aller Punkte");
+        }
+        //destinationMarkerList.add(Feature.fromGeometry(Point.fromLngLat(point.getLongitude(), point.getLatitude())));
+        GeoJsonSource iconSource = style.getSourceAs(ICON_GEOJSON_SOURCE_ID);
+        if (iconSource != null) {
+            iconSource.setGeoJson(FeatureCollection.fromFeatures(destinationMarkerList));
+        }
+    }
+
+
+
+
 
     @SuppressWarnings( {"MissingPermission"})
     private void enableLocationComponent(@NonNull Style loadedMapStyle) {
@@ -230,5 +359,8 @@ public class StationMapView extends AppCompatActivity implements OnMapReadyCallb
             finish();
         }
     }
+
+
+
 
 }

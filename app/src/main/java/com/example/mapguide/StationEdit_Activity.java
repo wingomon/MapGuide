@@ -43,6 +43,7 @@ import android.widget.Chronometer;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -85,9 +86,12 @@ public class StationEdit_Activity extends AppCompatActivity {
     int bitmapMaxWidth = 1000;
     int bitmapMaxHeight = 1000;
 
+    //Delete Icon at Media Content in px
+    int deleteIconWidth=100;
+    int deleteIconHeight=100;
 
     //Add more media content
-    Button addMedia;
+    ImageView addMedia;
     List<View> viewList;
     List<MediaElement> mediaElementList;
     LinearLayout linearLayout;
@@ -135,7 +139,7 @@ public class StationEdit_Activity extends AppCompatActivity {
 
         mediaElementList = new ArrayList<>();
         linearLayout = (LinearLayout) findViewById(R.id.add_mediaContent);
-        addMedia = (Button) findViewById(R.id.addmedia);
+        addMedia = (ImageView) findViewById(R.id.addmedia);
         addMedia.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
@@ -159,7 +163,7 @@ public class StationEdit_Activity extends AppCompatActivity {
                         tempAudioUri = Uri.parse(tempAudioPath);
 
                         //Enabling Click-Button
-                        if(tempAudioPath == null && !(tempAudioPath.equals("null"))){
+                        if(tempAudioPath == null || !(tempAudioPath.equals("null"))){
                             playButton.setAlpha(1f);
                             playButton.setClickable(true);
                             playButton.setEnabled(true);
@@ -189,66 +193,63 @@ public class StationEdit_Activity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                if(title.length() == 0 || description.length() == 0|| tempAudioPath.equals("null") || currentPhotoPath.equals("null")){
+                //Validation of EditText fields
+                if (title.length() == 0 || description.length() == 0) {
 
-                    if(title.length() == 0) {
+                    if (title.length() == 0) {
                         title.setError("Dieses Feld darf nicht leer sein");
                     }
 
-                    if(description.length() == 0 ){
+                    if (description.length() == 0) {
                         description.setError("Dieses Feld darf nicht leer sein");
                     }
 
-                    if(tempAudioPath.equals("null"))
-                }
+                } else {
+                    //Set Station Values to pass to next intent
+                    station.setImgSrcPath(currentPhotoPath);
+                    station.setTitle(title.getText().toString());
+                    station.setDescription(description.getText().toString());
 
+                    if (station.getAudioSrcPath() != null) {
+                        station.setAudioSrcPath(tempAudioPath);
+                        Log.d("--AUDIO--", "Saved Audiosourcepfad:" + tempAudioPath);
+                        Log.d("--AUDIO--", "Saved Audiosourcepfad:" + tempAudioUri);
+                    }
 
+                    //Iterating through the "More Media Content"-View (linearLayout with id addmediacontent) to get all Views and save them in a list
+                    if (mediaElementList.size() > 0) {
+                        mediaElementList.clear();
+                    }
 
-
-                //Set Station Values to pass to next intent
-                station.setImgSrcPath(currentPhotoPath);
-                station.setTitle(title.getText().toString());
-                station.setDescription(description.getText().toString());
-
-                if(station.getAudioSrcPath() != null) {
-                    station.setAudioSrcPath(tempAudioPath);
-                    Log.d("--AUDIO--", "Saved Audiosourcepfad:" + tempAudioPath);
-                    Log.d("--AUDIO--", "Saved Audiosourcepfad:" + tempAudioUri);
-                }
-
-                //Iterating through the "More Media Content"-View (linearLayout with id addmediacontent) to get all Views and save them in a list
-                if(mediaElementList.size()>0) {
-                    mediaElementList.clear();
-                }
-
-                    for(int i=0; i < linearLayout.getChildCount(); i++){
+                    for (int i = 0; i < linearLayout.getChildCount(); i++) {
                         ViewGroup vg = (ViewGroup) linearLayout.getChildAt(i);
                         //The first Element of the respective linearLayout has ImageView or EditText as first child
-                        if(vg.getChildAt(0) instanceof EditText){
+                        if (vg.getChildAt(0) instanceof EditText) {
 
                             //Get Text of EditText-Element
                             String text = ((EditText) vg.getChildAt(0)).getText().toString();
-                            MediaElement mText = new MediaElement("TEXT",text);
+                            MediaElement mText = new MediaElement("TEXT", text);
                             mediaElementList.add(mText);
                         }
                         //If it is not a EditText-Element, it has to be an "IMAGE"
                         else {
-                            String imgPath = ((ImageView)vg.getChildAt(0)).getTag().toString();
-                            MediaElement mImage = new MediaElement("IMAGE",imgPath);
+                            String imgPath = ((ImageView) vg.getChildAt(0)).getTag().toString();
+                            MediaElement mImage = new MediaElement("IMAGE", imgPath);
                             mediaElementList.add(mImage);
-                            Log.d("--FOR-LOOP--MediaElements", "Saved ImagePath is:" +imgPath);
+                            Log.d("--FOR-LOOP--MediaElements", "Saved ImagePath is:" + imgPath);
                         }
                     }
 
-                    if(mediaElementList.size()>0){
+                    if (mediaElementList.size() > 0) {
                         station.setMediaElementList(mediaElementList);
                     }
 
 
-                Intent resultIntent = new Intent();
-                resultIntent.putExtra("station", (Parcelable) station);
-                setResult(RESULT_OK, resultIntent);
-                finish();
+                    Intent resultIntent = new Intent();
+                    resultIntent.putExtra("station", (Parcelable) station);
+                    setResult(RESULT_OK, resultIntent);
+                    finish();
+                }
             }
         });
 
@@ -298,7 +299,7 @@ public class StationEdit_Activity extends AppCompatActivity {
         //MediaPlayer
         mPlayer = MediaPlayerSingle.getInstance();
         playButton = (ImageView) findViewById(R.id.playButton);
-        if(station.getAudioSrcPath() == null && station.getAudioSrcPath().equals("null")){
+        if(station.getAudioSrcPath() == null || station.getAudioSrcPath().equals("null")){
             playButton.setAlpha(0.5f);
             playButton.setClickable(false);
             playButton.setEnabled(false);
@@ -404,7 +405,7 @@ public class StationEdit_Activity extends AppCompatActivity {
                     isRecording=false;
 
                     //Enabling PlayButton
-                    if(tempAudioPath == null && !(tempAudioPath.equals("null"))){
+                    if(tempAudioPath == null || !(tempAudioPath.equals("null"))){
                         playButton.setAlpha(1f);
                         playButton.setClickable(true);
                         playButton.setEnabled(true);
@@ -496,7 +497,7 @@ public class StationEdit_Activity extends AppCompatActivity {
      */
 
     private void addNewMedia(Context context){
-        final CharSequence[] mediaOptions = {"Text", "Foto", "Video"};
+        final CharSequence[] mediaOptions = {"Text", "Foto"};
         AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.CustomAlertDialog);
         builder.setTitle("Füge weitere Medien hinzu");
 
@@ -509,34 +510,43 @@ public class StationEdit_Activity extends AppCompatActivity {
 
                 if(mediaOptions[which].equals("Text")){
                     //Create a EditText programmatically as Child of a Linear Layout
+                    RelativeLayout relativeLayoutText = new RelativeLayout(context);
+                    RelativeLayout.LayoutParams rlp = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                    relativeLayoutText.setLayoutParams(rlp);
 
-                    LinearLayout linearLayoutText = new LinearLayout(context);
-                    linearLayoutText.setOrientation(LinearLayout.VERTICAL);
                     EditText textfield = new EditText(getBaseContext());
-                    final ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,300);
+                    final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,300);
+                    layoutParams.setMargins(0,0,0,10);
                     textfield.setLayoutParams(layoutParams);
+                    textfield.setVerticalScrollBarEnabled(true);
+                    textfield.setSingleLine(false);
                     textfield.setHint("Füge einen Text hinzu");
                     textfield.setId(R.id.edittext);
                     textfield.setTextColor(getResources().getColor(R.color.colorPrimary));
                     textfield.setBackgroundResource(R.drawable.edit_text_rounded);
-                    textfield.setInputType(InputType.TYPE_TEXT_FLAG_MULTI_LINE);
-                    textfield.setPadding(10,10,10,10);
+                    textfield.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+                    textfield.setPadding(10,10,20,10);
                     textfield.setGravity(Gravity.START);
                     Typeface type = ResourcesCompat.getFont(getApplicationContext(),R.font.airbnbcereallight);
                     textfield.setTypeface(type);
                     textfield.setTextSize(TypedValue.COMPLEX_UNIT_DIP,16);
-                    linearLayoutText.addView(textfield);
-                    linearLayout.addView(linearLayoutText);
+                    relativeLayoutText.addView(textfield);
+                    linearLayout.addView(relativeLayoutText);
 
                     //Also add a Button to delete this EditText View again
-                    Button btnDelete = new Button(getBaseContext());
-                    btnDelete.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 200));
-                    btnDelete.setText("Löschen");
-                    linearLayoutText.addView(btnDelete);
+                    ImageView btnDelete = new ImageView(getBaseContext());
+                    RelativeLayout.LayoutParams buttonParam = new RelativeLayout.LayoutParams(deleteIconWidth,deleteIconHeight);
+                    buttonParam.setMargins(10,10,10,10);
+                    buttonParam.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                    btnDelete.setLayoutParams(buttonParam);
+                    btnDelete.setClickable(true);
+                    relativeLayoutText.addView(btnDelete);
+                    Picasso.get().load(R.drawable.icons8_cancel_100).into(btnDelete);
+                    // btnDelete.setImageResource(R.drawable.icons8_cancel_100);
                     btnDelete.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            linearLayout.removeView(linearLayoutText);
+                            linearLayout.removeView(relativeLayoutText);
                         }
                     });
 
@@ -548,36 +558,38 @@ public class StationEdit_Activity extends AppCompatActivity {
                     imagePicker.setImagePickerCallback(new ImagePickerCallback() {
                         @Override
                         public void onImagesChosen(List<ChosenImage> list) {
-
-                            LinearLayout linearLayoutImage = new LinearLayout(context);
-                            linearLayoutImage.setOrientation(LinearLayout.VERTICAL);
-
+                            RelativeLayout relativeLayoutImage = new RelativeLayout(context);
+                            RelativeLayout.LayoutParams rlp = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                            relativeLayoutImage.setLayoutParams(rlp);
                             //Create new ImageView programmatically with picked image
                             ChosenImage c1 = list.get(0);
                             String imagePath = c1.getOriginalPath();
-                            Log.d("--ImageFilePicker-Path:--",c1.getOriginalPath());
                             Uri imgUri = Uri.parse(imagePath);
                             ImageView imgView = new ImageView(StationEdit_Activity.this);
                             imgView.setTag(imagePath);
-                            final LinearLayout.LayoutParams layoutParams1 = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,500);
-                            layoutParams1.setMargins(20,20,20,20);
+                            final RelativeLayout.LayoutParams layoutParams1 = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,500);
+                            layoutParams1.setMargins(0,0,0,10);
                             imgView.setLayoutParams(layoutParams1);
                             imgView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                            linearLayoutImage.addView(imgView);
-                            linearLayout.addView(linearLayoutImage);
+                            relativeLayoutImage.addView(imgView);
+                            linearLayout.addView(relativeLayoutImage);
                             Picasso.get().load(new File(imagePath))
                                     .transform(new BitmapResizer(bitmapMaxWidth,bitmapMaxHeight))
                                     .into(imgView);
-
                             //Also add a Button to delete this EditText View again
-                            Button btnDelete = new Button(getBaseContext());
-                            btnDelete.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 200));
-                            btnDelete.setText("Löschen");
-                            linearLayoutImage.addView(btnDelete);
+                            ImageView btnDelete = new ImageView(getBaseContext());
+                            RelativeLayout.LayoutParams buttonParam = new RelativeLayout.LayoutParams(deleteIconWidth,deleteIconHeight);
+                            buttonParam.setMargins(10,10,10,10);
+                            buttonParam.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                            btnDelete.setLayoutParams(buttonParam);
+                            btnDelete.setClickable(true);
+                            relativeLayoutImage.addView(btnDelete);
+                            Picasso.get().load(R.drawable.icons8_cancel_100).into(btnDelete);
+                            //btnDelete.setImageResource(R.drawable.icons8_cancel_100);
                             btnDelete.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    linearLayout.removeView(linearLayoutImage);
+                                    linearLayout.removeView(relativeLayoutImage);
                                 }
                             });
                         }
@@ -797,65 +809,108 @@ public class StationEdit_Activity extends AppCompatActivity {
     private void initMediaContentView(List<MediaElement> mediaElementList){
         for(MediaElement m : mediaElementList){
             if(m.getType().equals("TEXT")){
-                LinearLayout linearLayoutText = new LinearLayout(context);
-                linearLayoutText.setOrientation(LinearLayout.VERTICAL);
+                RelativeLayout relativeLayoutText = new RelativeLayout(this);
+                RelativeLayout.LayoutParams rlp = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                rlp.setMargins(10,10,10,10);
+                relativeLayoutText.setLayoutParams(rlp);
+
                 EditText textfield = new EditText(getBaseContext());
                 final ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,300);
                 textfield.setLayoutParams(layoutParams);
+                textfield.setVerticalScrollBarEnabled(true);
+                textfield.setSingleLine(false);
                 textfield.setHint("Füge einen Text hinzu");
                 textfield.setId(R.id.edittext);
                 textfield.setText(m.getStore());
                 textfield.setTextColor(getResources().getColor(R.color.colorPrimary));
                 textfield.setBackgroundResource(R.drawable.edit_text_rounded);
-                textfield.setInputType(InputType.TYPE_TEXT_FLAG_MULTI_LINE);
-                textfield.setPadding(10,10,10,10);
+                textfield.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+                textfield.setPadding(10,10,20,10);
                 textfield.setGravity(Gravity.START);
                 Typeface type = ResourcesCompat.getFont(getApplicationContext(),R.font.airbnbcereallight);
                 textfield.setTypeface(type);
                 textfield.setTextSize(TypedValue.COMPLEX_UNIT_DIP,16);
-                linearLayoutText.addView(textfield);
-                linearLayout.addView(linearLayoutText);
+                relativeLayoutText.addView(textfield);
+                linearLayout.addView(relativeLayoutText);
 
                 //Also add a Button to delete this EditText View again
-                Button btnDelete = new Button(getBaseContext());
-                btnDelete.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 200));
-                btnDelete.setText("Löschen");
-                linearLayoutText.addView(btnDelete);
+                ImageView btnDelete = new ImageView(getBaseContext());
+                RelativeLayout.LayoutParams buttonParam = new RelativeLayout.LayoutParams(deleteIconWidth,deleteIconHeight);
+                buttonParam.setMargins(10,10,10,10);
+                buttonParam.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                btnDelete.setLayoutParams(buttonParam);
+                btnDelete.setClickable(true);
+                relativeLayoutText.addView(btnDelete);
+                Picasso.get().load(R.drawable.icons8_cancel_100).into(btnDelete);
+               // btnDelete.setImageResource(R.drawable.icons8_cancel_100);
                 btnDelete.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        linearLayout.removeView(linearLayoutText);
+                        linearLayout.removeView(relativeLayoutText);
                     }
                 });
             } else {
-                LinearLayout linearLayoutImage = new LinearLayout(context);
-                linearLayoutImage.setOrientation(LinearLayout.VERTICAL);
+
+                RelativeLayout relativeLayoutImage = new RelativeLayout(this);
+                RelativeLayout.LayoutParams rlp = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                rlp.setMargins(10,10,10,10);
+                relativeLayoutImage.setLayoutParams(rlp);
                 //Create new ImageView programmatically with picked image
                 String imagePath = m.getStore();
                 Uri imgUri = Uri.parse(imagePath);
                 ImageView imgView = new ImageView(StationEdit_Activity.this);
                 imgView.setTag(imagePath);
                 final LinearLayout.LayoutParams layoutParams1 = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,500);
-                layoutParams1.setMargins(20,20,20,20);
                 imgView.setLayoutParams(layoutParams1);
                 imgView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                linearLayoutImage.addView(imgView);
-                linearLayout.addView(linearLayoutImage);
+                relativeLayoutImage.addView(imgView);
+                linearLayout.addView(relativeLayoutImage);
                 Picasso.get().load(new File(imagePath)).into(imgView);
                 //Also add a Button to delete this EditText View again
-                Button btnDelete = new Button(getBaseContext());
-                btnDelete.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 200));
-                btnDelete.setText("Löschen");
-                linearLayoutImage.addView(btnDelete);
+                ImageView btnDelete = new ImageView(getBaseContext());
+                RelativeLayout.LayoutParams buttonParam = new RelativeLayout.LayoutParams(deleteIconWidth,deleteIconHeight);
+                buttonParam.setMargins(10,10,10,10);
+                buttonParam.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                btnDelete.setLayoutParams(buttonParam);
+                btnDelete.setClickable(true);
+                relativeLayoutImage.addView(btnDelete);
+                Picasso.get().load(R.drawable.icons8_cancel_100).into(btnDelete);
+                //btnDelete.setImageResource(R.drawable.icons8_cancel_100);
                 btnDelete.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        linearLayout.removeView(linearLayoutImage);
+                        linearLayout.removeView(relativeLayoutImage);
                     }
                 });
 
             }
         }
     }
+
+
+
+    @Override
+    public void onBackPressed(){
+        Log.d("Station_edit_Activity","Back Button was pressed");
+        AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
+        builder1.setTitle("Achtung");
+        builder1.setMessage("Deine Änderungen werden nicht gespeichert. Möchtest Du fortfahren?");
+        builder1.setCancelable(true);
+        builder1.setPositiveButton("Ja", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                StationEdit_Activity.super.onBackPressed();
+            }
+        });
+        builder1.setNeutralButton("Abbrechen",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+        AlertDialog alert11 = builder1.create();
+        alert11.show();
+    }
+
+
 
 }
