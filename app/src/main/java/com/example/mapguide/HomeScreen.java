@@ -17,6 +17,8 @@ import android.widget.Toast;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -36,6 +38,7 @@ public class HomeScreen extends AppCompatActivity {
     DatabaseReference ref;
     RecyclerView recyclerView;
     FirebaseRecyclerAdapter<Multimediaguide, MultimediaguideViewHolder> firebaseRecyclerAdapter;
+    private FirebaseAuth mAuth;
 
 
     @Override
@@ -43,6 +46,7 @@ public class HomeScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_screen);
 
+        mAuth = FirebaseAuth.getInstance();
 
         /** Push Data into Database!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         // Cloud Storage
@@ -78,22 +82,49 @@ public class HomeScreen extends AppCompatActivity {
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
+                FirebaseUser currentUser = mAuth.getCurrentUser();
+
                 switch (item.getItemId()){
                     case R.id.guidesNear:
                         startActivity(new Intent(getApplicationContext(), TopGuides.class));
                         overridePendingTransition(0,0);
                         return true;
 
-                    case R.id.info:
-                        startActivity(new Intent(getApplicationContext(), GuideViewActivity.class));
-                        overridePendingTransition(0,0);
-                        return true;
+                    case R.id.myGuides:
+                        if(currentUser != null){
+                            //Jump Activity "Start Create Guide"
+                            Intent intent = new Intent(getBaseContext(), UserPage.class);
+                            startActivity(intent);
+                            overridePendingTransition(0,0);
+                            return true;
+
+                        } else {
+                            //Jump to Login Screen
+                            Intent intent = new Intent(getBaseContext(), LoginActivity.class);
+                            startActivity(intent);
+                            overridePendingTransition(0,0);
+                            return true;
+
+                        }
 
                     case R.id.guideAdd:
-                        startActivity(new Intent(getApplicationContext(), StartCreateGuide.class));
-                        overridePendingTransition(0,0);
-                        return true;
+                        if(currentUser != null){
 
+                            //Jump Activity "Start Create Guide"
+                            Intent intent = new Intent(getBaseContext(), StartCreateGuide.class);
+                            startActivity(intent);
+                            overridePendingTransition(0,0);
+                            return true;
+
+                        } else {
+                            //Jump to Login Screen
+                            Intent intent = new Intent(getBaseContext(), LoginActivity.class);
+                            startActivity(intent);
+                            overridePendingTransition(0,0);
+                            return true;
+
+                        }
                 }
 
                 return false;

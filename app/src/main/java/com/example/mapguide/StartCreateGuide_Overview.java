@@ -19,10 +19,15 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GetTokenResult;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -45,6 +50,10 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
     Button save;
     ImageView addStation_overview;
     String downloadImgUrl;
+
+
+    private FirebaseAuth mAuth;
+
 
     BitmapResizer bitmapResizer;
     int maxwidth = 1000;
@@ -70,6 +79,7 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start_create_guide__overview);
 
+        mAuth = FirebaseAuth.getInstance();
         mStorageRef = FirebaseStorage.getInstance().getReference();
 
         //Database connection
@@ -193,10 +203,31 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
                                             @Override
                                             public void onSuccess(Uri uri) {
                                                 //uri = downloadUrl.getResult().toString();
-                                                Multimediaguide m = new Multimediaguide(title_, description_, uri.toString(), 5, "Beispiel_Kategorie", stationList);
-                                                Log.d("--DOWNLOAD URI",uri.toString());
-                                                Log.d("--DOWNLOAD URI",stationList.toString());
-                                                ref.push().setValue(m);
+                                                FirebaseUser currentUser = mAuth.getCurrentUser();
+
+                                                if(currentUser != null) {
+
+                                                    currentUser.getIdToken(true)
+                                                            .addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+                                                                public void onComplete(@NonNull Task<GetTokenResult> task) {
+                                                                    if (task.isSuccessful()) {
+                                                                        String userIdtoken = task.getResult().getToken();
+                                                                        Multimediaguide m = new Multimediaguide(title_, description_, uri.toString(), 5, "Beispiel_Kategorie", stationList, userIdtoken);
+                                                                        Log.d("--DOWNLOAD URI",uri.toString());
+                                                                        Log.d("--DOWNLOAD URI",stationList.toString());
+                                                                        ref.push().setValue(m);
+                                                                        Toast.makeText(StartCreateGuide_Overview.this, "Dein Guide wurde erfolgreich hochgeladen.",
+                                                                                Toast.LENGTH_SHORT).show();
+
+                                                                    } else {
+                                                                        // Handle error -> task.getException();
+                                                                        Toast.makeText(StartCreateGuide_Overview.this, "Beim Upload deines Guides ist etwas schiefgelaufen. Bitte versuche es nochmal.",
+                                                                                Toast.LENGTH_SHORT).show();
+                                                                    }
+                                                                }
+                                                            });
+                                                }
+
 
                                             }
                                         });
@@ -208,6 +239,8 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
                             public void onFailure(@NonNull Exception exception) {
                                 // Handle unsuccessful uploads
                                 // ...
+                                Toast.makeText(StartCreateGuide_Overview.this, "Beim Upload deines Guides ist etwas schiefgelaufen. Bitte versuche es nochmal.",
+                                        Toast.LENGTH_SHORT).show();
                                 Log.d("--DOWNLOAD--","FAILED");
                             }
                         });

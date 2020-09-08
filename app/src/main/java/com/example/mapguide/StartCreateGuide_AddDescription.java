@@ -22,11 +22,7 @@ public class StartCreateGuide_AddDescription extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start_create_guide__add_description);
-
-        TextView t1 = (TextView)findViewById(R.id.textView3);
         name=getIntent().getStringExtra("name");
-        t1.setText(name);
-
         button = (Button)findViewById(R.id.button2);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
