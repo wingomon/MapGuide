@@ -23,6 +23,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -39,6 +40,8 @@ public class HomeScreen extends AppCompatActivity {
     RecyclerView recyclerView;
     FirebaseRecyclerAdapter<Multimediaguide, MultimediaguideViewHolder> firebaseRecyclerAdapter;
     private FirebaseAuth mAuth;
+
+    private int showMultimediaguideLimit = 10;
 
 
     @Override
@@ -139,9 +142,10 @@ public class HomeScreen extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
+        Query q = ref.limitToFirst(showMultimediaguideLimit);
 
         FirebaseRecyclerOptions<Multimediaguide> options = new FirebaseRecyclerOptions.Builder<Multimediaguide>()
-                .setQuery(ref, Multimediaguide.class)
+                .setQuery(q, Multimediaguide.class)
                 .build();
 
         firebaseRecyclerAdapter= new FirebaseRecyclerAdapter<Multimediaguide, MultimediaguideViewHolder>(options) {

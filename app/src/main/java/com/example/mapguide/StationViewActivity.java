@@ -3,6 +3,7 @@ package com.example.mapguide;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.res.ResourcesCompat;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
@@ -31,13 +32,14 @@ import com.squareup.picasso.Picasso;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class StationViewActivity extends AppCompatActivity {
 
     TextView title, description, number;
     ImageView image, cardIcon;
-    Button playButton;
+    Button playButton, nextButton, backButton;
     private Context context;
 
     //Für Audio-Player
@@ -58,6 +60,7 @@ public class StationViewActivity extends AppCompatActivity {
     private Uri tempAudioUri;
 
     Station station;
+    List<Station> stationList = new ArrayList<>();
     LinearLayout linearLayout;
 
     @Override
@@ -85,8 +88,12 @@ public class StationViewActivity extends AppCompatActivity {
         });
 
 
+        //StationList from previous Activity
+        stationList = (List<Station>) getIntent().getSerializableExtra("stationList");
+
         //Stations-Objekt aus vorheriger Activity entnehmen
         station = getIntent().getExtras().getParcelable("station");
+
         tempAudioPath = station.getAudioSrcPath();
 
         title.setText(station.getTitle());
@@ -164,8 +171,59 @@ public class StationViewActivity extends AppCompatActivity {
             }
         });
 
-    }
 
+        //Back und Next Button Control to previous or next Station
+        backButton = (Button) findViewById(R.id.backButton);
+        nextButton = (Button) findViewById(R.id.nextButton);
+
+        //Set Visibility of Back and Next Control accordingly to current Station
+        setVisibilityOfControl();
+
+        //Set onClickListener to Back and Next Control to navigating to desired Station via Control
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                station = stationList.get(station.getNumber()-2);
+                Intent intent = new Intent(context, StationViewActivity.class);
+                intent.putExtra("station",(Parcelable)station);
+                intent.putExtra("stationList",(Serializable) stationList);
+                startActivity(intent);
+                finish();
+            }
+        });
+
+        nextButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                station = stationList.get(station.getNumber());
+                Intent intent = new Intent(context, StationViewActivity.class);
+                intent.putExtra("station",(Parcelable)station);
+                intent.putExtra("stationList",(Serializable) stationList);
+                startActivity(intent);
+                finish();
+
+            }
+        });
+    }//end onCreate()
+
+
+    private void setVisibilityOfControl(){
+        if(station.getNumber()==1){
+            backButton.setVisibility(View.INVISIBLE);
+            backButton.setEnabled(false);
+        } else {
+            backButton.setVisibility(View.VISIBLE);
+            backButton.setEnabled(true);
+        }
+
+        if(station.getNumber() == stationList.size()){
+            nextButton.setVisibility(View.INVISIBLE);
+            nextButton.setEnabled(false);
+        } else {
+            nextButton.setVisibility(View.VISIBLE);
+            nextButton.setEnabled(true);
+        }
+    }
 
     private void loadMediaContent(){
 

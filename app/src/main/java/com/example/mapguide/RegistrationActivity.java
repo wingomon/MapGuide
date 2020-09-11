@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -24,6 +25,7 @@ public class RegistrationActivity extends AppCompatActivity {
 
     EditText etEmail, etName, etPassword;
     Button register;
+    TextView backToLogin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +37,16 @@ public class RegistrationActivity extends AppCompatActivity {
         etName = (EditText) findViewById(R.id.username);
         etEmail = (EditText) findViewById(R.id.email);
         etPassword = (EditText) findViewById(R.id.password);
+
+        backToLogin = (TextView) findViewById(R.id.backtoLogin);
+        backToLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getBaseContext(), LoginActivity.class).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                startActivity(intent);
+
+            }
+        });
 
         register = (Button) findViewById(R.id.button);
 

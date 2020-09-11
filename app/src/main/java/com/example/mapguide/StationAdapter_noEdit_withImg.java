@@ -85,7 +85,7 @@ public class StationAdapter_noEdit_withImg extends RecyclerView.Adapter<StationA
             public void onClick(View view) {
 
                 Activity origin = (Activity) mContext;
-                Intent intent = new Intent(mContext, StationViewActivity.class);
+                Intent intent = new Intent(mContext, StationViewActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 intent.putExtra("station",(Parcelable)stationList.get(position));
                 intent.putExtra("stationList",(Serializable) stationList);
                 origin.startActivity(intent);

@@ -712,10 +712,7 @@ public class StationEdit_Activity extends AppCompatActivity {
                         //Bitmap selectedImage = (Bitmap) data.getExtras().get("data");
                         //String imgPath = createImageFromBitmap(selectedImage);
                         //imageView.setImageBitmap(selectedImage);
-                        //stationImage.setImageURI(Uri.parse(currentPhotoPath));
-                        Picasso.get().load(Uri.parse(currentPhotoPath))
-                                .transform(new BitmapResizer(bitmapMaxWidth,bitmapMaxHeight))
-                                .into(stationImage);
+                        stationImage.setImageURI(Uri.parse(currentPhotoPath));
                         Log.i("---HAKLO----","-----------------------DAS BILD SOLLTE AUF DEN PFAD GESETZT WERDEN:" + currentPhotoPath);
                         /**
                          Bundle extras = data.getExtras();
@@ -759,11 +756,7 @@ public class StationEdit_Activity extends AppCompatActivity {
 
 
                                 //Berechtigungen für Zugriff auf den Speicher
-
                                 stationImage.setImageBitmap(BitmapFactory.decodeFile(picturePath));
-                               /** Picasso.get().load(Uri.parse(picturePath))
-                                        .transform(new BitmapResizer(bitmapMaxWidth,getBitmapMaxHeight))
-                                        .into(stationImage); **/
                                 cursor.close();
                             }
                         }

@@ -11,7 +11,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".StartCreateGuide_AddName"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:focusable="true"
+        android:focusableInTouchMode="true">
 
 
         <RelativeLayout
@@ -144,6 +146,7 @@
             android:layout_marginBottom="10dp"
             android:text="Hast du bereits ein Konto? Dann melde dich hier an."
             android:gravity="center"
+            android:clickable="true"
             android:fontFamily="@font/airbnbcereallight"
             android:textColor="@color/colorPrimary"
             android:textSize="14dp"/>

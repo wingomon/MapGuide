@@ -207,25 +207,13 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
 
                                                 if(currentUser != null) {
 
-                                                    currentUser.getIdToken(true)
-                                                            .addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
-                                                                public void onComplete(@NonNull Task<GetTokenResult> task) {
-                                                                    if (task.isSuccessful()) {
-                                                                        String userIdtoken = task.getResult().getToken();
-                                                                        Multimediaguide m = new Multimediaguide(title_, description_, uri.toString(), 5, "Beispiel_Kategorie", stationList, userIdtoken);
-                                                                        Log.d("--DOWNLOAD URI",uri.toString());
-                                                                        Log.d("--DOWNLOAD URI",stationList.toString());
-                                                                        ref.push().setValue(m);
-                                                                        Toast.makeText(StartCreateGuide_Overview.this, "Dein Guide wurde erfolgreich hochgeladen.",
-                                                                                Toast.LENGTH_SHORT).show();
-
-                                                                    } else {
-                                                                        // Handle error -> task.getException();
-                                                                        Toast.makeText(StartCreateGuide_Overview.this, "Beim Upload deines Guides ist etwas schiefgelaufen. Bitte versuche es nochmal.",
-                                                                                Toast.LENGTH_SHORT).show();
-                                                                    }
-                                                                }
-                                                            });
+                                                    String userId = currentUser.getUid();
+                                                    Multimediaguide m = new Multimediaguide(title_, description_, uri.toString(), 5, "Beispiel_Kategorie", stationList, userId);
+                                                    Log.d("--DOWNLOAD URI",uri.toString());
+                                                    Log.d("--DOWNLOAD URI",stationList.toString());
+                                                    ref.push().setValue(m);
+                                                    Toast.makeText(StartCreateGuide_Overview.this, "Dein Guide wurde erfolgreich hochgeladen.",
+                                                            Toast.LENGTH_SHORT).show();
                                                 }
 
 
