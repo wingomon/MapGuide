@@ -20,15 +20,33 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-           <RelativeLayout
-               android:layout_width="match_parent"
-               android:layout_height="450dp">
 
             <com.mapbox.mapboxsdk.maps.MapView
                 android:id="@+id/mapView"
                 android:layout_width="match_parent"
                 android:layout_height="450dp"
                 mapbox:mapbox_cameraZoom="11"/>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardElevation="1dp"
+                android:layout_marginBottom="10dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="right">
+
+                <ImageView
+                    android:id="@+id/search"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:src="@drawable/search"
+                    android:background="@drawable/circle"
+                    android:padding="6dp"
+                    android:layout_margin="10dp" />
 
                 <ImageView
                     android:id="@+id/updateView"
@@ -37,13 +55,11 @@
                     android:src="@drawable/reload"
                     android:background="@drawable/circle"
                     android:padding="5dp"
-                    android:layout_margin="10dp"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentBottom="true"
-                 />
+                    android:layout_margin="10dp" />
 
+            </LinearLayout>
+            </androidx.cardview.widget.CardView>
 
-           </RelativeLayout>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -53,7 +69,6 @@
                 android:textColor="@color/colorPrimary"
                 android:textSize="17dp"
                 android:layout_marginLeft="20dp"
-                android:layout_marginTop="20dp"
                 android:layout_marginBottom="10dp"/>
 
             <androidx.recyclerview.widget.RecyclerView

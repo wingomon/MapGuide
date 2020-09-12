@@ -10,8 +10,6 @@
     android:focusable="true">
 
     <androidx.core.widget.NestedScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -24,6 +22,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:cardElevation="5dp">
+
+                <TextView
+                    android:id="@+id/missingImg"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="Füge ein Bild hinzu."
+                    android:fontFamily="@font/airbnbcereallight"
+                    android:textSize="17dp"
+                    />
+
                 <ImageView
                     android:id="@+id/imageViewTitle"
                     android:layout_width="match_parent"
@@ -92,6 +101,40 @@
         android:layout_marginBottom="10dp"
         android:textColor="@color/colorPrimary"
         android:padding="10dp"/>
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Kategorie"
+                    android:fontFamily="@font/airbnbcerealmedium"
+                    android:layout_marginBottom="10dp"
+                    android:textSize="17dp"
+                    android:textColor="@color/colorPrimary"
+                    />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp">
+                <Spinner
+                    android:id="@+id/spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="35dp"
+                    android:background="@drawable/rounded_stroke_shape"
+                    android:theme="@style/SpinnerTheme"/>
+
+                    <ImageView
+                        android:layout_width="35dp"
+                        android:layout_height="35dp"
+                        android:layout_alignParentRight="true"
+                        android:src="@drawable/dropdown"
+                        android:padding="10dp"/>
+
+
+                </RelativeLayout>
+
+
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"

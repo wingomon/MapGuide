@@ -49,6 +49,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.kbeanie.multipicker.api.AudioPicker;
+import com.kbeanie.multipicker.api.CameraImagePicker;
 import com.kbeanie.multipicker.api.ImagePicker;
 import com.kbeanie.multipicker.api.Picker;
 import com.kbeanie.multipicker.api.callbacks.AudioPickerCallback;
@@ -68,12 +69,11 @@ import java.util.Locale;
 
 public class StationEdit_Activity extends AppCompatActivity {
 
-    TextView stationnumber;
+    TextView stationnumber, missingImg;
     EditText description;
     EditText title;
     Station station;
     ImageView addimageicon;
-    TextView addimagetext;
     String currentPhotoPath;
     Uri currentUri;
     Button saveButton;
@@ -97,6 +97,7 @@ public class StationEdit_Activity extends AppCompatActivity {
     List<MediaElement> mediaElementList;
     LinearLayout linearLayout;
     ImagePicker imagePicker;
+    CameraImagePicker cameraImagePicker;
 
 
     //Für Audio-Recorder
@@ -138,6 +139,7 @@ public class StationEdit_Activity extends AppCompatActivity {
 
 
 
+        missingImg = (TextView) findViewById(R.id.missingImg);
         mediaElementList = new ArrayList<>();
         linearLayout = (LinearLayout) findViewById(R.id.add_mediaContent);
         addMedia = (ImageView) findViewById(R.id.addmedia);
@@ -283,14 +285,7 @@ public class StationEdit_Activity extends AppCompatActivity {
 
         addimageicon = (ImageView) findViewById(R.id.addimageicon);
         addimageicon.setOnClickListener(this::onClick);
-        addimagetext = (TextView) findViewById(R.id.addImageText);
-        if(station.getImgSrcPath() != null){
-            if(!(station.getImgSrcPath().equals("null"))) {
-                addimageicon.setAlpha(0f);
-                addimagetext.setAlpha(0f);
-            }
 
-        }
 
         //Recorder
         recordButton = (ImageView)findViewById(R.id.recordButton);
@@ -393,7 +388,7 @@ public class StationEdit_Activity extends AppCompatActivity {
     public void onClick(View v){
         switch(v.getId()){
             case R.id.addimageicon:
-                selectImage(StationEdit_Activity.this);
+                selectImage();
                 break;
 
             case R.id.recordButton:
@@ -498,7 +493,7 @@ public class StationEdit_Activity extends AppCompatActivity {
      */
 
     private void addNewMedia(Context context){
-        final CharSequence[] mediaOptions = {"Text", "Foto"};
+        final CharSequence[] mediaOptions = {"Text", "Foto aus Bibliothek auswählen", "Foto aufnehmen"};
         AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.CustomAlertDialog);
         builder.setTitle("Füge weitere Medien hinzu");
 
@@ -554,7 +549,7 @@ public class StationEdit_Activity extends AppCompatActivity {
                     //Add this View to the ViewList
                   //  MediaElement m = new MediaElement(viewId, "TEXT", null);
 
-                } else if(mediaOptions[which].equals("Foto")){
+                } else if(mediaOptions[which].equals("Foto aus Bibliothek auswählen")){
                     imagePicker = new ImagePicker(StationEdit_Activity.this);
                     imagePicker.setImagePickerCallback(new ImagePickerCallback() {
                         @Override
@@ -565,7 +560,6 @@ public class StationEdit_Activity extends AppCompatActivity {
                             //Create new ImageView programmatically with picked image
                             ChosenImage c1 = list.get(0);
                             String imagePath = c1.getOriginalPath();
-                            Uri imgUri = Uri.parse(imagePath);
                             ImageView imgView = new ImageView(StationEdit_Activity.this);
                             imgView.setTag(imagePath);
                             final RelativeLayout.LayoutParams layoutParams1 = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,500);
@@ -601,6 +595,55 @@ public class StationEdit_Activity extends AppCompatActivity {
                         }
                     });
                     imagePicker.pickImage();
+                } else {
+                    cameraImagePicker = new CameraImagePicker(StationEdit_Activity.this);
+                    cameraImagePicker.setImagePickerCallback(new ImagePickerCallback(){
+                                                                 @Override
+                                                                 public void onImagesChosen(List<ChosenImage> list) {
+                                                                     RelativeLayout relativeLayoutImage = new RelativeLayout(context);
+                                                                     RelativeLayout.LayoutParams rlp = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                                                                     relativeLayoutImage.setLayoutParams(rlp);
+                                                                     //Create new ImageView programmatically with picked image
+                                                                     ChosenImage c1 = list.get(0);
+                                                                     String imagePath = c1.getOriginalPath();
+                                                                     ImageView imgView = new ImageView(StationEdit_Activity.this);
+                                                                     imgView.setTag(imagePath);
+                                                                     final RelativeLayout.LayoutParams layoutParams1 = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,500);
+                                                                     layoutParams1.setMargins(0,0,0,10);
+                                                                     imgView.setLayoutParams(layoutParams1);
+                                                                     imgView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                                                                     relativeLayoutImage.addView(imgView);
+                                                                     linearLayout.addView(relativeLayoutImage);
+                                                                     Picasso.get().load(new File(imagePath))
+                                                                             .transform(new BitmapResizer(bitmapMaxWidth,bitmapMaxHeight))
+                                                                             .into(imgView);
+                                                                     //Also add a Button to delete this EditText View again
+                                                                     ImageView btnDelete = new ImageView(getBaseContext());
+                                                                     RelativeLayout.LayoutParams buttonParam = new RelativeLayout.LayoutParams(deleteIconWidth,deleteIconHeight);
+                                                                     buttonParam.setMargins(10,10,10,10);
+                                                                     buttonParam.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                                                                     btnDelete.setLayoutParams(buttonParam);
+                                                                     btnDelete.setClickable(true);
+                                                                     relativeLayoutImage.addView(btnDelete);
+                                                                     Picasso.get().load(R.drawable.icons8_cancel_100).into(btnDelete);
+                                                                     //btnDelete.setImageResource(R.drawable.icons8_cancel_100);
+                                                                     btnDelete.setOnClickListener(new View.OnClickListener() {
+                                                                         @Override
+                                                                         public void onClick(View v) {
+                                                                             linearLayout.removeView(relativeLayoutImage);
+                                                                         }
+                                                                     });
+                                                                 }
+
+                                                                 @Override
+                                                                 public void onError(String message) {
+                                                                     // Do error handling
+                                                                 }
+                                                             }
+                    );
+                    // imagePicker.shouldGenerateMetadata(false); // Default is true
+                    // imagePicker.shouldGenerateThumbnails(false); // Default is true
+                    cameraImagePicker.pickImage();
                 }
 
             }
@@ -613,64 +656,68 @@ public class StationEdit_Activity extends AppCompatActivity {
      * Select Image
      * Possible to choose between
      * Gallery or Camera
-     * @param context
+     *
      */
-    private void selectImage(Context context) {
-        final CharSequence[] options = { "Foto aufnehmen", "Aus Bibliothek auswählen","Abbrechen" };
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.CustomAlertDialog);
+    private void selectImage(){
+        final CharSequence[] mediaOptions = {"Aus Bibliothek auswählen", "Foto aufnehmen","Abbrechen"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(StationEdit_Activity.this, R.style.CustomAlertDialog);
         builder.setTitle("Füge ein Foto hinzu");
 
-        builder.setItems(options, new DialogInterface.OnClickListener() {
-
+        builder.setItems(mediaOptions, new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int item) {
+            public void onClick(DialogInterface dialog, int which) {
 
-                if (options[item].equals("Foto aufnehmen")) {
-                    Intent takePicture = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-                    //  startActivityForResult(takePicture, 0);
-                    Log.i("------You-------","------------Clicked on TAKE PHOTO---------" + currentPhotoPath);
+                if(mediaOptions[which].equals("Aus Bibliothek auswählen")) {
 
-                    if (takePicture.resolveActivity(getPackageManager()) != null) {
-                        // Create the File where the photo should go
-                        File photoFile = null;
-                        try {
-                            photoFile = createImageFile();
-                            Log.i("---TRy---","---TO CREATE IMAGE");
-                        } catch (IOException ex) {
-                            // Error occurred while creating the File
-                            Log.i("---FAIL---","FILE COULD NOT BE CREATED");
-                        }
-                        // Continue only if the File was successfully created
-                        if (photoFile != null) {
-                            Uri photoURI = FileProvider.getUriForFile(getApplicationContext(),
-                                    BuildConfig.APPLICATION_ID+".provider",
-                                    photoFile);
-                            takePicture.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                    imagePicker = new ImagePicker(StationEdit_Activity.this);
+                    imagePicker.setImagePickerCallback(new ImagePickerCallback(){
+                                                           @Override
+                                                           public void onImagesChosen(List<ChosenImage> images) {
+                                                               // Adapt picture to imageView
+                                                               currentPhotoPath = images.get(0).getOriginalPath();
+                                                               stationImage.setImageBitmap(BitmapFactory.decodeFile(currentPhotoPath));
+                                                               missingImg.setVisibility(View.GONE);
+                                                           }
 
-                            //----THIS HAS BEEN ADDED
-                            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP) {
-                                takePicture.setClipData(ClipData.newRawUri("", photoURI));
-                                takePicture.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION|Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                            }
+                                                           @Override
+                                                           public void onError(String message) {
+                                                               // Do error handling
+                                                           }
+                                                       }
+                    );
+                    imagePicker.pickImage();
 
-                            Log.i("------YOOO---",currentPhotoPath);
+                } else if(mediaOptions[which].equals("Foto aufnehmen")){
+                    cameraImagePicker = new CameraImagePicker(StationEdit_Activity.this);
+                    cameraImagePicker.setImagePickerCallback(new ImagePickerCallback(){
+                                                                 @Override
+                                                                 public void onImagesChosen(List<ChosenImage> images) {
+                                                                     // Display images
+                                                                     // Adapt picture to imageView
+                                                                     currentPhotoPath = images.get(0).getOriginalPath();
+                                                                     stationImage.setImageBitmap(BitmapFactory.decodeFile(currentPhotoPath));
+                                                                     missingImg.setVisibility(View.GONE);
+                                                                 }
 
-                            startActivityForResult(takePicture, 0);
-                        }
-                    }
-
-                } else if (options[item].equals("Aus Bibliothek auswählen")) {
-                    Intent pickPhoto = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    startActivityForResult(pickPhoto , 1);
-
-                } else if (options[item].equals("Abbrechen")) {
+                                                                 @Override
+                                                                 public void onError(String message) {
+                                                                     // Do error handling
+                                                                 }
+                                                             }
+                    );
+                    // imagePicker.shouldGenerateMetadata(false); // Default is true
+                    // imagePicker.shouldGenerateThumbnails(false); // Default is true
+                    currentPhotoPath = cameraImagePicker.pickImage();
+                } else if(mediaOptions[which].equals("Abbrechen")){
                     dialog.dismiss();
                 }
+
             }
         });
         builder.show();
     }
+
 
 
     /**
@@ -690,114 +737,15 @@ public class StationEdit_Activity extends AppCompatActivity {
             audioPicker.submit(data);
         }
 
-        if (requestCode == Picker.PICK_IMAGE_DEVICE && resultCode == RESULT_OK){
+         else if (requestCode == Picker.PICK_IMAGE_DEVICE && resultCode == RESULT_OK){
             imagePicker.submit(data);
         }
-
-        if (resultCode != RESULT_CANCELED) {
-            switch (requestCode) {
-                case 0:
-                    if (resultCode == RESULT_OK) {
-
-                        /**
-
-                        //Wenn Bild ausgewählt wurde, dann aktiviere den "Weiter"-Button
-                        next = (Button) findViewById(R.id.button4);
-                        next.setEnabled(true);
-                        next.setAlpha(1f);
-                         **/
-                        // und blende das "Hinzufügen" Icon aus
-                        addimageicon.setAlpha(0f);
-                        addimagetext.setAlpha(0f);
-
-                        //Bitmap selectedImage = (Bitmap) data.getExtras().get("data");
-                        //String imgPath = createImageFromBitmap(selectedImage);
-                        //imageView.setImageBitmap(selectedImage);
-                        stationImage.setImageURI(Uri.parse(currentPhotoPath));
-                        Log.i("---HAKLO----","-----------------------DAS BILD SOLLTE AUF DEN PFAD GESETZT WERDEN:" + currentPhotoPath);
-                        /**
-                         Bundle extras = data.getExtras();
-                         Bitmap imageBitmap = (Bitmap) extras.get("data");
-                         imageView.setImageBitmap(imageBitmap);**/
-
-                    }
-
-                    break;
-                case 1:
-                    if (resultCode == RESULT_OK && data != null) {
-                        Uri selectedImage = data.getData();
-                        currentUri = selectedImage;
-                        Log.i("----FilePath----",getRealPathFromURI(currentUri));
-
-                        /**
-                        //Wenn Bild ausgewählt wurde, dann aktiviere den "Weiter"-Button
-                        next = (Button) findViewById(R.id.button4);
-                        next.setEnabled(true);
-                        next.setAlpha(1f);
-                         **/
-                        // und blende das "Hinzufügen" Icon aus
-                        addimageicon.setAlpha(0f);
-                        addimagetext.setAlpha(0f);
-
-                        String[] filePathColumn = {MediaStore.Images.Media.DATA};
-                        if (selectedImage != null) {
-                            Cursor cursor = getContentResolver().query(selectedImage,
-                                    filePathColumn, null, null, null);
-
-                            //Wenn Bild ausgewählt ist, dann speichere den Pfad in die Variable "currentPhotoPath"
-                            currentPhotoPath=getRealPathFromURI(currentUri);
-
-
-
-                            if (cursor != null) {
-                                cursor.moveToFirst();
-
-                                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                                String picturePath = cursor.getString(columnIndex);
-
-
-                                //Berechtigungen für Zugriff auf den Speicher
-                                stationImage.setImageBitmap(BitmapFactory.decodeFile(picturePath));
-                                cursor.close();
-                            }
-                        }
-
-                    }
-                    break;
-            }
+        else if(requestCode == Picker.PICK_IMAGE_CAMERA) {
+            cameraImagePicker.submit(data);
         }
+
     }
 
-
-    private File createImageFile() throws IOException {
-        // Create an image file name
-        String imageFileName = "TakeCameraPhoto";
-        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
-
-        // Save a file: path for use with ACTION_VIEW intents
-        currentPhotoPath = image.getAbsolutePath();
-        return image;
-    }
-
-
-    private String getRealPathFromURI(Uri contentURI) {
-        String result;
-        Cursor cursor = getContentResolver().query(contentURI, null, null, null, null);
-        if (cursor == null) { // Source is Dropbox or other similar local file path
-            result = contentURI.getPath();
-        } else {
-            cursor.moveToFirst();
-            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
-            result = cursor.getString(idx);
-            cursor.close();
-        }
-        return result;
-    }
 
 
     private void initMediaContentView(List<MediaElement> mediaElementList){

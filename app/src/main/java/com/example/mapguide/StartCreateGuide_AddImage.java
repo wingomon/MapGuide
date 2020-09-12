@@ -26,6 +26,11 @@ import android.widget.Button;
 import android.widget.ImageView;
 
 import com.google.android.material.textfield.TextInputEditText;
+import com.kbeanie.multipicker.api.CameraImagePicker;
+import com.kbeanie.multipicker.api.ImagePicker;
+import com.kbeanie.multipicker.api.Picker;
+import com.kbeanie.multipicker.api.callbacks.ImagePickerCallback;
+import com.kbeanie.multipicker.api.entity.ChosenImage;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -33,6 +38,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 public class StartCreateGuide_AddImage extends AppCompatActivity {
 
@@ -49,17 +55,21 @@ public class StartCreateGuide_AddImage extends AppCompatActivity {
     ContentValues values;
     Uri imageUri;
 
+    ImagePicker imagePicker;
+    CameraImagePicker cameraImagePicker;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start_create_guide__add_image);
 
         imageView = (ImageView) findViewById(R.id.imageView2);
+        next = (Button) findViewById(R.id.button4);
         addimageicon = (ImageView)findViewById(R.id.addimageicon);
         addimageicon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               selectImage(StartCreateGuide_AddImage.this);
+               selectImage();
             }
         });
 
@@ -81,7 +91,6 @@ public class StartCreateGuide_AddImage extends AppCompatActivity {
                 intent.putExtra("name",name);
                 intent.putExtra("description",description);
                 intent.putExtra("imgPath",currentPhotoPath);
-                intent.putExtra("imgUri",currentUri.toString());
                 startActivity(intent);
                 Log.i("hallo","ich wurde geklickt" + intent.getDataString());
             }
@@ -89,59 +98,89 @@ public class StartCreateGuide_AddImage extends AppCompatActivity {
 
     }
 
-    private void selectImage(Context context) {
-        final CharSequence[] options = { "Foto aufnehmen", "Aus Bibliothek auswählen","Abbrechen" };
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.CustomAlertDialog);
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(resultCode == RESULT_OK) {
+            if(requestCode == Picker.PICK_IMAGE_DEVICE) {
+                imagePicker.submit(data);
+            }
+            else if(requestCode == Picker.PICK_IMAGE_CAMERA) {
+                cameraImagePicker.submit(data);
+            }
+        }
+
+    }
+
+    /**
+     * Select Image
+     * Possible to choose between
+     * Gallery or Camera
+     *
+     */
+
+    private void selectImage(){
+        final CharSequence[] mediaOptions = {"Aus Bibliothek auswählen", "Foto aufnehmen","Abbrechen"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(StartCreateGuide_AddImage.this, R.style.CustomAlertDialog);
         builder.setTitle("Füge ein Foto hinzu");
 
-        builder.setItems(options, new DialogInterface.OnClickListener() {
-
+        builder.setItems(mediaOptions, new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int item) {
+            public void onClick(DialogInterface dialog, int which) {
 
-                if (options[item].equals("Foto aufnehmen")) {
-                   Intent takePicture = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-                  //  startActivityForResult(takePicture, 0);
-                    Log.i("------You-------","------------Clicked on TAKE PHOTO---------" + currentPhotoPath);
+                if(mediaOptions[which].equals("Aus Bibliothek auswählen")) {
 
-                    if (takePicture.resolveActivity(getPackageManager()) != null) {
-                        // Create the File where the photo should go
-                        File photoFile = null;
-                        try {
-                            photoFile = createImageFile();
-                            Log.i("---TRY---","---TO CREATE IMAGE");
-                        } catch (IOException ex) {
-                            // Error occurred while creating the File
-                            Log.i("---FAIL---","FILE COULD NOT BE CREATED");
-                        }
-                        // Continue only if the File was successfully created
-                        if (photoFile != null) {
-                            Uri photoURI = FileProvider.getUriForFile(getApplicationContext(),
-                                    BuildConfig.APPLICATION_ID+".provider",
-                                    photoFile);
-                            takePicture.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                    imagePicker = new ImagePicker(StartCreateGuide_AddImage.this);
+                    imagePicker.setImagePickerCallback(new ImagePickerCallback(){
+                                                           @Override
+                                                           public void onImagesChosen(List<ChosenImage> images) {
+                                                               // Adapt picture to imageView
+                                                               currentPhotoPath = images.get(0).getOriginalPath();
+                                                               imageView.setImageBitmap(BitmapFactory.decodeFile(currentPhotoPath));
+                                                               addimageicon.setAlpha(0f);
+                                                               next.setEnabled(true);
+                                                               next.setAlpha(1f);
+                                                           }
 
-                            //----THIS HAS BEEN ADDED
-                            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP) {
-                                takePicture.setClipData(ClipData.newRawUri("", photoURI));
-                                takePicture.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION|Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                            }
+                                                           @Override
+                                                           public void onError(String message) {
+                                                               // Do error handling
+                                                           }
+                                                       }
+                    );
+                    imagePicker.pickImage();
 
+                } else if(mediaOptions[which].equals("Foto aufnehmen")){
+                    cameraImagePicker = new CameraImagePicker(StartCreateGuide_AddImage.this);
+                    cameraImagePicker.setImagePickerCallback(new ImagePickerCallback(){
+                                                                 @Override
+                                                                 public void onImagesChosen(List<ChosenImage> images) {
+                                                                     // Display images
+                                                                     // Adapt picture to imageView
+                                                                     currentPhotoPath = images.get(0).getOriginalPath();
+                                                                     imageView.setImageBitmap(BitmapFactory.decodeFile(currentPhotoPath));
+                                                                     addimageicon.setAlpha(0f);
+                                                                     next.setEnabled(true);
+                                                                     next.setAlpha(1f);
 
-                            Log.i("------YOOO---",currentPhotoPath);
+                                                                 }
 
-                            startActivityForResult(takePicture, 0);
-                        }
-                    }
-
-                } else if (options[item].equals("Aus Bibliothek auswählen")) {
-                    Intent pickPhoto = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    startActivityForResult(pickPhoto , 1);
-
-                } else if (options[item].equals("Abbrechen")) {
+                                                                 @Override
+                                                                 public void onError(String message) {
+                                                                     // Do error handling
+                                                                 }
+                                                             }
+                    );
+                    // imagePicker.shouldGenerateMetadata(false); // Default is true
+                    // imagePicker.shouldGenerateThumbnails(false); // Default is true
+                    currentPhotoPath = cameraImagePicker.pickImage();
+                } else if(mediaOptions[which].equals("Abbrechen")){
                     dialog.dismiss();
                 }
+
             }
         });
         builder.show();
@@ -149,103 +188,6 @@ public class StartCreateGuide_AddImage extends AppCompatActivity {
 
 
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        Log.i("-------111111HAKLO----","---RESULTCODE:" + resultCode + "-------REQUESTCODE:" + requestCode+"------DATA"+data+ "-DAS BILD SOLLTE AUF DEN PFAD GESETZT WERDEN:" + currentPhotoPath );
-
-
-        if (resultCode != RESULT_CANCELED) {
-            switch (requestCode) {
-                case 0:
-                    if (resultCode == RESULT_OK) {
-
-                        //Wenn Bild ausgewählt wurde, dann aktiviere den "Weiter"-Button
-                        next = (Button) findViewById(R.id.button4);
-                        next.setEnabled(true);
-                        next.setAlpha(1f);
-                        // und blende das "Hinzufügen" Icon aus
-                        addimageicon.setAlpha(0f);
-
-                        imageView.setImageURI(Uri.parse(currentPhotoPath));
-                        Log.i("---Camera,AddImageView---","-----------------------DAS BILD SOLLTE AUF DEN PFAD GESETZT WERDEN:" + currentPhotoPath);
-
-
-                    }
-
-                    break;
-                case 1:
-                    if (resultCode == RESULT_OK && data != null) {
-                        Uri selectedImage = data.getData();
-                        currentUri = selectedImage;
-                        Log.i("----FilePath----",getRealPathFromURI(currentUri));
-
-                        //Wenn Bild ausgewählt wurde, dann aktiviere den "Weiter"-Button
-                        next = (Button) findViewById(R.id.button4);
-                        next.setEnabled(true);
-                        next.setAlpha(1f);
-                        // und blende das "Hinzufügen" Icon aus
-                        addimageicon.setAlpha(0f);
-
-                        String[] filePathColumn = {MediaStore.Images.Media.DATA};
-                        if (selectedImage != null) {
-                            Cursor cursor = getContentResolver().query(selectedImage,
-                                    filePathColumn, null, null, null);
-
-                            //Wenn Bild ausgewählt ist, dann speichere den Pfad in die Variable "currentPhotoPath"
-                            currentPhotoPath=getRealPathFromURI(currentUri);
-                            Log.d("--DOWNLOAD URI--",currentUri.toString());
-
-
-                            if (cursor != null) {
-                                cursor.moveToFirst();
-
-                                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                                String picturePath = cursor.getString(columnIndex);
-
-                                //Berechtigungen für Zugriff auf den Speicher
-                                imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath));
-                                cursor.close();
-                            }
-                        }
-
-                    }
-                    break;
-            }
-        }
-    }
-
-
-    private File createImageFile() throws IOException {
-        // Create an image file name
-        String imageFileName = "TakeCameraPhoto";
-        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
-
-        // Save a file: path for use with ACTION_VIEW intents
-        currentPhotoPath = image.getAbsolutePath();
-        currentUri = Uri.parse(image.getAbsolutePath());
-        return image;
-    }
-
-
-    private String getRealPathFromURI(Uri contentURI) {
-        String result;
-        Cursor cursor = getContentResolver().query(contentURI, null, null, null, null);
-        if (cursor == null) { // Source is Dropbox or other similar local file path
-            result = contentURI.getPath();
-        } else {
-            cursor.moveToFirst();
-            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
-            result = cursor.getString(idx);
-            cursor.close();
-        }
-        return result;
-    }
 
 
 }

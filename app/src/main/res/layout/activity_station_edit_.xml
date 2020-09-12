@@ -23,9 +23,6 @@
                 android:layout_height="wrap_content"
                 app:cardElevation="5dp">
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
 
             <ImageView
                 android:id="@+id/stationImage"
@@ -34,32 +31,28 @@
                 android:scaleType="centerCrop"
                 android:background="@color/Lightgrey"/>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:layout_centerInParent="true">
-            <ImageView
-                android:id="@+id/addimageicon"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:src="@drawable/ic_add"
-                android:clickable="true"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="10dp"/>
+
+                <ImageView
+                    android:id="@+id/addimageicon"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:scaleType="centerCrop"
+                    android:background="@drawable/circle"
+                    android:src="@drawable/edit"
+                    android:padding="7dp"
+                    android:clickable="true"
+                    android:layout_gravity="bottom|right"
+                    android:layout_margin="10dp"/>
 
                 <TextView
-                    android:id="@+id/addImageText"
+                    android:id="@+id/missingImg"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="3dp"
-                    android:text="Klicke um ein Bild hinzuzufügen"
-                    android:layout_gravity="center_horizontal"
+                    android:layout_gravity="center"
+                    android:text="Füge ein Bild hinzu."
                     android:fontFamily="@font/airbnbcereallight"
-                    android:textColor="@color/colorPrimary"/>
-
-                </LinearLayout>
-            </RelativeLayout>
+                    android:textSize="17dp"
+                    />
 
             </androidx.cardview.widget.CardView>
 

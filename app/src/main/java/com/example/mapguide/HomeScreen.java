@@ -41,7 +41,7 @@ public class HomeScreen extends AppCompatActivity {
     FirebaseRecyclerAdapter<Multimediaguide, MultimediaguideViewHolder> firebaseRecyclerAdapter;
     private FirebaseAuth mAuth;
 
-    private int showMultimediaguideLimit = 10;
+    private int showMultimediaguideLimit = 30;
 
 
     @Override

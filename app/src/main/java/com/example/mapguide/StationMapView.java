@@ -191,12 +191,23 @@ public class StationMapView extends AppCompatActivity implements OnMapReadyCallb
                 if(startOfTour != null){
                     if(startOfTour.equals("true")){
 
-                            List<LatLng> stationLatLngList = new ArrayList<>();
-                            for(Station s : stationList){
-                                stationLatLngList.add(new LatLng(s.getLatitude(),s.getLongitude()));
+                            if(stationList.size()>1) {
+
+                                List<LatLng> stationLatLngList = new ArrayList<>();
+                                for (Station s : stationList) {
+                                    stationLatLngList.add(new LatLng(s.getLatitude(), s.getLongitude()));
+                                }
+                                LatLngBounds latLngBounds = new LatLngBounds.Builder().includes(stationLatLngList).build();
+                                mapboxMap.animateCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 300));
                             }
-                            LatLngBounds latLngBounds = new LatLngBounds.Builder().includes(stationLatLngList).build();
-                            mapboxMap.animateCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 300));
+                                CameraPosition cameraPosition = new CameraPosition.Builder()
+                                        .target(new LatLng(stationList.get(0).getLatitude(), stationList.get(0).getLongitude()))
+                                        .zoom(15)
+                                        .tilt(20)
+                                        .build();
+
+                                mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 7000);
+
 
                     }
                 } else {

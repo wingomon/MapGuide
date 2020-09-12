@@ -32,12 +32,16 @@ import com.mapbox.api.directions.v5.DirectionsCriteria;
 import com.mapbox.api.directions.v5.MapboxDirections;
 import com.mapbox.api.directions.v5.models.DirectionsResponse;
 import com.mapbox.api.directions.v5.models.DirectionsRoute;
+import com.mapbox.api.geocoding.v5.models.CarmenFeature;
 import com.mapbox.api.optimization.v1.MapboxOptimization;
 import com.mapbox.api.optimization.v1.models.OptimizationResponse;
 import com.mapbox.geojson.LineString;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.annotations.Marker;
+import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.location.LocationComponent;
 import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions;
 import com.mapbox.mapboxsdk.location.modes.CameraMode;
@@ -54,11 +58,14 @@ import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.geojson.Point;
+import com.mapbox.mapboxsdk.plugins.places.autocomplete.PlaceAutocomplete;
+import com.mapbox.mapboxsdk.plugins.places.autocomplete.model.PlaceOptions;
 import com.mapbox.mapboxsdk.style.layers.LineLayer;
 import com.mapbox.mapboxsdk.style.layers.Property;
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
+
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -91,7 +98,7 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
     SymbolManager symbolManager;
 
     Button saveButton;
-    ImageView updateView;
+    ImageView updateView, search;
 
     private DirectionsRoute optimizedRoute;
     private MapboxOptimization optimizedClient;
@@ -103,6 +110,9 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
     private static final String TEAL_COLOR = "#FF0000";
     private static final float POLYLINE_WIDTH = 4;
     private static final String ROUTE_SOURCE_ID = "route-source-id";
+
+
+    private static final int REQUEST_CODE_AUTOCOMPLETE = 5;
 
     private DirectionsRoute currentRoute;
     MapboxDirections client;
@@ -191,6 +201,34 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
                         updateMapView();
                     }
                 });
+
+                search = (ImageView) findViewById(R.id.search);
+                search.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new PlaceAutocomplete.IntentBuilder()
+                                .accessToken(Mapbox.getAccessToken() != null ? Mapbox.getAccessToken() : getString(R.string.mapbox_access_token))
+                                .placeOptions(PlaceOptions.builder()
+                                        .backgroundColor(Color.parseColor("#EEEEEE"))
+                                        .limit(10)
+                                        .build(PlaceOptions.MODE_CARDS))
+                                .build(StartCreateGuide_AddStationOverview.this);
+                        startActivityForResult(intent, REQUEST_CODE_AUTOCOMPLETE);
+                    }
+                });
+
+                if(stationList != null) {
+                    if (stationList.size() > 0) {
+                        List<LatLng> stationLatLngList = new ArrayList<>();
+                        for(Station s : stationList){
+                            stationLatLngList.add(new LatLng(s.getLatitude(),s.getLongitude()));
+                        }
+                        LatLngBounds latLngBounds = new LatLngBounds.Builder().includes(stationLatLngList).build();
+                        mapboxMap.animateCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 300));
+
+                    }
+                }
+
             }
         });
     }
@@ -540,6 +578,20 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
                 Station stationEdited = data.getExtras().getParcelable("station");
                 stationList.set((stationEdited.getNumber()-1),stationEdited);
                 stationAdapter.notifyDataSetChanged();
+            }
+        } else if(requestCode==REQUEST_CODE_AUTOCOMPLETE){
+            if(resultCode==RESULT_OK){
+
+                // Retrieve selected location's CarmenFeature
+                CarmenFeature selectedCarmenFeature = PlaceAutocomplete.getPlace(data);
+                // Move map camera to the selected location
+                mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(
+                        new CameraPosition.Builder()
+                                .target(new LatLng(((Point) selectedCarmenFeature.geometry()).latitude(),
+                                        ((Point) selectedCarmenFeature.geometry()).longitude()))
+                                .zoom(14)
+                                .build()), 4000);
+
             }
         }
     }

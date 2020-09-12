@@ -1,6 +1,7 @@
 package com.example.mapguide;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -8,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -16,9 +18,11 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -33,6 +37,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.kbeanie.multipicker.api.CameraImagePicker;
+import com.kbeanie.multipicker.api.ImagePicker;
+import com.kbeanie.multipicker.api.Picker;
+import com.kbeanie.multipicker.api.callbacks.ImagePickerCallback;
+import com.kbeanie.multipicker.api.entity.ChosenImage;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -44,13 +53,13 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
 
     ImageView imageView;
     String imgPath;
-    Uri imgUri;
     EditText title;
     EditText description;
     Button save;
     ImageView addStation_overview;
     ImageView editButton;
-    String downloadImgUrl;
+    private Spinner spinner;
+    private static final String[] category = {"Sonstige","Städte","Natur","Museum", "Abenteuer"};
 
 
     private FirebaseAuth mAuth;
@@ -60,6 +69,8 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
     int maxwidth = 1000;
     int maxHeight = 1000;
 
+    ImagePicker imagePicker;
+    CameraImagePicker cameraImagePicker;
 
 
     //Liste der Stationen | RecyclerView Variablen
@@ -103,15 +114,23 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(stationAdapter);
 
-       // tempStation = new Station(stationList.size()+1, 6.982851545508879, 51.02212194428202 ,"Titel der Station","null","null","Beschreibung der Station");
-       // stationList.add(tempStation);
-        //stationAdapter.notifyDataSetChanged();
+       //Spinner
+        spinner = (Spinner) findViewById(R.id.spinner);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(StartCreateGuide_Overview.this,
+                android.R.layout.simple_spinner_item,category);
+        // Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        // Apply the adapter to the spinner
+        spinner.setAdapter(adapter);
+
+
 
         editButton = (ImageView) findViewById(R.id.editButton);
         editButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                selectImage();
             }
         });
 
@@ -126,7 +145,6 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
 
 
         imgPath = getIntent().getStringExtra("imgPath");
-        imgUri = Uri.parse(getIntent().getStringExtra("imgUri"));
         imageView = (ImageView) findViewById(R.id.imageViewTitle);
         imageView.setImageURI(Uri.parse(imgPath));
 
@@ -216,7 +234,7 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
                                                 if(currentUser != null) {
 
                                                     String userId = currentUser.getUid();
-                                                    Multimediaguide m = new Multimediaguide(title_, description_, uri.toString(), 5, "Beispiel_Kategorie", stationList, userId);
+                                                    Multimediaguide m = new Multimediaguide(title_, description_, uri.toString(), 5, spinner.getSelectedItem().toString(), stationList, userId);
                                                     Log.d("--DOWNLOAD URI",uri.toString());
                                                     Log.d("--DOWNLOAD URI",stationList.toString());
                                                     ref.push().setValue(m);
@@ -369,6 +387,8 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
         super.onActivityResult(requestCode, resultCode, data);
 
+
+        //---------Get Stations as Result
         if(requestCode == 1){
             if (resultCode == RESULT_OK){
 
@@ -381,9 +401,82 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
                     if(stationList != null){stationList.add(s); }
                 }
                 stationAdapter.notifyDataSetChanged();
-
             }
         }
 
+        //---------ImagePicker
+        if(resultCode == RESULT_OK) {
+            if(requestCode == Picker.PICK_IMAGE_DEVICE) {
+                imagePicker.submit(data);
+            }
+            else if(requestCode == Picker.PICK_IMAGE_CAMERA) {
+                cameraImagePicker.submit(data);
+            }
+        }
+
+
+
+
     }
+
+
+    private void selectImage(){
+        final CharSequence[] mediaOptions = {"Aus Bibliothek auswählen", "Foto aufnehmen","Abbrechen"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(StartCreateGuide_Overview.this, R.style.CustomAlertDialog);
+        builder.setTitle("Füge ein Foto hinzu");
+
+        builder.setItems(mediaOptions, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                if(mediaOptions[which].equals("Aus Bibliothek auswählen")) {
+
+                    imagePicker = new ImagePicker(StartCreateGuide_Overview.this);
+                    imagePicker.setImagePickerCallback(new ImagePickerCallback(){
+                                                           @Override
+                                                           public void onImagesChosen(List<ChosenImage> images) {
+                                                               // Adapt picture to imageView
+                                                               imgPath = images.get(0).getOriginalPath();
+                                                               imageView.setImageBitmap(BitmapFactory.decodeFile(imgPath));
+                                                           }
+
+                                                           @Override
+                                                           public void onError(String message) {
+                                                               // Do error handling
+                                                           }
+                                                       }
+                    );
+                    imagePicker.pickImage();
+
+                } else if(mediaOptions[which].equals("Foto aufnehmen")){
+                    cameraImagePicker = new CameraImagePicker(StartCreateGuide_Overview.this);
+                    cameraImagePicker.setImagePickerCallback(new ImagePickerCallback(){
+                                                           @Override
+                                                           public void onImagesChosen(List<ChosenImage> images) {
+                                                               // Display images
+                                                               // Adapt picture to imageView
+                                                               String imagePath = images.get(0).getOriginalPath();
+                                                               imageView.setImageBitmap(BitmapFactory.decodeFile(imagePath));
+                                                           }
+
+                                                           @Override
+                                                           public void onError(String message) {
+                                                               // Do error handling
+                                                           }
+                                                       }
+                    );
+                    // imagePicker.shouldGenerateMetadata(false); // Default is true
+                    // imagePicker.shouldGenerateThumbnails(false); // Default is true
+                    imgPath = cameraImagePicker.pickImage();
+                } else if(mediaOptions[which].equals("Abbrechen")){
+                    dialog.dismiss();
+                }
+
+            }
+        });
+        builder.show();
+    }
+
+
+
 }
