@@ -46,10 +46,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:id="@+id/textView1"
+                android:id="@+id/toStationView"
                 android:layout_centerInParent="true"
                 android:layout_marginLeft="15dp"
-                android:layout_centerVertical="true">
+                android:layout_centerVertical="true"
+                android:clickable="true">
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/textViewNumber"

@@ -29,6 +29,19 @@
                     android:layout_width="match_parent"
                     android:layout_height="250dp"
                     android:scaleType="centerCrop"/>
+
+                <ImageView
+                    android:id="@+id/editButton"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:scaleType="centerCrop"
+                    android:background="@drawable/circle"
+                    android:src="@drawable/edit"
+                    android:padding="7dp"
+                    android:clickable="true"
+                    android:layout_gravity="bottom|right"
+                    android:layout_margin="10dp"/>
+
             </androidx.cardview.widget.CardView>
 
             <LinearLayout
@@ -107,7 +120,7 @@
                         android:src="@drawable/ic_add"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        app:layout_constraintTop_toTopOf="parent"/>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -127,6 +140,8 @@
                 android:textColor="@color/white"
                 android:fontFamily="@font/amiko_bold"
                 android:layout_gravity="center_horizontal"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="20dp"
                 android:background="@drawable/rounded_corners_blue_gradient"/>
 
 

@@ -12,6 +12,7 @@
 
     <style name="CustomAlertDialog" parent="Theme.AppCompat.Light.Dialog.Alert">
         <item name="android:windowBackground">@drawable/alertbuilder_style</item>
+        <item name="colorAccent">@color/colorAccent</item>
     </style>
 
 

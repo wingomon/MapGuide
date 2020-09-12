@@ -49,6 +49,7 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
     EditText description;
     Button save;
     ImageView addStation_overview;
+    ImageView editButton;
     String downloadImgUrl;
 
 
@@ -106,6 +107,13 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
        // stationList.add(tempStation);
         //stationAdapter.notifyDataSetChanged();
 
+        editButton = (ImageView) findViewById(R.id.editButton);
+        editButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
 
 
         //Bekomme Daten aus vorheriger Activity

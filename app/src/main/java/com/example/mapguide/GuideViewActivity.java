@@ -5,17 +5,24 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
+import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +33,7 @@ public class GuideViewActivity extends AppCompatActivity {
     TextView guideTitle;
     TextView guideDescription;
     ImageView guideImage;
+    Button startTour;
 
     //Liste der Stationen | RecyclerView Variablen
     List<Station> stationList;
@@ -80,6 +88,30 @@ public class GuideViewActivity extends AppCompatActivity {
             }
         }
         stationAdapter.notifyDataSetChanged();
+
+        startTour = (Button) findViewById(R.id.startButton);
+
+        startTour.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if(stationList != null){
+                    if(stationList.size()>0){
+                        Intent intent = new Intent(getApplicationContext(), StationMapView.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                        intent.putExtra("station",(Parcelable)stationList.get(0));
+                        intent.putExtra("stationList",(Serializable) stationList);
+                        intent.putExtra("start","true");
+                        startActivity(intent);
+                    }
+                    else{
+                        Toast.makeText(GuideViewActivity.this, "Dieser Guide beinhaltet keine Stationen und kann daher nicht gestartet werden.",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+            }
+        });
+
 
     }
 }

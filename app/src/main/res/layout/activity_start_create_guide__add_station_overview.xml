@@ -20,21 +20,30 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:mapbox="http://schemas.android.com/apk/res-auto"
-                xmlns:tools="http://schemas.android.com/tools">
+           <RelativeLayout
+               android:layout_width="match_parent"
+               android:layout_height="450dp">
 
             <com.mapbox.mapboxsdk.maps.MapView
                 android:id="@+id/mapView"
                 android:layout_width="match_parent"
-                android:layout_height="400dp"
+                android:layout_height="450dp"
                 mapbox:mapbox_cameraZoom="11"/>
 
-            </FrameLayout>
+                <ImageView
+                    android:id="@+id/updateView"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:src="@drawable/reload"
+                    android:background="@drawable/circle"
+                    android:padding="5dp"
+                    android:layout_margin="10dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentBottom="true"
+                 />
 
+
+           </RelativeLayout>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -61,7 +70,10 @@
                 android:textColor="@color/white"
                 android:fontFamily="@font/amiko_bold"
                 android:layout_gravity="center_horizontal"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="20dp"
                 android:background="@drawable/rounded_corners_blue_gradient"/>
+
 
         </LinearLayout>
 

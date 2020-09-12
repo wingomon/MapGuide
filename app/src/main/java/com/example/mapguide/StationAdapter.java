@@ -37,7 +37,6 @@ public class StationAdapter extends RecyclerView.Adapter<StationAdapter.StationV
 
 
 
-
         public StationViewHolder(View view){
             super(view);
             number = (TextView) view.findViewById(R.id.textView);

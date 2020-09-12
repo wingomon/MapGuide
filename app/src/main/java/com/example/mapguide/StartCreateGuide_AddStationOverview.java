@@ -1,6 +1,7 @@
 package com.example.mapguide;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -11,6 +12,7 @@ import retrofit2.Response;
 import timber.log.Timber;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -20,6 +22,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.mapbox.android.core.location.LocationEngine;
@@ -88,7 +91,7 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
     SymbolManager symbolManager;
 
     Button saveButton;
-
+    ImageView updateView;
 
     private DirectionsRoute optimizedRoute;
     private MapboxOptimization optimizedClient;
@@ -103,17 +106,17 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
 
     private DirectionsRoute currentRoute;
     MapboxDirections client;
-    private List<DirectionsRoute> directionsRouteList;
     private final List<Feature> featureList = new ArrayList<>();
 
     boolean responseReady;
+
+    FeatureCollection tempFeatureCollection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         //Initialize MapBox View
-
         Log.d("----MY MAPBOX TOKEN IS------", getString(R.string.mapbox_access_token));
 
         Mapbox.getInstance(this, getString(R.string.mapbox_access_token));
@@ -161,6 +164,8 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
         });
 
 
+
+
     } //end OnCreate()
 
 
@@ -177,6 +182,15 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
                 initMapIfStationsExistent(style);
                 mapboxMap.addOnMapClickListener(StartCreateGuide_AddStationOverview.this);
                 enableLocationComponent(style);
+
+
+                updateView = (ImageView) findViewById(R.id.updateView);
+                updateView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        updateMapView();
+                    }
+                });
             }
         });
     }
@@ -185,12 +199,6 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
             // Add the marker image to map
             loadedMapStyle.addImage("icon-image", BitmapFactory.decodeResource(
                     this.getResources(), R.drawable.marker));
-
-            // Add the source to the map
-            /**
-            loadedMapStyle.addSource(new GeoJsonSource(ICON_GEOJSON_SOURCE_ID,
-                    Feature.fromGeometry(Point.fromLngLat(origin.longitude(), origin.latitude()))));
-            **/
 
             loadedMapStyle.addSource(new GeoJsonSource(ICON_GEOJSON_SOURCE_ID));
 
@@ -223,21 +231,9 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
             Point destination;
 
             if (stationList != null) {
-                if (stationList.size() == 1) {
-                    addDestinationMarker(style, new LatLng(stationList.get(0).getLongitude(), stationList.get(0).getLatitude()));
-                }
-
-
+                    addDestinationMarker(style);
                 if (stationList.size() >= 2) {
-
-                    Log.d("MAPBOXDEBUG", "StationListe ist größer als 2");
-
                     for (int i = stationList.size() - 1; i > 0; i--) {
-
-                        if(i >=1) {
-                            addDestinationMarker(style, new LatLng(stationList.get(i).getLongitude(), stationList.get(i).getLatitude()));
-                        }
-
                         Log.d("MAPBOXDEBUG", "StationList-Size:" + stationList.size());
                         destination = Point.fromLngLat((stationList.get(i).getLongitude()), (stationList.get(i).getLatitude()));
                         Log.d("MAPBOXDEBUG", destination.toString());
@@ -250,81 +246,68 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
                         Log.d("MAPBOXDEBUG", "For INT I=" + i + "---" + currentRoute);
 
                     }
-                    FeatureCollection tempFeatureCollection = FeatureCollection.fromFeatures(featureList);
-                    drawLines(tempFeatureCollection);
-                    Log.d("MAPBOXDEBUG", "FeatureCollection:" + FeatureCollection.fromFeatures(featureList).features().size());
-
                 }
             }
-
         }
-
     }
 
     @Override
     public boolean onMapClick(@NonNull LatLng point) {
 
-        FeatureCollection featureCollection;
+            if(stationList != null){
 
-        clearMap();
+                //Check if stationList has more than 15 Stations, if yes --> Ccreating new Stations is not possible anymore
+                if(stationList.size() < 15){
+                    //ADD NEW STATION
+                    tempStation = new Station(stationList.size()+1, point.getLongitude(), point.getLatitude(),"Titel der Station","null","null","Beschreibung der Station", new ArrayList<>());
+                    stationList.add(tempStation);
+                    stationAdapter.notifyDataSetChanged();
 
-            //ADD NEW STATION
-            tempStation = new Station(stationList.size()+1, point.getLongitude(), point.getLatitude(),"Titel der Station","null","null","Beschreibung der Station", new ArrayList<>());
-            stationList.add(tempStation);
-            stationAdapter.notifyDataSetChanged();
-
-            Style style = mapboxMap.getStyle();
-            if (style != null) {
-                addDestinationMarker(style, point);
-
-
-                Point origin;
-                Point destination;
-
-                if(stationList.size() >= 2) {
-
-                    Log.d("MAPBOXDEBUG","StationListe ist größer als 2");
-
-                    for (int i = stationList.size()-1; i > 0; i--) {
-
-                        Log.d("MAPBOXDEBUG","StationList-Size:"+stationList.size());
-                        destination = Point.fromLngLat((stationList.get(i).getLongitude()), (stationList.get(i).getLatitude()));
-                        Log.d("MAPBOXDEBUG",destination.toString());
-
-                        origin = Point.fromLngLat((stationList.get(i-1).getLongitude()), (stationList.get(i-1).getLatitude()));
-                        Log.d("MAPBOXDEBUG",origin.toString());
-
-                        getRoute(mapboxMap, origin, destination);
-
-                        Log.d("MAPBOXDEBUG", "For INT I="+i+"---"+currentRoute);
-
+                    Style style = mapboxMap.getStyle();
+                    if (style != null) {
+                        addDestinationMarker(style);
                     }
-                    FeatureCollection tempFeatureCollection = FeatureCollection.fromFeatures(featureList);
-                    drawLines(tempFeatureCollection);
-                    Log.d("MAPBOXDEBUG","FeatureCollection:"+FeatureCollection.fromFeatures(featureList).features().size());
-
-
-                /**
-                    FeatureCollection tempFeatureCollection = FeatureCollection.fromFeatures(featureList);
-                    drawLines(tempFeatureCollection);
-                    Log.d("MAPBOXDEBUG","FeatureCollection:"+FeatureCollection.fromFeatures(featureList).features().size());
-**/
+                    updateMapView();
                 }
-
-                /**
-                //Ich brauche für getOptimizedRoute eine Liste mit Punkten von der Stationsliste
-                List<Point> stationPointList = new ArrayList<>();
-                for(Station s: stationList) {
-                    stationPointList.add(Point.fromLngLat(s.getLongitude(), s.getLatitude()));
+                else {
+                    Toast.makeText(this, "Maximale Anzahl an Stationen erreicht.",
+                            Toast.LENGTH_SHORT).show();
                 }
-                if(stationList.size()>=2) {
-                    getOptimizedRoute(style, stationPointList);
-                } **/
             }
+
+
 
         return true;
 }
 
+
+    private void updateMapView(){
+        clearMap();
+        Style style = mapboxMap.getStyle();
+        if (style != null) {
+            Point origin;
+            Point destination;
+
+            if(stationList.size() >= 2) {
+
+                Log.d("MAPBOXDEBUG","StationListe ist größer als 2");
+
+                for (int i = stationList.size()-1; i > 0; i--) {
+
+                    Log.d("MAPBOXDEBUG","StationList-Size:"+stationList.size());
+                    destination = Point.fromLngLat((stationList.get(i).getLongitude()), (stationList.get(i).getLatitude()));
+                    Log.d("MAPBOXDEBUG",destination.toString());
+
+                    origin = Point.fromLngLat((stationList.get(i-1).getLongitude()), (stationList.get(i-1).getLatitude()));
+                    Log.d("MAPBOXDEBUG",origin.toString());
+
+                    getRoute(mapboxMap, origin, destination);
+
+                }
+            }
+        }
+
+    }
 
     private void clearMap() {
 
@@ -332,7 +315,7 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
         if (mapboxMap != null) {
             Style style = mapboxMap.getStyle();
             if (style != null) {
-                resetDestinationMarkers(style);
+                addDestinationMarker(style);
                 removeRoute(style);
             }
         }
@@ -340,32 +323,29 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
 
     private void resetDestinationMarkers(@NonNull Style style) {
         GeoJsonSource lineSource = style.getSourceAs(ICON_GEOJSON_SOURCE_ID);
-        /**
-        if (optimizedLineSource != null) {
-            optimizedLineSource.setGeoJson(Point.fromLngLat(origin.longitude(), origin.latitude()));
-        }**/
+
     }
 
 
 
     private void removeRoute(@NonNull Style style) {
         GeoJsonSource lineSource = style.getSourceAs("route-source-id");
-        /**
-         if (optimizedLineSource != null) {
-         optimizedLineSource.setGeoJson(FeatureCollection.fromFeatures(new Feature[] {}));
-         }**/
+        if(lineSource!=null) {
+            featureList.clear();
+            FeatureCollection tempFeatureCollection = FeatureCollection.fromFeatures(featureList);
+            drawLines(tempFeatureCollection);
+        }
     }
 
 
 
-    private void addDestinationMarker(@NonNull Style style, LatLng point) {
+    private void addDestinationMarker(@NonNull Style style) {
         List<Feature> destinationMarkerList = new ArrayList<>();
         for (Station s : stationList) {
             destinationMarkerList.add(Feature.fromGeometry(
                     Point.fromLngLat(s.getLongitude(), s.getLatitude())));
             Log.d("MAPBOX", "AddDestinationMarker: Iteration durch stationList, Hinzufügen aller Punkte");
         }
-        //destinationMarkerList.add(Feature.fromGeometry(Point.fromLngLat(point.getLongitude(), point.getLatitude())));
         GeoJsonSource iconSource = style.getSourceAs(ICON_GEOJSON_SOURCE_ID);
         if (iconSource != null) {
             iconSource.setGeoJson(FeatureCollection.fromFeatures(destinationMarkerList));
@@ -405,7 +385,7 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
                             LineString.fromPolyline(currentRoute.geometry(), PRECISION_6)));
 
                     FeatureCollection tempFeatureCollection = FeatureCollection.fromFeatures(featureList);
-
+                    drawLines(tempFeatureCollection);
                     Log.d("MAPBOXDEBUG", "GET ROUTE " + currentRoute);
                     Log.d("MAPBOXDEBUG", "FeatureList-size is" + featureList.size());
                     Log.d("MAPBOXDEBUG", "FeatureList FEATURE COLLECTION-size is" + FeatureCollection.fromFeatures(featureList).features().size());
@@ -427,7 +407,7 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
         if (mapboxMap != null) {
             mapboxMap.getStyle(style -> {
                 if (featureCollection.features() != null) {
-                    if (featureCollection.features().size() > 0) {
+                    if (featureCollection.features().size() >= 0) {
 
 
                         GeoJsonSource source = style.getSourceAs("route-source-id");
@@ -435,80 +415,13 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
                         if(source!=null) {
                             source.setGeoJson(featureCollection);
                         }
-
-                        /**
-                        style.addLayer(new LineLayer("linelayer", "line-source")
-                                .withProperties(PropertyFactory.lineCap(Property.LINE_CAP_SQUARE),
-                                        PropertyFactory.lineJoin(Property.LINE_JOIN_MITER),
-                                        PropertyFactory.lineOpacity(.7f),
-                                        PropertyFactory.lineWidth(7f),
-                                        PropertyFactory.lineColor(Color.parseColor("#3bb2d0"))));
-**/
                         Log.d("MAPBOXDEBUG","DRAW LINES");
                     }
                 }
             });
         }
-        if (featureList != null) {
-            if(featureList.size() > 0) {
-                featureList.clear();
-            }
-        }
     }
 
-/**
-        StartCreateGuide_AddStationOverview.this.mapboxMap = mapboxMap;
-
-        Log.d("--MAPREADY--","OnMapReady was loaded");
-        mapboxMap.setStyle(new Style.Builder().fromUri("mapbox://styles/mapbox/cjerxnqt3cgvp2rmyuxbeqme7"),
-                new Style.OnStyleLoaded() {
-                    @Override
-                    public void onStyleLoaded(@NonNull Style style) {
-
-                        //Liste für Marker-Symbole
-                        List<Symbol> symbolList = new ArrayList<>();
-
-                        //Manager für Icons auf der Karte
-                        style.addImage("markerIcon",getResources().getDrawable(R.drawable.marker));
-                        symbolManager = new SymbolManager(mapView,mapboxMap,style);
-                        // set non-data-driven properties, such as:
-                        symbolManager.setIconAllowOverlap(true);
-                        symbolManager.setIconTranslate(new Float[]{-4f,5f});
-                        symbolManager.setIconRotationAlignment(ICON_ROTATION_ALIGNMENT_VIEWPORT);
-
-                        enableLocationComponent(style);
-                        Log.d("--MAPREADY,ONSTYLELOADED--","OnMapReady - OnSTyleloaded");
-
-                        //Interaktion bei Klick auf die Karte
-                        mapboxMap.addOnMapClickListener(new MapboxMap.OnMapClickListener() {
-                            @Override
-                            public boolean onMapClick(@NonNull LatLng point) {
-
-                                //Wenn auf die Karte geklickt wird, werden alle vorherigen Symbole/Marker gelöscht! Danach durch die Liste iteriert und neu generiert
-                                symbolManager.deleteAll();
-                                LatLng tempPoint;
-                                tempStation = new Station(stationList.size()+1, point.getLongitude(), point.getLatitude(),"Titel der Station","null","null","Beschreibung der Station");
-                                stationList.add(tempStation);
-                                //Nachdem die Stationen der Liste hinzugefügt werden, soll jede Station auch einen Marker auf der Karte erhalten
-                                // Add symbol to symbolList at specified lat/lon
-
-                                for (Station s : stationList) {
-                                    tempPoint = new LatLng(s.getLatitude(),s.getLongitude());
-                                    Symbol symbol = symbolManager.create(new SymbolOptions()
-                                            .withLatLng(tempPoint)
-                                            .withIconImage("markerIcon")
-                                            .withIconSize(0.3f));
-                                }
-                                stationAdapter.notifyDataSetChanged();
-
-                                //Wenn in der StationListe ein Eintrag vorher herrsscht, dann nimm diesen und zeichne eine Route von diesem Punkt zum aktuell geklickten Punkt
-
-                                return true;
-                            }
-                        });
-                    }
-                });
-    } //End onMapReady()**/
 
     @SuppressWarnings( {"MissingPermission"})
     private void enableLocationComponent(@NonNull Style loadedMapStyle) {
@@ -630,6 +543,29 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
             }
         }
     }
+
+    @Override
+    public void onBackPressed(){
+        Log.d("Station_edit_Activity","Back Button was pressed");
+        AlertDialog.Builder builder1 = new AlertDialog.Builder(this, R.style.CustomAlertDialog);
+        builder1.setTitle("Änderungen verwerfen?");
+        builder1.setMessage("Wenn du jetzt zurückgehst, verlierst du deine Änderungen.");
+        builder1.setCancelable(true);
+        builder1.setPositiveButton("Änderungen verwerfen", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                StartCreateGuide_AddStationOverview.super.onBackPressed();
+            }
+        });
+        builder1.setNeutralButton("Weiter bearbeiten",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+        AlertDialog alert11 = builder1.create();
+        alert11.show();
+    }
+
 
 
 }

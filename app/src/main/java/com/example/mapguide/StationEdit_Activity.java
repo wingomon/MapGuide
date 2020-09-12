@@ -46,6 +46,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.kbeanie.multipicker.api.AudioPicker;
 import com.kbeanie.multipicker.api.ImagePicker;
@@ -143,7 +144,7 @@ public class StationEdit_Activity extends AppCompatActivity {
         addMedia.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                addNewMedia(StationEdit_Activity.this);
+                    addNewMedia(StationEdit_Activity.this);
             }
         });
 
@@ -885,16 +886,16 @@ public class StationEdit_Activity extends AppCompatActivity {
     @Override
     public void onBackPressed(){
         Log.d("Station_edit_Activity","Back Button was pressed");
-        AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
-        builder1.setTitle("Achtung");
-        builder1.setMessage("Deine Änderungen werden nicht gespeichert. Möchtest Du fortfahren?");
+        AlertDialog.Builder builder1 = new AlertDialog.Builder(this, R.style.CustomAlertDialog);
+        builder1.setTitle("Änderungen verwerfen?");
+        builder1.setMessage("Wenn du jetzt zurückgehst, verlierst du deine Änderungen.");
         builder1.setCancelable(true);
-        builder1.setPositiveButton("Ja", new DialogInterface.OnClickListener() {
+        builder1.setPositiveButton("Änderungen verwerfen", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 StationEdit_Activity.super.onBackPressed();
             }
         });
-        builder1.setNeutralButton("Abbrechen",
+        builder1.setNeutralButton("Weiter bearbeiten",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         dialog.cancel();
