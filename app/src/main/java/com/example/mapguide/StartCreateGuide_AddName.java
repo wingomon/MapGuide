@@ -34,6 +34,7 @@ public class StartCreateGuide_AddName extends AppCompatActivity {
                     Intent intent = new Intent(getBaseContext(), StartCreateGuide_AddDescription.class);
                     intent.putExtra("name", name.getText().toString());
                     startActivity(intent);
+                    finish();
                 }
             }
         });

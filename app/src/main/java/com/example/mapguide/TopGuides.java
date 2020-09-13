@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +17,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.StorageReference;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -72,6 +74,14 @@ public class TopGuides extends AppCompatActivity {
                holder.setDescription(desc);
                holder.setTitle(model.getName());
                holder.setKilometer(model.getKm());
+               holder.getmView().setOnClickListener(new View.OnClickListener() {
+                   @Override
+                   public void onClick(View v) {
+                       Intent intent = new Intent(getApplicationContext(), GuideViewActivity.class);
+                       intent.putExtra("Multimediaguide",(Serializable) model);
+                       startActivity(intent);
+                   }
+               });
            }
 
            @NonNull

@@ -92,6 +92,7 @@ public class StartCreateGuide_AddImage extends AppCompatActivity {
                 intent.putExtra("description",description);
                 intent.putExtra("imgPath",currentPhotoPath);
                 startActivity(intent);
+                finish();
                 Log.i("hallo","ich wurde geklickt" + intent.getDataString());
             }
         });

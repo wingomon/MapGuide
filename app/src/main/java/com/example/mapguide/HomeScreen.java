@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -28,6 +29,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import org.w3c.dom.Text;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,8 +44,12 @@ public class HomeScreen extends AppCompatActivity {
     FirebaseRecyclerAdapter<Multimediaguide, MultimediaguideViewHolder> firebaseRecyclerAdapter;
     private FirebaseAuth mAuth;
 
+    TextView moreGuidesNear;
+
     private int showMultimediaguideLimit = 30;
 
+
+    TextView cityCategory, natureCategory, museumCategory, adventureCategory, defaultCategory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,14 +57,6 @@ public class HomeScreen extends AppCompatActivity {
         setContentView(R.layout.activity_home_screen);
 
         mAuth = FirebaseAuth.getInstance();
-
-        /** Push Data into Database!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        // Cloud Storage
-        mStorageRef = FirebaseStorage.getInstance().getReference();
-        ref = FirebaseDatabase.getInstance().getReference().child("guides");
-        Multimediaguide m1 = new Multimediaguide("Rom bei Nacht", "Erleben Sie Roms wunderschönes Nachtleben", "https://www.travelbook.de/data/uploads/2017/06/17978759_95907d892c.jpg", 5, "Sightseeing");
-        ref.push().setValue(m1);
-        **/
 
 
         //Database connection
@@ -70,12 +69,54 @@ public class HomeScreen extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false));
 
 
+        moreGuidesNear = (TextView) findViewById(R.id.moreGuidesNear);
+        moreGuidesNear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), TopGuides.class).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+            }
+        });
 
 
+        cityCategory = (TextView) findViewById(R.id.textViewCategoryCity);
+        cityCategory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), CategoryActivity.class).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                intent.putExtra("category","city");
+                startActivity(intent);
+            }
+        });
 
+        natureCategory = (TextView) findViewById(R.id.textViewCategoryNature);
+        natureCategory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), CategoryActivity.class).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                intent.putExtra("category","nature");
+                startActivity(intent);
+            }
+        });
 
+        adventureCategory = (TextView) findViewById(R.id.textViewCategoryAdventure);
+        adventureCategory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), CategoryActivity.class).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                intent.putExtra("category","adventure");
+                startActivity(intent);
+            }
+        });
 
-
+        museumCategory = (TextView) findViewById(R.id.textViewCategoryMuseum);
+        museumCategory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), CategoryActivity.class).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                intent.putExtra("category","museum");
+                startActivity(intent);
+            }
+        });
 
 
         //Navigation related

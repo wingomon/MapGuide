@@ -178,6 +178,12 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+                //ALertDialog for Loading with Loading circle
+                AlertDialog.Builder loadingBuilder = new AlertDialog.Builder(StartCreateGuide_Overview.this, R.style.CustomAlertDialog);
+                loadingBuilder.setView(R.layout.my_progress_view);
+                loadingBuilder.show();
+
+
                 for(Station s: stationList) {
                     //Upload of Picture and Audio of Station
                     uploadStationFilesToFirebaseStorage(s.getImgSrcPath(),s,"image");
@@ -238,6 +244,11 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
                                                     Log.d("--DOWNLOAD URI",uri.toString());
                                                     Log.d("--DOWNLOAD URI",stationList.toString());
                                                     ref.push().setValue(m);
+
+                                                    Intent intent = new Intent(getApplicationContext(), UserPage.class);
+                                                    startActivity(intent);
+                                                    finish();
+
                                                     Toast.makeText(StartCreateGuide_Overview.this, "Dein Guide wurde erfolgreich hochgeladen.",
                                                             Toast.LENGTH_SHORT).show();
                                                 }
@@ -476,6 +487,29 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
         });
         builder.show();
     }
+
+    @Override
+    public void onBackPressed(){
+        Log.d("Station_edit_Activity","Back Button was pressed");
+        AlertDialog.Builder builder1 = new AlertDialog.Builder(this, R.style.CustomAlertDialog);
+        builder1.setTitle("Änderungen verwerfen?");
+        builder1.setMessage("Wenn du jetzt zurückgehst, wird dein Guide verworfen.");
+        builder1.setCancelable(true);
+        builder1.setPositiveButton("Änderungen verwerfen", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                StartCreateGuide_Overview.super.onBackPressed();
+            }
+        });
+        builder1.setNeutralButton("Weiter bearbeiten",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+        AlertDialog alert11 = builder1.create();
+        alert11.show();
+    }
+
 
 
 

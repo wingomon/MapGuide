@@ -84,7 +84,7 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineWidth;
 
 public class StartCreateGuide_AddStationOverview extends AppCompatActivity implements OnMapReadyCallback, PermissionsListener, MapboxMap.OnMapClickListener{
 
-   private MapView mapView;
+   private CustomMapView mapView;
 
    //Für Berechtigungen für Zugriff zum Standort
     private MapboxMap mapboxMap;
@@ -134,7 +134,7 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
         setContentView(R.layout.activity_start_create_guide__add_station_overview);
 
 
-        mapView = (MapView) findViewById(R.id.mapView);
+        mapView = (CustomMapView) findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
 

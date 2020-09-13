@@ -60,18 +60,19 @@
 
                          <RelativeLayout
                              android:layout_width="match_parent"
-                             android:layout_height="match_parent">
+                             android:layout_height="match_parent"
+                             android:background="@drawable/titleimg">
 
                              <TextView
                                  android:layout_width="wrap_content"
                                  android:layout_height="wrap_content"
                                  android:fontFamily="@font/airbnbcerealbold"
-                                 android:gravity="bottom"
+                                 android:gravity="right"
                                  android:text="Geschichten auf neue Arten erzählen und erleben"
                                  android:textColor="@color/white"
                                  android:textSize="30dp"
                                  android:layout_margin="20dp"
-                                 android:textAlignment="center"/>
+                                 android:layout_alignParentBottom="true"/>
 
 
                          </RelativeLayout>
@@ -102,9 +103,11 @@
                 android:textSize="17dp"/>
 
                     <TextView
+                        android:id="@+id/moreGuidesNear"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:text="mehr...."
+                        android:clickable="true"
                         android:fontFamily="@font/airbnbcereallight"
                         android:textSize="15dp"
                         android:layout_toRightOf="@+id/TextViewNear"

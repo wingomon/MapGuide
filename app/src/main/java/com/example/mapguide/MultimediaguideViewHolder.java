@@ -49,9 +49,15 @@ class MultimediaguideViewHolder extends RecyclerView.ViewHolder {
     public void setKilometer (int km)
     {
         TextView guideDescription = (TextView) mView.findViewById(R.id.textViewKm);
-        guideDescription.setText(Integer.toString(km));
+        guideDescription.setText(Integer.toString(km)+" km");
         Log.i("Myactivity","Km is set to" + km);
     }
 
+    public View getmView() {
+        return mView;
+    }
 
+    public void setmView(View mView) {
+        this.mView = mView;
+    }
 }

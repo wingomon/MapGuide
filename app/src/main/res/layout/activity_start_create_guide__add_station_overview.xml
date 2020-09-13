@@ -21,11 +21,12 @@
             android:orientation="vertical">
 
 
-            <com.mapbox.mapboxsdk.maps.MapView
+            <com.example.mapguide.CustomMapView
                 android:id="@+id/mapView"
                 android:layout_width="match_parent"
                 android:layout_height="450dp"
-                mapbox:mapbox_cameraZoom="11"/>
+                mapbox:mapbox_cameraZoom="11"
+                android:focusableInTouchMode="true"/>
 
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
@@ -75,7 +76,8 @@
                 android:id="@+id/stationRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:overScrollMode="never"/>
+                android:overScrollMode="never"
+                android:focusable="false"/>
 
             <Button
                 android:id="@+id/buttonSave"

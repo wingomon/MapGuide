@@ -130,7 +130,8 @@
                 android:id="@+id/recyclerViewStation"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:overScrollMode="never"/>
+                android:overScrollMode="never"
+                android:focusable="false"/>
 
 
 

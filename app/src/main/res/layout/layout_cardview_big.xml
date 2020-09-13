@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    >
+    android:layout_gravity="center_horizontal">
 
     <androidx.cardview.widget.CardView
-        android:layout_width="230dp"
-        android:layout_height="230dp"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
         app:cardCornerRadius="10dp"
-        app:cardElevation="1dp"
+        app:cardElevation="3dp"
         android:clickable="true"
-        android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="10dp">
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginLeft="20dp">
 
 
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
@@ -30,24 +30,24 @@
                 xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:id="@+id/imageView"
                 android:layout_width="match_parent"
-                android:layout_height="130dp"
+                android:layout_height="match_parent"
                 android:src="@drawable/placeholder_astronaut"
                 android:scaleType="centerCrop"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_alignParentBottom="true"
-                android:background="@drawable/white_gradient"
-                android:padding="10dp"
-                >
-
+                android:background="@drawable/white_gradient">
             <TextView
                 android:id="@+id/textViewTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/airbnbcerealmedium"
+                android:layout_marginLeft="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="30dp"
                 android:text="Titel des Guides "
                 android:textColor="@color/colorPrimary"
                 android:textSize="15dp"/>
@@ -57,29 +57,34 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/textViewTitle"
+                android:layout_marginEnd="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginStart="10dp"
                 android:fontFamily="@font/airbnbcereallight"
                 android:textSize="12dp"
                 android:textColor="@color/colorPrimary"
-                android:text="Lorem diam nonumy eirmod " />
+                android:text="Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod " />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="end">
             <TextView
                 android:id="@+id/textViewKm"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/airbnbcereallight"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="3dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginBottom="10dp"
+                android:fontFamily="@font/amiko_bold"
                 android:textColor="@color/colorPrimary"
-                android:layout_gravity="bottom|right"
-                android:text="XY KM"
-                android:padding="5dp"
-                android:background="@drawable/rounded_stroke_shape"/>
-                </LinearLayout>
+                android:textAlignment="textEnd"
+                android:layout_gravity="end"
+                android:gravity="bottom"
+                android:text="XY KM" />
             </LinearLayout>
 
-        </LinearLayout>
+        </RelativeLayout>
     </androidx.cardview.widget.CardView>
 
 

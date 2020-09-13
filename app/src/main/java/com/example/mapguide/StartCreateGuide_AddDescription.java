@@ -38,6 +38,7 @@ public class StartCreateGuide_AddDescription extends AppCompatActivity {
                     intent.putExtra("name", name);
                     intent.putExtra("description", description.getText().toString());
                     startActivity(intent);
+                    finish();
                 }
 
             }
