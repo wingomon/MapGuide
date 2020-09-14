@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/gradient_background"
+    android:background="@color/Lightgrey"
     tools:context=".HomeScreen">
 
     <TextView
@@ -14,7 +14,7 @@
         android:textAlignment="center"
         android:fontFamily="@font/beattingvile"
         android:text="Tour with me"
-        android:textColor="#FFFFFF"
+        android:textColor="@color/Primary_grey"
         android:textSize="100dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

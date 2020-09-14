@@ -71,7 +71,7 @@ public class TopGuides extends AppCompatActivity {
                    desc= desc.substring(0,47) + "...";
                }
                holder.setImage(model.getImgPath());
-               holder.setDescription(desc);
+               //holder.setDescription(desc);
                holder.setTitle(model.getName());
                holder.setKilometer(model.getKm());
                holder.getmView().setOnClickListener(new View.OnClickListener() {
@@ -88,7 +88,7 @@ public class TopGuides extends AppCompatActivity {
            @Override
            public MultimediaguideViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
                View view = LayoutInflater.from(parent.getContext())
-                       .inflate(R.layout.layout_listguide,parent,false);
+                       .inflate(R.layout.layout_cardview_big,parent,false);
                return new MultimediaguideViewHolder(view);
            }
        };

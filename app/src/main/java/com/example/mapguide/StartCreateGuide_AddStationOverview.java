@@ -32,6 +32,8 @@ import com.mapbox.api.directions.v5.DirectionsCriteria;
 import com.mapbox.api.directions.v5.MapboxDirections;
 import com.mapbox.api.directions.v5.models.DirectionsResponse;
 import com.mapbox.api.directions.v5.models.DirectionsRoute;
+import com.mapbox.api.geocoding.v5.GeocodingCriteria;
+import com.mapbox.api.geocoding.v5.MapboxGeocoding;
 import com.mapbox.api.geocoding.v5.models.CarmenFeature;
 import com.mapbox.api.optimization.v1.MapboxOptimization;
 import com.mapbox.api.optimization.v1.models.OptimizationResponse;
@@ -81,6 +83,7 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconOffset;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconSize;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineWidth;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineGradient;
 
 public class StartCreateGuide_AddStationOverview extends AppCompatActivity implements OnMapReadyCallback, PermissionsListener, MapboxMap.OnMapClickListener{
 
@@ -100,6 +103,8 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
     Button saveButton;
     ImageView updateView, search;
 
+    String location;
+
     private DirectionsRoute optimizedRoute;
     private MapboxOptimization optimizedClient;
     private Point origin;
@@ -107,7 +112,7 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
     private static final String ICON_GEOJSON_SOURCE_ID = "icon-source-id";
     private static final String FIRST = "first";
     private static final String ANY = "any";
-    private static final String TEAL_COLOR = "#FF0000";
+    private static final String TEAL_COLOR = "#B993D6";
     private static final float POLYLINE_WIDTH = 4;
     private static final String ROUTE_SOURCE_ID = "route-source-id";
 
@@ -164,7 +169,6 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 Intent resultIntent = new Intent();
                 resultIntent.putExtra("stationList",(Serializable) stationList);
                 Log.d("--MAPGUIDE--AddstationOverview",stationList.toString());
@@ -183,7 +187,7 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
     public void onMapReady(@NonNull final MapboxMap mapboxMap) {
 
         this.mapboxMap = mapboxMap;
-        mapboxMap.setStyle(Style.MAPBOX_STREETS, new Style.OnStyleLoaded() {
+        mapboxMap.setStyle(Style.LIGHT, new Style.OnStyleLoaded() {
             @Override
             public void onStyleLoaded(@NonNull Style style) {
                 // Add origin and destination to the mapboxMap
@@ -236,13 +240,13 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
         private void initMarkerIconSymbolLayer(@NonNull Style loadedMapStyle) {
             // Add the marker image to map
             loadedMapStyle.addImage("icon-image", BitmapFactory.decodeResource(
-                    this.getResources(), R.drawable.marker));
+                    this.getResources(), R.drawable.marker_blue));
 
             loadedMapStyle.addSource(new GeoJsonSource(ICON_GEOJSON_SOURCE_ID));
 
             loadedMapStyle.addLayer(new SymbolLayer("icon-layer-id", ICON_GEOJSON_SOURCE_ID).withProperties(
                     iconImage("icon-image"),
-                    iconSize(0.3f),
+                    iconSize(0.15f),
                     iconAllowOverlap(true),
                     iconIgnorePlacement(true),
                     iconOffset(new Float[] {0f, -7f})

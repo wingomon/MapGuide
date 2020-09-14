@@ -87,7 +87,7 @@ public class StationMapView extends AppCompatActivity implements OnMapReadyCallb
     HashMap<Symbol,Integer> markerIdMapping = new HashMap<>();
 
     //ROUTE LINE STYLE
-    private static final String TEAL_COLOR = "#FF0000";
+    private static final String TEAL_COLOR = "#B993D6";
     private static final float POLYLINE_WIDTH = 4;
 
     //Für Berechtigungen für Zugriff zum Standort
@@ -176,7 +176,7 @@ public class StationMapView extends AppCompatActivity implements OnMapReadyCallb
     public void onMapReady(@NonNull final MapboxMap mapboxMap) {
 
         this.mapboxMap = mapboxMap;
-        mapboxMap.setStyle(Style.MAPBOX_STREETS, new Style.OnStyleLoaded() {
+        mapboxMap.setStyle(Style.LIGHT, new Style.OnStyleLoaded() {
             @Override
             public void onStyleLoaded(@NonNull Style style) {
 
@@ -263,7 +263,7 @@ public class StationMapView extends AppCompatActivity implements OnMapReadyCallb
         symbolManager.setIconAllowOverlap(true);
 
         //Add Marker Bitmaps
-        Bitmap bm = BitmapFactory.decodeResource(getBaseContext().getResources(),R.drawable.marker);
+        Bitmap bm = BitmapFactory.decodeResource(getBaseContext().getResources(),R.drawable.marker_blue);
         mapboxMap.getStyle().addImage("my-marker", bm);
 
         List<SymbolOptions> options = new ArrayList<>();
@@ -275,7 +275,7 @@ public class StationMapView extends AppCompatActivity implements OnMapReadyCallb
                     .withLatLng(new LatLng(s.getLatitude(),s.getLongitude()))
                     .withIconImage("my-marker")
                     //set the below attributes according to your requirements
-                    .withIconSize(0.3f)
+                    .withIconSize(0.15f)
                     .withIconOffset(new Float[] {0f,-1.5f})
                     .withTextHaloColor("rgba(255, 255, 255, 100)")
                     .withTextHaloWidth(5.0f)

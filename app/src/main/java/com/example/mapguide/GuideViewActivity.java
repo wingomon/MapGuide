@@ -22,6 +22,8 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
+import org.w3c.dom.Text;
+
 import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
@@ -32,6 +34,7 @@ public class GuideViewActivity extends AppCompatActivity {
     Multimediaguide multimediaguide;
     TextView guideTitle;
     TextView guideDescription;
+    TextView stations, location;
     ImageView guideImage;
     Button startTour;
 
@@ -56,6 +59,20 @@ public class GuideViewActivity extends AppCompatActivity {
         }
         guideTitle = (TextView) findViewById(R.id.guideTitle);
         guideTitle.setText(multimediaguide.getName());
+        stations = (TextView) findViewById(R.id.textViewStationAnzahl);
+        if(stationListTemp != null) {
+            if(stationListTemp.size()==1){
+                stations.setText("1 Station");
+            } else {
+                stations.setText(stationListTemp.size() + " Stationen");
+            }
+        }
+        location = (TextView) findViewById(R.id.textViewLocation);
+        if(location != null) {
+            location.setText(multimediaguide.getLocation());
+        } else{
+            location.setVisibility(View.GONE);
+        }
         guideDescription = (TextView) findViewById(R.id.guideDescription);
         guideDescription.setText(multimediaguide.getDescription());
         guideImage = (ImageView) findViewById(R.id.guideImage);

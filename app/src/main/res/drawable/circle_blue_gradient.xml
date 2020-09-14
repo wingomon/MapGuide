@@ -6,10 +6,13 @@
     android:thicknessRatio="2.0"
     android:useLevel="false" >
 
-    <solid
-        android:color="@color/white" />
 
-    <stroke
-        android:width="1dp"
-        android:color="@color/colorPrimary" />
+    <gradient
+        android:type="linear"
+        android:startColor="#B993D6"
+        android:endColor="#8CA6DB"
+        android:angle="0"
+        />
+
+
 </shape>

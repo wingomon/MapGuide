@@ -11,6 +11,7 @@ public class Multimediaguide implements Serializable {
     public String name;
     public String description;
     public int km;
+    public String location;
     public String category;
    // public ArrayList<pointOfInterest> poiList;
     public String imgPath;
@@ -21,7 +22,7 @@ public class Multimediaguide implements Serializable {
     public Multimediaguide() {
     }
 
-    public Multimediaguide(String name_, String description_, String imgPath_, int km_, String category_, List<Station> stationList_, String userId_){
+    public Multimediaguide(String name_, String description_, String imgPath_, int km_, String category_, List<Station> stationList_, String userId_, String location_){
         this.name = name_;
         this.description = description_;
         this. imgPath = imgPath_;
@@ -29,6 +30,7 @@ public class Multimediaguide implements Serializable {
         this.category = category_;
         this.stationList = stationList_;
         this.userId = userId_;
+        this.location =location_;
     }
 
     public void setName(String name) {
@@ -82,5 +84,13 @@ public class Multimediaguide implements Serializable {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 }

@@ -57,7 +57,7 @@ public class CategoryActivity extends AppCompatActivity {
 
         category = getIntent().getStringExtra("category");
 
-        titleImg = (ImageView) findViewById(R.id.titleImg);
+       // titleImg = (ImageView) findViewById(R.id.titleImg);
         textCategory = (TextView) findViewById(R.id.textCategory);
 
         //Setting ImageView/TextView to given category
@@ -68,7 +68,7 @@ public class CategoryActivity extends AppCompatActivity {
         } else if(category.equals("museum")){
             textCategory.setText("Museum");
         } else if(category.equals("adventure")){
-            textCategory.setText("Abenteuer");
+            textCategory.setText("Sonstige");
         } else {
             textCategory.setText("Sonstige");
         }
@@ -90,12 +90,13 @@ public class CategoryActivity extends AppCompatActivity {
             @Override
             protected void onBindViewHolder(@NonNull MultimediaguideViewHolder holder, int position, @NonNull Multimediaguide model) {
 
+                /**
                 String desc = model.getDescription();
                 if(desc.length() > 50){
                     desc= desc.substring(0,47) + "...";
-                }
+                }**/
                 holder.setImage(model.getImgPath());
-                holder.setDescription(desc);
+                //holder.setDescription(desc);
                 holder.setTitle(model.getName());
                 holder.setKilometer(model.getKm());
 

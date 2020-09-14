@@ -6,6 +6,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import android.app.Activity;
 import android.content.Context;
@@ -42,6 +45,11 @@ import com.kbeanie.multipicker.api.ImagePicker;
 import com.kbeanie.multipicker.api.Picker;
 import com.kbeanie.multipicker.api.callbacks.ImagePickerCallback;
 import com.kbeanie.multipicker.api.entity.ChosenImage;
+import com.mapbox.api.geocoding.v5.GeocodingCriteria;
+import com.mapbox.api.geocoding.v5.MapboxGeocoding;
+import com.mapbox.api.geocoding.v5.models.CarmenFeature;
+import com.mapbox.api.geocoding.v5.models.GeocodingResponse;
+import com.mapbox.geojson.Point;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -79,6 +87,9 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
     StationAdapter_noEdit stationAdapter;
     Station tempStation;
     Context mContext;
+
+    String location;
+
 
     //Database
     DatabaseReference ref;
@@ -240,7 +251,7 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
                                                 if(currentUser != null) {
 
                                                     String userId = currentUser.getUid();
-                                                    Multimediaguide m = new Multimediaguide(title_, description_, uri.toString(), 5, spinner.getSelectedItem().toString(), stationList, userId);
+                                                    Multimediaguide m = new Multimediaguide(title_, description_, uri.toString(), 5, spinner.getSelectedItem().toString(), stationList, userId, location);
                                                     Log.d("--DOWNLOAD URI",uri.toString());
                                                     Log.d("--DOWNLOAD URI",stationList.toString());
                                                     ref.push().setValue(m);
@@ -412,6 +423,39 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
                     if(stationList != null){stationList.add(s); }
                 }
                 stationAdapter.notifyDataSetChanged();
+
+                if(stationList != null){
+                    if (stationList.size() > 0){
+                        MapboxGeocoding reverseGeocode = MapboxGeocoding.builder()
+                                .accessToken(getString(R.string.mapbox_access_token))
+                                .query(Point.fromLngLat(stationList.get(0).getLongitude(), stationList.get(0).getLatitude()))
+                                .geocodingTypes(GeocodingCriteria.TYPE_PLACE)
+                                .build();
+
+
+                        reverseGeocode.enqueueCall(new Callback<GeocodingResponse>() {
+                            @Override
+                            public void onResponse(Call<GeocodingResponse> call, Response<GeocodingResponse> response) {
+
+                                List<CarmenFeature> results = response.body().features();
+
+                                if (results.size() > 0) {
+
+                                    location = results.get(0).placeName();
+
+                                } else {
+
+
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<GeocodingResponse> call, Throwable throwable) {
+                                throwable.printStackTrace();
+                            }
+                        });
+                    }
+                }
             }
         }
 

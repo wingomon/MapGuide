@@ -257,11 +257,11 @@ public class StationViewActivity extends AppCompatActivity {
                                 textfield.setLayoutParams(layoutParams);
                                 textfield.setText(text);
                                 textfield.setTextColor(getResources().getColor(R.color.colorPrimary));
-                                textfield.setPadding(10,10,10,10);
+                                textfield.setPadding(10,5,10,5);
                                 textfield.setGravity(Gravity.CENTER);
                                 Typeface type = ResourcesCompat.getFont(getApplicationContext(),R.font.airbnbcereallight);
                                 textfield.setTypeface(type);
-                                textfield.setTextSize(TypedValue.COMPLEX_UNIT_DIP,16);
+                                textfield.setTextSize(TypedValue.COMPLEX_UNIT_DIP,14);
                                 linearLayout.addView(textfield);
                             }
 
