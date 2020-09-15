@@ -47,6 +47,7 @@
         android:hint="Füge eine Beschreibung hinzu."
         android:gravity="start"
         android:padding="10dp"
+        android:textSize="14dp"
         android:layout_margin="20dp"
         android:background="@drawable/edit_text_rounded"
         android:inputType="textMultiLine"

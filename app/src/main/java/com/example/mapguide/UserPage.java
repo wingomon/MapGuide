@@ -148,6 +148,17 @@ public class UserPage extends AppCompatActivity {
                     }
                 });
 
+                /**
+                holder.editButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(getApplicationContext(), StartCreateGuide_Overview.class);
+                        intent.putExtra("type","edit");
+                        intent.putExtra("Multimediaguide",(Serializable) model);
+                        startActivity(intent);
+                        Log.d("--KLICK--","Multimediaguide wurde geklickt");
+                    }
+                });**/
 
             }
 

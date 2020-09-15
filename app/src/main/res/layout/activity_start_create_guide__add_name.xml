@@ -47,11 +47,13 @@
         android:layout_height="wrap_content"
         android:hint="Titel deines Guides"
         android:padding="10dp"
+        android:textSize="16dp"
         android:layout_margin="20dp"
         android:fontFamily="@font/airbnbcereallight"
         android:background="@drawable/edit_text_rounded"
         android:inputType="text"
-        android:maxLines="1"/>
+        android:maxLines="1"
+        android:maxLength="25"/>
 
     <Button
         android:id="@+id/button"

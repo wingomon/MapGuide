@@ -84,7 +84,7 @@
 
                     <LinearLayout
                         android:id="@+id/LayoutTitle"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:layout_toRightOf="@id/textViewStationNumber"
@@ -93,21 +93,18 @@
 
                         <EditText
                             android:id="@+id/stationTitle"
-                            android:layout_width="250dp"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="Titel der Station"
                             android:textSize="16dp"
-                            android:fontFamily="@font/airbnbcereallight"
-                            android:textColor="@color/colorPrimary"/>
-
-                        <TextView
-                            android:id="@+id/textViewLocation"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Stadt, genauere Ortsangabe"
+                            android:padding="10dp"
+                            android:maxLength="25"
+                            android:layout_gravity="center_vertical"
                             android:fontFamily="@font/airbnbcereallight"
                             android:textColor="@color/colorPrimary"
-                            />
+                            android:background="@drawable/edit_text_rounded"/>
+
+
 
                     </LinearLayout>
 
@@ -218,6 +215,7 @@
                         android:text="Weitere Medien"
                         android:fontFamily="@font/airbnbcerealmedium"
                         android:textSize="17dp"
+                        android:layout_centerVertical="true"
                         android:layout_marginBottom="10dp"
                         android:textColor="@color/colorPrimary"/>
 

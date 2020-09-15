@@ -180,6 +180,8 @@ public class StationMapView extends AppCompatActivity implements OnMapReadyCallb
             @Override
             public void onStyleLoaded(@NonNull Style style) {
 
+                enableLocationComponent(style);
+
                 if(stationList.size() > 1) {
                     initRouteLineLayer(style);
                 }

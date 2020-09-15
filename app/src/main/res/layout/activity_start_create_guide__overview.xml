@@ -65,6 +65,7 @@
                     android:text="Titel"
                     android:fontFamily="@font/airbnbcerealmedium"
                     android:textSize="17dp"
+                    android:layout_marginBottom="10dp"
                     android:textColor="@color/colorPrimary"
                     />
 
@@ -73,8 +74,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:maxLines="1"
-        android:textSize="14dp"
+        android:background="@drawable/edit_text_rounded"
+        android:textSize="16dp"
         android:hint="Titel des Guides"
+        android:layout_marginBottom="10dp"
         android:fontFamily="@font/airbnbcereallight"
         android:padding="10dp"/>
 
@@ -95,7 +98,7 @@
         android:background="@drawable/edit_text_rounded"
         android:inputType="textMultiLine"
         android:gravity="start"
-        android:textSize="14dp"
+        android:textSize="16dp"
         android:hint="Hier wird die Beschreibung hinzugefügt"
         android:fontFamily="@font/airbnbcereallight"
         android:layout_marginBottom="10dp"
@@ -117,12 +120,15 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp">
+
                 <Spinner
                     android:id="@+id/spinner"
                     android:layout_width="match_parent"
                     android:layout_height="35dp"
-                    android:background="@drawable/rounded_stroke_shape"
-                    android:theme="@style/SpinnerTheme"/>
+                    android:background="@drawable/edit_text_rounded"
+                    android:theme="@style/SpinnerTheme"
+                    android:layout_marginBottom="10dp"
+                    android:textSize="16dp"/>
 
                     <ImageView
                         android:layout_width="35dp"
@@ -134,11 +140,9 @@
 
                 </RelativeLayout>
 
-
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
                     <TextView
                         android:id="@+id/TextViewNear"
@@ -147,25 +151,21 @@
                         android:fontFamily="@font/airbnbcerealmedium"
                         android:text="Stationen"
                         android:textSize="17dp"
-                        app:layout_constraintHorizontal_bias="0.0"
-                        app:layout_constraintStart_toStartOf="parent"
                         tools:layout_editor_absoluteY="0dp"
                         android:textColor="@color/colorPrimary"
+                        android:layout_centerVertical="true"
                         />
 
                     <ImageView
                         android:id="@+id/button_add_station_overview"
                         android:layout_width="25dp"
                         android:layout_height="25dp"
-                        android:layout_gravity="end"
-                        android:layout_toRightOf="@+id/TextViewNear"
                         android:fontFamily="@font/amiko"
                         android:src="@drawable/ic_add"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"/>
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"/>
+</RelativeLayout>
 
-                </androidx.constraintlayout.widget.ConstraintLayout>
 
 
             </LinearLayout>
@@ -179,7 +179,7 @@
                 android:id="@+id/buttonSave"
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
-                android:text="Weiter"
+                android:text="Veröffentlichen"
                 android:textColor="@color/white"
                 android:fontFamily="@font/amiko_bold"
                 android:layout_gravity="center_horizontal"

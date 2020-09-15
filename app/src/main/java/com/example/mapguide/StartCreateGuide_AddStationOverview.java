@@ -222,14 +222,14 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
                 });
 
                 if(stationList != null) {
-                    if (stationList.size() > 0) {
+                    if (stationList.size() > 1) {
                         List<LatLng> stationLatLngList = new ArrayList<>();
                         for(Station s : stationList){
                             stationLatLngList.add(new LatLng(s.getLatitude(),s.getLongitude()));
                         }
+
                         LatLngBounds latLngBounds = new LatLngBounds.Builder().includes(stationLatLngList).build();
                         mapboxMap.animateCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 300));
-
                     }
                 }
 
@@ -427,6 +427,7 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
                             LineString.fromPolyline(currentRoute.geometry(), PRECISION_6)));
 
                     FeatureCollection tempFeatureCollection = FeatureCollection.fromFeatures(featureList);
+
                     drawLines(tempFeatureCollection);
                     Log.d("MAPBOXDEBUG", "GET ROUTE " + currentRoute);
                     Log.d("MAPBOXDEBUG", "FeatureList-size is" + featureList.size());

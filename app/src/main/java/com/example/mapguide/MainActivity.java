@@ -37,8 +37,11 @@ public class MainActivity extends AppCompatActivity {
 
         if(dirMusic.isDirectory()){
             String[] children = dirMusic.list();
-            for (int i = 0; i<children.length; i++){
-                new File(dirMusic, children[i]).delete();
+            if(children != null) {
+                for (int i = 0; i < children.length; i++) {
+                    new File(dirMusic, children[i]).delete();
+                    Log.d("--Delete Storage of MapGuide","Music Mediafile deleted.");
+                }
             }
         }
 
@@ -46,8 +49,11 @@ public class MainActivity extends AppCompatActivity {
 
         if(dirPhoto.isDirectory()){
             String[] children = dirPhoto.list();
-            for (int i = 0; i<children.length; i++){
-                new File(dirPhoto, children[i]).delete();
+            if(children != null) {
+                for (int i = 0; i < children.length; i++) {
+                    new File(dirPhoto, children[i]).delete();
+                    Log.d("--Delete Storage of MapGuide","Picture Mediafile deleted.");
+                }
             }
         }
 

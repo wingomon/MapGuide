@@ -253,7 +253,7 @@ public class StationViewActivity extends AppCompatActivity {
                             String text = station.getMediaElementList().get(i).getStore();
                             if (text != null && !(text.equals("null"))){
                                 TextView textfield = new TextView(getBaseContext());
-                                final ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,300);
+                                final ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                                 textfield.setLayoutParams(layoutParams);
                                 textfield.setText(text);
                                 textfield.setTextColor(getResources().getColor(R.color.colorPrimary));

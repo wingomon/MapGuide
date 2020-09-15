@@ -37,6 +37,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GetTokenResult;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -50,6 +51,7 @@ import com.mapbox.api.geocoding.v5.MapboxGeocoding;
 import com.mapbox.api.geocoding.v5.models.CarmenFeature;
 import com.mapbox.api.geocoding.v5.models.GeocodingResponse;
 import com.mapbox.geojson.Point;
+import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -69,6 +71,7 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
     private Spinner spinner;
     private static final String[] category = {"Sonstige","Städte","Natur","Museum", "Abenteuer"};
 
+    String urlNoUploadPrefix = "https://firebasestorage.googleapis.com/";
 
     private FirebaseAuth mAuth;
 
@@ -89,7 +92,7 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
     Context mContext;
 
     String location;
-
+    Multimediaguide tempGuide;
 
     //Database
     DatabaseReference ref;
@@ -147,19 +150,45 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
 
 
         //Bekomme Daten aus vorheriger Activity
+        //Dabei gibt es zwei Möglichkeiten: User kommt von "Create"-Activity oder möchte seinen Guide bearbeiten und kommt von der UserPage
+        // type kann "create" oder "edit" sein
 
+        String type= getIntent().getStringExtra("type");
         title = (EditText) findViewById(R.id.etTitle);
-        title.setText(getIntent().getStringExtra("name"));
-
         description = (EditText) findViewById(R.id.etDescription);
-        description.setText(getIntent().getStringExtra("description"));
-
-
-        imgPath = getIntent().getStringExtra("imgPath");
         imageView = (ImageView) findViewById(R.id.imageViewTitle);
-        imageView.setImageURI(Uri.parse(imgPath));
 
-       // stationList = (List<Station>) getIntent().getSerializableExtra("stationList");
+
+        if(type.equals("create")) {
+
+            title.setText(getIntent().getStringExtra("name"));
+            description.setText(getIntent().getStringExtra("description"));
+            imgPath = getIntent().getStringExtra("imgPath");
+            imageView.setImageURI(Uri.parse(imgPath));
+
+        } else if (type.equals("edit")){
+            tempGuide = (Multimediaguide) getIntent().getSerializableExtra("Multimediaguide");
+            title.setText(tempGuide.getName());
+            description.setText(tempGuide.getDescription());
+
+            if(tempGuide.getImgPath() != null || !(tempGuide.getImgPath().equals("null"))) {
+
+                imgPath = tempGuide.getImgPath();
+                Picasso.get().load(imgPath).into(imageView);
+
+            }
+
+            //StationList übertragen
+            if(tempGuide.getStationList() != null)
+                if(tempGuide.getStationList().size()>0) {
+                    for (Station s : tempGuide.getStationList()) {
+                        stationList.add(s);
+                    }
+
+                    stationAdapter.notifyDataSetChanged();
+                }
+
+        }
 
 
 
@@ -197,14 +226,21 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
 
                 for(Station s: stationList) {
                     //Upload of Picture and Audio of Station
-                    uploadStationFilesToFirebaseStorage(s.getImgSrcPath(),s,"image");
-                    uploadStationFilesToFirebaseStorage(s.getAudioSrcPath(),s,"audio");
+                    if(!(s.getImgSrcPath().contains(urlNoUploadPrefix))) {
+                        uploadStationFilesToFirebaseStorage(s.getImgSrcPath(), s, "image");
+                    }
+                    if(!(s.getAudioSrcPath().contains(urlNoUploadPrefix))) {
+                        uploadStationFilesToFirebaseStorage(s.getAudioSrcPath(), s, "audio");
+                    }
+
                     //Upload of "More Media"-List Images
                     if(s.getMediaElementList() != null) {
                         if (s.getMediaElementList().size() > 0) {
                             for (int i = 0; i < s.getMediaElementList().size(); i++) {
                                 if (s.getMediaElementList().get(i).getType().equals("IMAGE")) {
-                                    uploadStationMediaListImagesToFirebaseStorage(s, i);
+                                    if(!(s.getMediaElementList().get(i).getStore().contains(urlNoUploadPrefix))) {
+                                        uploadStationMediaListImagesToFirebaseStorage(s, i);
+                                    }
                                 }
                             }
                         }
@@ -212,77 +248,79 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
 
                 }
 
-                Log.d("--DOWNLOAD--"," SAVE BUTTON WAS CLICKED");
                 String title_ = title.getText().toString();
                 String description_ = description.getText().toString();
 
 
-
                 //Upload picture to FirebaseStorage
                 //But compressing before
-                File origfile = new File(imgPath);
+                //But ONLY if imgPath does not contain "https://firebasestorage.googleapis.com/" --> no upload needed then
+                FirebaseUser currentUser = mAuth.getCurrentUser();
+                String userId = currentUser.getUid();
+                String id = ref.push().getKey();
 
-                try {
-                   // Bitmap bitmap = BitmapFactory.decodeFile (origfile.getPath());
-                    Bitmap bitmap = bitmapResizer.transform(BitmapFactory.decodeFile(origfile.getPath()));
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, new FileOutputStream(origfile));
-                }
-                catch (Throwable t) {
-                    Log.e("--ERROR--", "Error compressing file." + t.toString ());
-                    t.printStackTrace ();
-                }
+                if(!(imgPath.contains(urlNoUploadPrefix))) {
 
-                Uri file = Uri.fromFile(origfile);
-                Log.d("--DOWNLOAD--","imgpath:"+imgPath);
-                StorageReference riversRef = mStorageRef.child("images").child(System.currentTimeMillis()+".jpg");
+                    File origfile = new File(imgPath);
+                    try {
+                        // Bitmap bitmap = BitmapFactory.decodeFile (origfile.getPath());
+                        Bitmap bitmap = bitmapResizer.transform(BitmapFactory.decodeFile(origfile.getPath()));
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, new FileOutputStream(origfile));
+                    } catch (Throwable t) {
+                        Log.e("--ERROR--", "Error compressing file." + t.toString());
+                        t.printStackTrace();
+                    }
 
-                riversRef.putFile(file)
-                        .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                            @Override
-                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                // Get a URL to the uploaded content
-                                Task<Uri> downloadUrl = taskSnapshot.getStorage().getDownloadUrl()
-                                        .addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                            @Override
-                                            public void onSuccess(Uri uri) {
-                                                //uri = downloadUrl.getResult().toString();
-                                                FirebaseUser currentUser = mAuth.getCurrentUser();
+                    Uri file = Uri.fromFile(origfile);
+                    Log.d("--DOWNLOAD--", "imgpath:" + imgPath);
+                    StorageReference riversRef = mStorageRef.child("images").child(System.currentTimeMillis() + ".jpg");
 
-                                                if(currentUser != null) {
+                    riversRef.putFile(file)
+                            .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                @Override
+                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                    // Get a URL to the uploaded content
+                                    Task<Uri> downloadUrl = taskSnapshot.getStorage().getDownloadUrl()
+                                            .addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                                @Override
+                                                public void onSuccess(Uri uri) {
 
-                                                    String userId = currentUser.getUid();
-                                                    Multimediaguide m = new Multimediaguide(title_, description_, uri.toString(), 5, spinner.getSelectedItem().toString(), stationList, userId, location);
-                                                    Log.d("--DOWNLOAD URI",uri.toString());
-                                                    Log.d("--DOWNLOAD URI",stationList.toString());
-                                                    ref.push().setValue(m);
+                                                    if (currentUser != null) {
 
-                                                    Intent intent = new Intent(getApplicationContext(), UserPage.class);
-                                                    startActivity(intent);
-                                                    finish();
+                                                        Multimediaguide m = new Multimediaguide(id, title_, description_, uri.toString(), 5, spinner.getSelectedItem().toString(), stationList, userId, location);
+                                                        ref.push().setValue(m);
 
-                                                    Toast.makeText(StartCreateGuide_Overview.this, "Dein Guide wurde erfolgreich hochgeladen.",
-                                                            Toast.LENGTH_SHORT).show();
+                                                        Intent intent = new Intent(getApplicationContext(), UserPage.class);
+                                                        startActivity(intent);
+                                                        finish();
+
+                                                        Toast.makeText(StartCreateGuide_Overview.this, "Dein Guide wurde erfolgreich hochgeladen.",
+                                                                Toast.LENGTH_SHORT).show();
+                                                    }
+
+
                                                 }
+                                            });
 
-
-                                            }
-                                        });
-
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception exception) {
-                                // Handle unsuccessful uploads
-                                // ...
-                                Toast.makeText(StartCreateGuide_Overview.this, "Beim Upload deines Guides ist etwas schiefgelaufen. Bitte versuche es nochmal.",
-                                        Toast.LENGTH_SHORT).show();
-                                Log.d("--DOWNLOAD--","FAILED");
-                            }
-                        });
-
-            }
-        });
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception exception) {
+                                    // Handle unsuccessful uploads
+                                    // ...
+                                    Toast.makeText(StartCreateGuide_Overview.this, "Beim Upload deines Guides ist etwas schiefgelaufen. Bitte versuche es nochmal.",
+                                            Toast.LENGTH_SHORT).show();
+                                    Log.d("--DOWNLOAD--", "FAILED");
+                                }
+                            });
+                } else if(imgPath.contains(urlNoUploadPrefix)){
+                    if(tempGuide != null) {
+                        ref.child(id).setValue(new Multimediaguide(id, title_, description_, tempGuide.getImgPath(), 5, spinner.getSelectedItem().toString(), stationList, userId, location));
+                    }
+                }
+            }//End onClick
+        });//End onClickListener of Save Button
 
     }
 

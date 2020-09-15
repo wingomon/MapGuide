@@ -44,44 +44,55 @@
                 android:padding="10dp"
                 >
 
-            <TextView
-                android:id="@+id/textViewTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/airbnbcerealmedium"
-                android:text="Titel des Guides "
-                android:textColor="@color/colorPrimary"
-                android:textSize="15dp"/>
+                <TextView
+                    android:id="@+id/textViewTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/airbnbcerealmedium"
+                    android:text="Titel des Guides "
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="15dp"/>
 
-            <TextView
-                android:id="@+id/textViewDescription"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/textViewTitle"
-                android:fontFamily="@font/airbnbcereallight"
-                android:textSize="12dp"
-                android:textColor="@color/colorPrimary"
-                android:text="Lorem diam nonumy eirmod " />
+                <TextView
+                    android:id="@+id/textViewDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/textViewTitle"
+                    android:fontFamily="@font/airbnbcereallight"
+                    android:textSize="12dp"
+                    android:textColor="@color/colorPrimary"
+                    android:text="Lorem diam nonumy eirmod " />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="end">
-            <TextView
-                android:id="@+id/textViewKm"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/airbnbcereallight"
-                android:textColor="@color/colorPrimary"
-                android:layout_gravity="bottom|right"
-                android:text="XY KM"
-                android:padding="5dp"
-                android:background="@drawable/rounded_stroke_shape"/>
+                    <TextView
+                        android:id="@+id/textViewKm"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/airbnbcereallight"
+                        android:textColor="@color/colorPrimary"
+                        android:layout_gravity="bottom|right"
+                        android:text="XY KM"
+                        android:padding="5dp"
+                        android:background="@drawable/rounded_stroke_shape"/>
                 </LinearLayout>
             </LinearLayout>
 
         </LinearLayout>
     </androidx.cardview.widget.CardView>
+
+    <ImageView
+        android:id="@+id/edit"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginLeft="10dp"
+        android:layout_gravity="center_horizontal"
+        android:src="@drawable/edit"
+        android:padding="10dp"
+        android:clickable="true"
+        android:background="@drawable/circle"/>
 
 
 </LinearLayout>

@@ -17,11 +17,13 @@ class MultimediaguideViewHolder extends RecyclerView.ViewHolder {
 
     View mView;
     ImageView imageView;
+    ImageView editButton;
 
     public MultimediaguideViewHolder(@NonNull View itemView) {
         super(itemView);
         mView=itemView;
         imageView = (ImageView) mView.findViewById(R.id.imageView);
+        editButton = (ImageView) mView.findViewById(R.id.edit);
     }
 
     public void setImage(String image)

@@ -2,6 +2,7 @@ package com.example.mapguide;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
 
 import android.Manifest;
@@ -58,6 +59,8 @@ public class StartCreateGuide_AddImage extends AppCompatActivity {
     ImagePicker imagePicker;
     CameraImagePicker cameraImagePicker;
 
+    private int PERMISSION_CODE=12;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,7 +72,9 @@ public class StartCreateGuide_AddImage extends AppCompatActivity {
         addimageicon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               selectImage();
+                if(checkPermissions()) {
+                    selectImage();
+                }
             }
         });
 
@@ -91,6 +96,7 @@ public class StartCreateGuide_AddImage extends AppCompatActivity {
                 intent.putExtra("name",name);
                 intent.putExtra("description",description);
                 intent.putExtra("imgPath",currentPhotoPath);
+                intent.putExtra("type","create");
                 startActivity(intent);
                 finish();
                 Log.i("hallo","ich wurde geklickt" + intent.getDataString());
@@ -189,6 +195,19 @@ public class StartCreateGuide_AddImage extends AppCompatActivity {
 
 
 
+    /**
+     * Check Permissions for Selecting Media from external storage
+     * @return
+     */
+    private boolean checkPermissions(){
+        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+            return true;
+        }
+        else {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_CODE);
+            return false;
+        }
+    }
 
 
 }

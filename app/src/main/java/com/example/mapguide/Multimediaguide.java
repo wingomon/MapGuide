@@ -7,7 +7,7 @@ import java.util.List;
 
 public class Multimediaguide implements Serializable {
 
-   public int id;
+   public String id;
     public String name;
     public String description;
     public int km;
@@ -22,7 +22,8 @@ public class Multimediaguide implements Serializable {
     public Multimediaguide() {
     }
 
-    public Multimediaguide(String name_, String description_, String imgPath_, int km_, String category_, List<Station> stationList_, String userId_, String location_){
+    public Multimediaguide(String id_, String name_, String description_, String imgPath_, int km_, String category_, List<Station> stationList_, String userId_, String location_){
+        this.id = id_;
         this.name = name_;
         this.description = description_;
         this. imgPath = imgPath_;
@@ -92,5 +93,13 @@ public class Multimediaguide implements Serializable {
 
     public void setLocation(String location) {
         this.location = location;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }
