@@ -1,6 +1,7 @@
 package com.example.mapguide;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.core.content.res.ResourcesCompat;
 
 import android.app.Activity;
@@ -40,6 +41,7 @@ public class StationViewActivity extends AppCompatActivity {
     TextView title, description, number;
     ImageView image, cardIcon;
     Button playButton, nextButton, backButton;
+    CardView cardView;
     private Context context;
 
     //Für Audio-Player
@@ -99,9 +101,15 @@ public class StationViewActivity extends AppCompatActivity {
         title.setText(station.getTitle());
         description.setText(station.getDescription());
         number.setText(Integer.toString(station.getNumber()));
+        cardView = (CardView) findViewById(R.id.cardView);
 
-        if(station.getImgSrcPath() != null || !(station.getImgSrcPath().equals("null"))) {
+        if(station.getImgSrcPath() != null && !(station.getImgSrcPath().equals("null"))) {
             Picasso.get().load(station.getImgSrcPath()).into(image);
+            Log.d("Station-View","Img Source of this station:" + station.getImgSrcPath());
+        } else {
+            cardView.setVisibility(View.GONE);
+            image.setVisibility(View.GONE);
+            Log.d("Station-View","SETTING VISIBILITY of" + station.getImgSrcPath());
         }
 
         loadMediaContent();

@@ -221,6 +221,7 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
                 //ALertDialog for Loading with Loading circle
                 AlertDialog.Builder loadingBuilder = new AlertDialog.Builder(StartCreateGuide_Overview.this, R.style.CustomAlertDialog);
                 loadingBuilder.setView(R.layout.my_progress_view);
+                loadingBuilder.setCancelable(false);
                 loadingBuilder.show();
 
 
