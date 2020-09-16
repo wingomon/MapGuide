@@ -40,27 +40,7 @@ public class BitmapResizer implements Transformation {
     public String key() {
         return maxWidth + "x" + maxHeight;
     }
-/**
-    private  Bitmap transform(Bitmap image) {
-        if (maxHeight > 0 && maxWidth > 0) {
-            int width = image.getWidth();
-            int height = image.getHeight();
-            float ratioBitmap = (float) width / (float) height;
-            float ratioMax = (float) maxWidth / (float) maxHeight;
 
-            int finalWidth = maxWidth;
-            int finalHeight = maxHeight;
-            if (ratioMax > 1) {
-                finalWidth = (int) ((float)maxHeight * ratioBitmap);
-            } else {
-                finalHeight = (int) ((float)maxWidth / ratioBitmap);
-            }
-            image = Bitmap.createScaledBitmap(image, finalWidth, finalHeight, true);
-            return image;
-        } else {
-            return image;
-        }
-    }**/
 
 
 }

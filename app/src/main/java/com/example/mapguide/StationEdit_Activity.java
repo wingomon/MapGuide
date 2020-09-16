@@ -84,6 +84,7 @@ public class StationEdit_Activity extends AppCompatActivity {
     private int PERMISSION_CODE=11;
 
 
+    BitmapResizer bitmapResizer;
     int bitmapMaxWidth = 1000;
     int bitmapMaxHeight = 1000;
 
@@ -136,7 +137,7 @@ public class StationEdit_Activity extends AppCompatActivity {
 
         context = getApplicationContext();
         imagePicker = new ImagePicker(StationEdit_Activity.this);
-
+        bitmapResizer = new BitmapResizer(bitmapMaxWidth,bitmapMaxHeight);
 
 
         missingImg = (TextView) findViewById(R.id.missingImg);
@@ -268,9 +269,12 @@ public class StationEdit_Activity extends AppCompatActivity {
 
 
         stationImage = (ImageView) findViewById(R.id.stationImage);
-        if(station.getImgSrcPath() != null){
-            stationImage.setImageBitmap(BitmapFactory.decodeFile(station.getImgSrcPath()));
+
+        if(station.getImgSrcPath() != null && !(station.getImgSrcPath().equals("null"))){
+            //stationImage.setImageBitmap(BitmapFactory.decodeFile(station.getImgSrcPath()));
+            stationImage.setImageBitmap(bitmapResizer.transform(BitmapFactory.decodeFile(station.getImgSrcPath())));
             currentPhotoPath = station.getImgSrcPath();
+            missingImg.setVisibility(View.INVISIBLE);
         }
 
         if(station.getAudioSrcPath() != null){
@@ -521,7 +525,7 @@ public class StationEdit_Activity extends AppCompatActivity {
                     textfield.setTextColor(getResources().getColor(R.color.colorPrimary));
                     textfield.setBackgroundResource(R.drawable.edit_text_rounded);
                     textfield.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
-                    textfield.setPadding(10,10,20,10);
+                    textfield.setPadding(20,20,20,20);
                     textfield.setGravity(Gravity.START);
                     Typeface type = ResourcesCompat.getFont(getApplicationContext(),R.font.airbnbcereallight);
                     textfield.setTypeface(type);
@@ -568,9 +572,11 @@ public class StationEdit_Activity extends AppCompatActivity {
                             imgView.setScaleType(ImageView.ScaleType.CENTER_CROP);
                             relativeLayoutImage.addView(imgView);
                             linearLayout.addView(relativeLayoutImage);
+                            /**
                             Picasso.get().load(new File(imagePath))
                                     .transform(new BitmapResizer(bitmapMaxWidth,bitmapMaxHeight))
-                                    .into(imgView);
+                                    .into(imgView);**/
+                            imgView.setImageBitmap(bitmapResizer.transform(BitmapFactory.decodeFile(imagePath)));
                             //Also add a Button to delete this EditText View again
                             ImageView btnDelete = new ImageView(getBaseContext());
                             RelativeLayout.LayoutParams buttonParam = new RelativeLayout.LayoutParams(deleteIconWidth,deleteIconHeight);
@@ -676,7 +682,8 @@ public class StationEdit_Activity extends AppCompatActivity {
                                                            public void onImagesChosen(List<ChosenImage> images) {
                                                                // Adapt picture to imageView
                                                                currentPhotoPath = images.get(0).getOriginalPath();
-                                                               stationImage.setImageBitmap(BitmapFactory.decodeFile(currentPhotoPath));
+                                                               //stationImage.setImageBitmap(BitmapFactory.decodeFile(currentPhotoPath));
+                                                               stationImage.setImageBitmap(bitmapResizer.transform(BitmapFactory.decodeFile(currentPhotoPath)));
                                                                missingImg.setVisibility(View.GONE);
                                                            }
 
@@ -696,7 +703,7 @@ public class StationEdit_Activity extends AppCompatActivity {
                                                                      // Display images
                                                                      // Adapt picture to imageView
                                                                      currentPhotoPath = images.get(0).getOriginalPath();
-                                                                     stationImage.setImageBitmap(BitmapFactory.decodeFile(currentPhotoPath));
+                                                                     stationImage.setImageBitmap(bitmapResizer.transform(BitmapFactory.decodeFile(currentPhotoPath)));
                                                                      missingImg.setVisibility(View.GONE);
                                                                  }
 
@@ -799,7 +806,6 @@ public class StationEdit_Activity extends AppCompatActivity {
                 relativeLayoutImage.setLayoutParams(rlp);
                 //Create new ImageView programmatically with picked image
                 String imagePath = m.getStore();
-                Uri imgUri = Uri.parse(imagePath);
                 ImageView imgView = new ImageView(StationEdit_Activity.this);
                 imgView.setTag(imagePath);
                 final LinearLayout.LayoutParams layoutParams1 = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,500);
@@ -807,7 +813,8 @@ public class StationEdit_Activity extends AppCompatActivity {
                 imgView.setScaleType(ImageView.ScaleType.CENTER_CROP);
                 relativeLayoutImage.addView(imgView);
                 linearLayout.addView(relativeLayoutImage);
-                Picasso.get().load(new File(imagePath)).into(imgView);
+                //Picasso.get().load(new File(imagePath)).into(imgView);
+                imgView.setImageBitmap(bitmapResizer.transform(BitmapFactory.decodeFile(imagePath)));
                 //Also add a Button to delete this EditText View again
                 ImageView btnDelete = new ImageView(getBaseContext());
                 RelativeLayout.LayoutParams buttonParam = new RelativeLayout.LayoutParams(deleteIconWidth,deleteIconHeight);

@@ -59,12 +59,17 @@ public class StartCreateGuide_AddImage extends AppCompatActivity {
     ImagePicker imagePicker;
     CameraImagePicker cameraImagePicker;
 
+    BitmapResizer bitmapResizer;
+
     private int PERMISSION_CODE=12;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start_create_guide__add_image);
+
+        //BitmaResizer initialisieren
+        bitmapResizer = new BitmapResizer(1000,1000);
 
         imageView = (ImageView) findViewById(R.id.imageView2);
         next = (Button) findViewById(R.id.button4);
@@ -146,7 +151,7 @@ public class StartCreateGuide_AddImage extends AppCompatActivity {
                                                            public void onImagesChosen(List<ChosenImage> images) {
                                                                // Adapt picture to imageView
                                                                currentPhotoPath = images.get(0).getOriginalPath();
-                                                               imageView.setImageBitmap(BitmapFactory.decodeFile(currentPhotoPath));
+                                                               imageView.setImageBitmap(bitmapResizer.transform(BitmapFactory.decodeFile(currentPhotoPath)));
                                                                addimageicon.setAlpha(0f);
                                                                next.setEnabled(true);
                                                                next.setAlpha(1f);
@@ -168,7 +173,7 @@ public class StartCreateGuide_AddImage extends AppCompatActivity {
                                                                      // Display images
                                                                      // Adapt picture to imageView
                                                                      currentPhotoPath = images.get(0).getOriginalPath();
-                                                                     imageView.setImageBitmap(BitmapFactory.decodeFile(currentPhotoPath));
+                                                                     imageView.setImageBitmap(bitmapResizer.transform(BitmapFactory.decodeFile(currentPhotoPath)));
                                                                      addimageicon.setAlpha(0f);
                                                                      next.setEnabled(true);
                                                                      next.setAlpha(1f);

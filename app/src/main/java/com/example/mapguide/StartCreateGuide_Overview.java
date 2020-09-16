@@ -164,7 +164,7 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
             title.setText(getIntent().getStringExtra("name"));
             description.setText(getIntent().getStringExtra("description"));
             imgPath = getIntent().getStringExtra("imgPath");
-            imageView.setImageURI(Uri.parse(imgPath));
+            imageView.setImageBitmap(bitmapResizer.transform(BitmapFactory.decodeFile(imgPath)));
 
         } else if (type.equals("edit")){
             tempGuide = (Multimediaguide) getIntent().getSerializableExtra("Multimediaguide");
@@ -174,7 +174,8 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
             if(tempGuide.getImgPath() != null || !(tempGuide.getImgPath().equals("null"))) {
 
                 imgPath = tempGuide.getImgPath();
-                Picasso.get().load(imgPath).into(imageView);
+                //Picasso.get().load(imgPath).into(imageView);
+                imageView.setImageBitmap(bitmapResizer.transform(BitmapFactory.decodeFile(imgPath)));
 
             }
 
@@ -340,14 +341,14 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
 
         File origfile = new File(filePath);
 
-        if(type.equals("IMAGE")) {
+        if(type.equals("image")) {
 
             try {
-                // Bitmap bitmap = BitmapFactory.decodeFile (origfile.getPath());
                 Bitmap bitmap = bitmapResizer.transform(BitmapFactory.decodeFile(origfile.getPath()));
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 100, new FileOutputStream(origfile));
+                Log.d("--COMPRESSING--", "compressing file.");
             } catch (Throwable t) {
-                Log.e("--ERROR--", "Error compressing file." + t.toString());
+                Log.d("--ERROR COMPRESSING--", "Error compressing file." + t.toString());
                 t.printStackTrace();
             }
 
@@ -370,7 +371,9 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
                                         //uri = downloadUrl.getResult().toString();
                                         switch(type){
                                             case "image":
+                                                String oldImgPath = station.getImgSrcPath();
                                                 station.setImgSrcPath(uri.toString());
+                                                Log.d("--StartCreateGuide_Overview","ImgPath was changed from " + oldImgPath + "to" + station.getImgSrcPath());
                                                 break;
                                             case "audio":
                                                 station.setAudioSrcPath(uri.toString());
