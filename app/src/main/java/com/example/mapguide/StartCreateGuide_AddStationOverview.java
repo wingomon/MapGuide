@@ -85,7 +85,7 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineWidth;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineGradient;
 
-public class StartCreateGuide_AddStationOverview extends AppCompatActivity implements OnMapReadyCallback, PermissionsListener, MapboxMap.OnMapClickListener{
+public class StartCreateGuide_AddStationOverview extends AppCompatActivity implements OnMapReadyCallback, PermissionsListener, MapboxMap.OnMapLongClickListener{
 
    private CustomMapView mapView;
 
@@ -101,7 +101,7 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
     SymbolManager symbolManager;
 
     Button saveButton;
-    ImageView updateView, search;
+    ImageView updateView, search, myLocation;
 
     String location;
 
@@ -194,7 +194,7 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
                 initMarkerIconSymbolLayer(style);
                 initRouteLineLayer(style);
                 initMapIfStationsExistent(style);
-                mapboxMap.addOnMapClickListener(StartCreateGuide_AddStationOverview.this);
+                mapboxMap.addOnMapLongClickListener(StartCreateGuide_AddStationOverview.this);
                 enableLocationComponent(style);
 
 
@@ -203,6 +203,15 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
                     @Override
                     public void onClick(View v) {
                         updateMapView();
+                    }
+                });
+
+                myLocation = (ImageView) findViewById(R.id.myLocation);
+                myLocation.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        enableLocationComponent(style);
+
                     }
                 });
 
@@ -294,11 +303,11 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
     }
 
     @Override
-    public boolean onMapClick(@NonNull LatLng point) {
+    public boolean onMapLongClick(@NonNull LatLng point) {
 
             if(stationList != null){
 
-                //Check if stationList has more than 15 Stations, if yes --> Ccreating new Stations is not possible anymore
+                //Check if stationList has more than 15 Stations, if yes --> Creating new Stations is not possible anymore
                 if(stationList.size() < 15){
                     //ADD NEW STATION
                     tempStation = new Station(stationList.size()+1, point.getLongitude(), point.getLatitude(),"Titel der Station","null","null","Beschreibung der Station", new ArrayList<>());

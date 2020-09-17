@@ -51,6 +51,15 @@
                         android:layout_margin="10dp" />
 
                     <ImageView
+                        android:id="@+id/myLocation"
+                        android:layout_width="35dp"
+                        android:layout_height="35dp"
+                        android:src="@drawable/mylocation"
+                        android:background="@drawable/circle"
+                        android:padding="5dp"
+                        android:layout_margin="10dp" />
+
+                    <ImageView
                         android:id="@+id/updateView"
                         android:layout_width="35dp"
                         android:layout_height="35dp"

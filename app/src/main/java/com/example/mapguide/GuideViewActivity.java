@@ -1,5 +1,6 @@
 package com.example.mapguide;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -20,6 +21,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.chrisbanes.photoview.PhotoView;
 import com.squareup.picasso.Picasso;
 
 import org.w3c.dom.Text;
@@ -81,6 +83,19 @@ public class GuideViewActivity extends AppCompatActivity {
 
             String imgPath = multimediaguide.getImgPath();
            Picasso.get().load(imgPath).into(guideImage);
+
+            guideImage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    AlertDialog.Builder mBuilder = new AlertDialog.Builder(GuideViewActivity.this);
+                    View mView = getLayoutInflater().inflate(R.layout.photoview, null);
+                    PhotoView photoView = mView.findViewById(R.id.imageView);
+                    Picasso.get().load(imgPath).placeholder(R.drawable.image_progress).into(photoView);
+                    mBuilder.setView(mView);
+                    AlertDialog mDialog = mBuilder.create();
+                    mDialog.show();
+                }
+            });
 
         }
         Log.d("--IMG--","imagepath is "+multimediaguide.getImgPath());

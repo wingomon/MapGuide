@@ -74,7 +74,7 @@ public class StationMapView extends AppCompatActivity implements OnMapReadyCallb
     Station selectedStation;
     TextView title, number;
     ImageView img;
-    ImageView next, back;
+    ImageView next, back, myLocation;
     LinearLayout toStationView;
 
     List<Station> stationList;
@@ -224,14 +224,14 @@ public class StationMapView extends AppCompatActivity implements OnMapReadyCallb
                     mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 10);
 
                 }
-                // Add click listener and change the symbol to a cafe icon on click
-                symbolManager.addClickListener(new OnSymbolClickListener() {
+
+                addClickListenerToMarker();
+
+                myLocation = (ImageView) findViewById(R.id.myLocation);
+                myLocation.setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void onAnnotationClick(Symbol symbol) {
-                        int positionOfSymbolInList = symbols.indexOf(symbol);
-                        selectedStation = stationList.get(positionOfSymbolInList);
-                        changeViewToSelectedStation();
-                        Log.d("StationMapView","This Marker was clicked:" + symbol.getLatLng() + "Positon:"+positionOfSymbolInList);
+                    public void onClick(View v) {
+                        enableLocationComponent(style);
 
                     }
                 });
@@ -267,28 +267,69 @@ public class StationMapView extends AppCompatActivity implements OnMapReadyCallb
         //Add Marker Bitmaps
         Bitmap bm = BitmapFactory.decodeResource(getBaseContext().getResources(),R.drawable.marker_blue);
         mapboxMap.getStyle().addImage("my-marker", bm);
+        //Marker for selected Station
+        Bitmap bm1 = BitmapFactory.decodeResource(getBaseContext().getResources(),R.drawable.marker);
+        mapboxMap.getStyle().addImage("my-marker-selected", bm1);
 
         List<SymbolOptions> options = new ArrayList<>();
 
 
         for (Station s : stationList) {
 
-            options.add(new SymbolOptions()
-                    .withLatLng(new LatLng(s.getLatitude(),s.getLongitude()))
-                    .withIconImage("my-marker")
-                    //set the below attributes according to your requirements
-                    .withIconSize(0.15f)
-                    .withIconOffset(new Float[] {0f,-1.5f})
-                    .withTextHaloColor("rgba(255, 255, 255, 100)")
-                    .withTextHaloWidth(5.0f)
-                    .withTextAnchor("top")
-                    .withTextOffset(new Float[] {0f, 1.5f})
+            //Setze einen anderen Marker für selektierte Station
+            if(selectedStation != null && s.getNumber() == selectedStation.getNumber()){
+                options.add(new SymbolOptions()
+                        .withLatLng(new LatLng(s.getLatitude(), s.getLongitude()))
+                        .withIconImage("my-marker-selected")
+                        //set the below attributes according to your requirements
+                        .withIconSize(0.3f)
+                        .withIconOffset(new Float[]{0f, -1.5f})
+                        .withTextHaloColor("rgba(255, 255, 255, 100)")
+                        .withTextHaloWidth(5.0f)
+                        .withTextAnchor("top")
+                        .withTextOffset(new Float[]{0f, 1.5f}));
+            } else {
 
-            );
-
+                options.add(new SymbolOptions()
+                        .withLatLng(new LatLng(s.getLatitude(), s.getLongitude()))
+                        .withIconImage("my-marker")
+                        //set the below attributes according to your requirements
+                        .withIconSize(0.15f)
+                        .withIconOffset(new Float[]{0f, -1.5f})
+                        .withTextHaloColor("rgba(255, 255, 255, 100)")
+                        .withTextHaloWidth(5.0f)
+                        .withTextAnchor("top")
+                        .withTextOffset(new Float[]{0f, 1.5f}));
+            }
         }
 
         symbols = symbolManager.create(options);
+
+    }
+
+    private void updateDestinationMarker(){
+        symbolManager.deleteAll();
+        addDestinationMarker(mapboxMap.getStyle());
+        addClickListenerToMarker();
+
+
+    }
+
+    private void addClickListenerToMarker(){
+
+        if (symbolManager != null) {
+            // Add click listener and change the symbol to a cafe icon on click
+            symbolManager.addClickListener(new OnSymbolClickListener() {
+                @Override
+                public void onAnnotationClick(Symbol symbol) {
+                    int positionOfSymbolInList = symbols.indexOf(symbol);
+                    selectedStation = stationList.get(positionOfSymbolInList);
+                    changeViewToSelectedStation();
+                    Log.d("StationMapView", "This Marker was clicked:" + symbol.getLatLng() + "Positon:" + positionOfSymbolInList);
+
+                }
+            });
+        }
 
     }
 
@@ -393,6 +434,8 @@ public class StationMapView extends AppCompatActivity implements OnMapReadyCallb
 
 
     private void changeViewToSelectedStation(){
+
+        updateDestinationMarker();
 
         title.setText(Integer.toString(selectedStation.getNumber())+". "+selectedStation.getTitle());
         Picasso.get().load(selectedStation.getImgSrcPath()).into(img);

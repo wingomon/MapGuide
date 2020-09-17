@@ -228,10 +228,10 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
 
                 for(Station s: stationList) {
                     //Upload of Picture and Audio of Station
-                    if(!(s.getImgSrcPath().contains(urlNoUploadPrefix))) {
+                    if(s.getImgSrcPath() != null){
                         uploadStationFilesToFirebaseStorage(s.getImgSrcPath(), s, "image");
                     }
-                    if(!(s.getAudioSrcPath().contains(urlNoUploadPrefix))) {
+                    if(s.getAudioSrcPath() != null) {
                         uploadStationFilesToFirebaseStorage(s.getAudioSrcPath(), s, "audio");
                     }
 
@@ -240,7 +240,7 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
                         if (s.getMediaElementList().size() > 0) {
                             for (int i = 0; i < s.getMediaElementList().size(); i++) {
                                 if (s.getMediaElementList().get(i).getType().equals("IMAGE")) {
-                                    if(!(s.getMediaElementList().get(i).getStore().contains(urlNoUploadPrefix))) {
+                                    if(s.getMediaElementList().get(i).getStore() != null) {
                                         uploadStationMediaListImagesToFirebaseStorage(s, i);
                                     }
                                 }

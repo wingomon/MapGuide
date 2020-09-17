@@ -1,5 +1,6 @@
 package com.example.mapguide;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.res.ResourcesCompat;
@@ -26,7 +27,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.github.chrisbanes.photoview.PhotoView;
 import com.kbeanie.multipicker.api.entity.ChosenImage;
 import com.squareup.picasso.Picasso;
 
@@ -104,7 +107,24 @@ public class StationViewActivity extends AppCompatActivity {
         cardView = (CardView) findViewById(R.id.cardView);
 
         if(station.getImgSrcPath() != null && !(station.getImgSrcPath().equals("null"))) {
-            Picasso.get().load(station.getImgSrcPath()).into(image);
+            //Load image
+            Picasso.get().load(station.getImgSrcPath()).placeholder(R.drawable.image_progress).into(image);
+
+            //Set OnCLickListener to open the PhotoView
+
+            image.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    AlertDialog.Builder mBuilder = new AlertDialog.Builder(StationViewActivity.this);
+                    View mView = getLayoutInflater().inflate(R.layout.photoview, null);
+                    PhotoView photoView = mView.findViewById(R.id.imageView);
+                    //photoView.setImageURI(Uri.parse(station.getImgSrcPath()));
+                    Picasso.get().load(station.getImgSrcPath()).placeholder(R.drawable.image_progress).into(photoView);
+                    mBuilder.setView(mView);
+                    AlertDialog mDialog = mBuilder.create();
+                    mDialog.show();
+                }
+            });
             Log.d("Station-View","Img Source of this station:" + station.getImgSrcPath());
         } else {
             cardView.setVisibility(View.GONE);
@@ -124,39 +144,43 @@ public class StationViewActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                //MediaPlayer
-                if(mPlayer.isPlaying()){
-                    mHandler.removeCallbacks(updater);
-                    mPlayer.pause();
-                    //playButton.setImageResource(R.drawable.ic_baseline_play_arrow_24);
-                }
-                else {
+                if(tempAudioPath != null && !(tempAudioPath.equals("null"))) {
+                    //MediaPlayer
+                    if (mPlayer.isPlaying()) {
+                        mHandler.removeCallbacks(updater);
+                        mPlayer.pause();
+                        //playButton.setImageResource(R.drawable.ic_baseline_play_arrow_24);
+                    } else {
 
-                    try {
-                        mPlayer.reset();
-                        mPlayer.setDataSource(context, Uri.parse(tempAudioPath));
-                        mPlayer.prepare();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                        try {
+                            mPlayer.reset();
+                            mPlayer.setDataSource(context, Uri.parse(tempAudioPath));
+                            mPlayer.prepare();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
 
                         mPlayer.start();
 
 
-                    mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                        @Override
-                        public void onCompletion(MediaPlayer mp) {
-                            seekbar.setProgress(0);
-                           // playButton.setImageResource(R.drawable.ic_baseline_play_arrow_24);
-                            mPlayer.reset();
-                            prepareMediaPlayer();
-                            Log.d("MediaPlayer", "Completed");
+                        mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                            @Override
+                            public void onCompletion(MediaPlayer mp) {
+                                seekbar.setProgress(0);
+                                // playButton.setImageResource(R.drawable.ic_baseline_play_arrow_24);
+                                mPlayer.reset();
+                                prepareMediaPlayer();
+                                Log.d("MediaPlayer", "Completed");
 
-                        }
-                    });
+                            }
+                        });
 
-                    //playButton.setImageResource(R.drawable.ic_baseline_pause_24);
-                    updateSeekBar();
+                        //playButton.setImageResource(R.drawable.ic_baseline_pause_24);
+                        updateSeekBar();
+                    }
+                } else {
+                    Toast.makeText(StationViewActivity.this, "Keine Audiodatei verfügbar.",
+                            Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -248,14 +272,28 @@ public class StationViewActivity extends AppCompatActivity {
                             //Create new ImageView programmatically with picked image
                             String imagePath = station.getMediaElementList().get(i).getStore();
                             Log.d("--ImageFilePicker-Path:--",imagePath);
-                            Uri imgUri = Uri.parse(imagePath);
                             ImageView imgView = new ImageView(StationViewActivity.this);
                             final LinearLayout.LayoutParams layoutParams1 = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,500);
                             layoutParams1.setMargins(20,20,20,20);
                             imgView.setLayoutParams(layoutParams1);
                             imgView.setScaleType(ImageView.ScaleType.CENTER_CROP);
                             linearLayout.addView(imgView);
-                            Picasso.get().load(imagePath).into(imgView);
+                            Picasso.get().load(imagePath).placeholder(R.drawable.image_progress).into(imgView);
+
+                            imgView.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    AlertDialog.Builder mBuilder = new AlertDialog.Builder(StationViewActivity.this);
+                                    View mView = getLayoutInflater().inflate(R.layout.photoview, null);
+                                    PhotoView photoView = mView.findViewById(R.id.imageView);
+                                    Picasso.get().load(imagePath).placeholder(R.drawable.image_progress).into(photoView);
+                                    mBuilder.setView(mView);
+                                    AlertDialog mDialog = mBuilder.create();
+                                    mDialog.show();
+                                }
+                            });
+
+
                         }
                         else {
                             String text = station.getMediaElementList().get(i).getStore();

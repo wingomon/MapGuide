@@ -74,6 +74,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:maxLines="1"
+        android:maxLength="35"
         android:background="@drawable/edit_text_rounded"
         android:textSize="16dp"
         android:hint="Titel des Guides"
