@@ -32,6 +32,7 @@ import com.kbeanie.multipicker.api.ImagePicker;
 import com.kbeanie.multipicker.api.Picker;
 import com.kbeanie.multipicker.api.callbacks.ImagePickerCallback;
 import com.kbeanie.multipicker.api.entity.ChosenImage;
+import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -60,6 +61,9 @@ public class StartCreateGuide_AddImage extends AppCompatActivity {
     CameraImagePicker cameraImagePicker;
 
     BitmapResizer bitmapResizer;
+
+    int bitmapMaxWidth = 1000;
+    int bitmapMaxHeight = 1000;
 
     private int PERMISSION_CODE=12;
 
@@ -151,8 +155,14 @@ public class StartCreateGuide_AddImage extends AppCompatActivity {
                                                            public void onImagesChosen(List<ChosenImage> images) {
                                                                // Adapt picture to imageView
                                                                currentPhotoPath = images.get(0).getOriginalPath();
-                                                               imageView.setImageBitmap(bitmapResizer.transform(BitmapFactory.decodeFile(currentPhotoPath)));
                                                                addimageicon.setAlpha(0f);
+                                                               Picasso.get().load(new File(currentPhotoPath))
+                                                                       .transform(new BitmapResizer(bitmapMaxWidth,bitmapMaxHeight))
+                                                                       .placeholder(R.drawable.image_progress)
+                                                                       .into(imageView);
+
+                                                               //imageView.setImageBitmap(bitmapResizer.transform(BitmapFactory.decodeFile(currentPhotoPath)));
+
                                                                next.setEnabled(true);
                                                                next.setAlpha(1f);
                                                            }
@@ -173,8 +183,12 @@ public class StartCreateGuide_AddImage extends AppCompatActivity {
                                                                      // Display images
                                                                      // Adapt picture to imageView
                                                                      currentPhotoPath = images.get(0).getOriginalPath();
-                                                                     imageView.setImageBitmap(bitmapResizer.transform(BitmapFactory.decodeFile(currentPhotoPath)));
+                                                                    // imageView.setImageBitmap(bitmapResizer.transform(BitmapFactory.decodeFile(currentPhotoPath)));
                                                                      addimageicon.setAlpha(0f);
+                                                                     Picasso.get().load(new File(currentPhotoPath))
+                                                                             .transform(new BitmapResizer(bitmapMaxWidth,bitmapMaxHeight))
+                                                                             .placeholder(R.drawable.image_progress)
+                                                                             .into(imageView);
                                                                      next.setEnabled(true);
                                                                      next.setAlpha(1f);
 

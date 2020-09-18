@@ -572,11 +572,8 @@ public class StationEdit_Activity extends AppCompatActivity {
                             imgView.setScaleType(ImageView.ScaleType.CENTER_CROP);
                             relativeLayoutImage.addView(imgView);
                             linearLayout.addView(relativeLayoutImage);
-                            /**
-                            Picasso.get().load(new File(imagePath))
-                                    .transform(new BitmapResizer(bitmapMaxWidth,bitmapMaxHeight))
-                                    .into(imgView);**/
-                            imgView.setImageBitmap(bitmapResizer.transform(BitmapFactory.decodeFile(imagePath)));
+                           // Picasso.get().load(bitmapResizer.transform(BitmapFactory.decodeFile(imagePath))).placeholder(R.drawable.image_progress).into(photoView);
+                          //  imgView.setImageBitmap(bitmapResizer.transform(BitmapFactory.decodeFile(imagePath)));
                             //Also add a Button to delete this EditText View again
                             ImageView btnDelete = new ImageView(getBaseContext());
                             RelativeLayout.LayoutParams buttonParam = new RelativeLayout.LayoutParams(deleteIconWidth,deleteIconHeight);
@@ -586,6 +583,10 @@ public class StationEdit_Activity extends AppCompatActivity {
                             btnDelete.setClickable(true);
                             relativeLayoutImage.addView(btnDelete);
                             Picasso.get().load(R.drawable.icons8_cancel_100).into(btnDelete);
+                            Picasso.get().load(new File(imagePath))
+                                    .transform(new BitmapResizer(bitmapMaxWidth,bitmapMaxHeight))
+                                    .placeholder(R.drawable.image_progress)
+                                    .into(imgView);
                             //btnDelete.setImageResource(R.drawable.icons8_cancel_100);
                             btnDelete.setOnClickListener(new View.OnClickListener() {
                                 @Override
@@ -683,8 +684,12 @@ public class StationEdit_Activity extends AppCompatActivity {
                                                                // Adapt picture to imageView
                                                                currentPhotoPath = images.get(0).getOriginalPath();
                                                                //stationImage.setImageBitmap(BitmapFactory.decodeFile(currentPhotoPath));
-                                                               stationImage.setImageBitmap(bitmapResizer.transform(BitmapFactory.decodeFile(currentPhotoPath)));
                                                                missingImg.setVisibility(View.GONE);
+                                                              // stationImage.setImageBitmap(bitmapResizer.transform(BitmapFactory.decodeFile(currentPhotoPath)));
+                                                               Picasso.get().load(new File(currentPhotoPath))
+                                                                       .transform(new BitmapResizer(bitmapMaxWidth,bitmapMaxHeight))
+                                                                       .placeholder(R.drawable.image_progress)
+                                                                       .into(stationImage);
                                                            }
 
                                                            @Override
@@ -747,7 +752,7 @@ public class StationEdit_Activity extends AppCompatActivity {
          else if (requestCode == Picker.PICK_IMAGE_DEVICE && resultCode == RESULT_OK){
             imagePicker.submit(data);
         }
-        else if(requestCode == Picker.PICK_IMAGE_CAMERA) {
+        else if(requestCode == Picker.PICK_IMAGE_CAMERA && resultCode == RESULT_OK) {
             cameraImagePicker.submit(data);
         }
 

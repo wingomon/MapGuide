@@ -23,16 +23,6 @@
                 android:layout_height="wrap_content"
                 app:cardElevation="5dp">
 
-                <TextView
-                    android:id="@+id/missingImg"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:text="Füge ein Bild hinzu."
-                    android:fontFamily="@font/airbnbcereallight"
-                    android:textSize="17dp"
-                    />
-
                 <ImageView
                     android:id="@+id/imageViewTitle"
                     android:layout_width="match_parent"

@@ -534,7 +534,11 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
                                                            public void onImagesChosen(List<ChosenImage> images) {
                                                                // Adapt picture to imageView
                                                                imgPath = images.get(0).getOriginalPath();
-                                                               imageView.setImageBitmap(BitmapFactory.decodeFile(imgPath));
+                                                               //imageView.setImageBitmap(BitmapFactory.decodeFile(imgPath));
+                                                               Picasso.get().load(new File(imgPath))
+                                                                       .transform(new BitmapResizer(maxwidth,maxHeight))
+                                                                       .placeholder(R.drawable.image_progress)
+                                                                       .into(imageView);
                                                            }
 
                                                            @Override
@@ -553,7 +557,10 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
                                                                // Display images
                                                                // Adapt picture to imageView
                                                                String imagePath = images.get(0).getOriginalPath();
-                                                               imageView.setImageBitmap(BitmapFactory.decodeFile(imagePath));
+                                                               Picasso.get().load(new File(imagePath))
+                                                                       .transform(new BitmapResizer(maxwidth,maxHeight))
+                                                                       .placeholder(R.drawable.image_progress)
+                                                                       .into(imageView);
                                                            }
 
                                                            @Override
