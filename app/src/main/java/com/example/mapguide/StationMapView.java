@@ -98,6 +98,9 @@ public class StationMapView extends AppCompatActivity implements OnMapReadyCallb
     MapboxDirections client;
     private final List<Feature> featureList = new ArrayList<>();
 
+    //Bitmap Markers
+    Bitmap bm,bm1,bm2,bm3,bm4,bm5,bm6,bm7,bm8,bm9,bm10,bm11,bm12,bm13,bm14,bm15;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -259,6 +262,10 @@ public class StationMapView extends AppCompatActivity implements OnMapReadyCallb
 
     }
 
+    private void initMarkerIcons(@NonNull Style style){
+
+    }
+
     private void addDestinationMarker(@NonNull Style style) {
 
         symbolManager = new SymbolManager(mapView, mapboxMap, style);
@@ -311,8 +318,6 @@ public class StationMapView extends AppCompatActivity implements OnMapReadyCallb
         symbolManager.deleteAll();
         addDestinationMarker(mapboxMap.getStyle());
         addClickListenerToMarker();
-
-
     }
 
     private void addClickListenerToMarker(){

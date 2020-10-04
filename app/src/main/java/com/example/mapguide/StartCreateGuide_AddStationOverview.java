@@ -99,6 +99,8 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
     StationAdapter stationAdapter;
     Station tempStation;
     SymbolManager symbolManager;
+    private List<Symbol> symbols = new ArrayList<>();
+    List<SymbolOptions> options = new ArrayList<>();
 
     Button saveButton;
     ImageView updateView, search, myLocation;
@@ -115,6 +117,10 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
     private static final String TEAL_COLOR = "#B993D6";
     private static final float POLYLINE_WIDTH = 4;
     private static final String ROUTE_SOURCE_ID = "route-source-id";
+
+
+
+
 
 
     private static final int REQUEST_CODE_AUTOCOMPLETE = 5;
@@ -190,12 +196,23 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
         mapboxMap.setStyle(Style.LIGHT, new Style.OnStyleLoaded() {
             @Override
             public void onStyleLoaded(@NonNull Style style) {
-                // Add origin and destination to the mapboxMap
-                initMarkerIconSymbolLayer(style);
+
+                symbolManager = new SymbolManager(mapView,mapboxMap, style);
+                symbolManager.setIconAllowOverlap(true);
+
+                //Initialisieren SymbolManager
+                initMarkerIconSymbolLayer();
                 initRouteLineLayer(style);
+                style.addSource(new GeoJsonSource(ICON_GEOJSON_SOURCE_ID));
+
+
+                // Add origin and destination to the mapboxMap
                 initMapIfStationsExistent(style);
                 mapboxMap.addOnMapLongClickListener(StartCreateGuide_AddStationOverview.this);
                 enableLocationComponent(style);
+
+
+
 
 
                 updateView = (ImageView) findViewById(R.id.updateView);
@@ -246,20 +263,19 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
         });
     }
 
-        private void initMarkerIconSymbolLayer(@NonNull Style loadedMapStyle) {
-            // Add the marker image to map
-            loadedMapStyle.addImage("icon-image", BitmapFactory.decodeResource(
-                    this.getResources(), R.drawable.marker_blue));
+        private void initMarkerIconSymbolLayer() {
 
-            loadedMapStyle.addSource(new GeoJsonSource(ICON_GEOJSON_SOURCE_ID));
+        String markerName;
+            //Add 15 custom marker with name "marker+number" from drawables folder
+            for(int i = 1; i<=15; i++){
+                //Add Marker Bitmaps
+                markerName = "marker" + i;
+                Bitmap bm = BitmapFactory.decodeResource(getBaseContext().getResources(),getResources().getIdentifier(markerName, "drawable", getPackageName()));
+                mapboxMap.getStyle().addImage("marker"+i, bm);
+            }
 
-            loadedMapStyle.addLayer(new SymbolLayer("icon-layer-id", ICON_GEOJSON_SOURCE_ID).withProperties(
-                    iconImage("icon-image"),
-                    iconSize(0.15f),
-                    iconAllowOverlap(true),
-                    iconIgnorePlacement(true),
-                    iconOffset(new Float[] {0f, -7f})
-            ));
+
+
         }
 
     private void initRouteLineLayer(@NonNull Style loadedMapStyle) {
@@ -268,7 +284,7 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
                 .withProperties(
                         lineColor(Color.parseColor(TEAL_COLOR)),
                         lineWidth(POLYLINE_WIDTH)
-                ), "icon-layer-id");
+                ), symbolManager.getLayerId());
     }
 
 
@@ -372,12 +388,6 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
         }
     }
 
-    private void resetDestinationMarkers(@NonNull Style style) {
-        GeoJsonSource lineSource = style.getSourceAs(ICON_GEOJSON_SOURCE_ID);
-
-    }
-
-
 
     private void removeRoute(@NonNull Style style) {
         GeoJsonSource lineSource = style.getSourceAs("route-source-id");
@@ -391,15 +401,25 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
 
 
     private void addDestinationMarker(@NonNull Style style) {
-        List<Feature> destinationMarkerList = new ArrayList<>();
+
+        //Zurücksetzen der Marker
+        symbolManager.deleteAll();
+        options.clear();
+
+        //Für jede Station soll ein Marker gesetzt werden
         for (Station s : stationList) {
-            destinationMarkerList.add(Feature.fromGeometry(
-                    Point.fromLngLat(s.getLongitude(), s.getLatitude())));
-            Log.d("MAPBOX", "AddDestinationMarker: Iteration durch stationList, Hinzufügen aller Punkte");
-        }
-        GeoJsonSource iconSource = style.getSourceAs(ICON_GEOJSON_SOURCE_ID);
-        if (iconSource != null) {
-            iconSource.setGeoJson(FeatureCollection.fromFeatures(destinationMarkerList));
+            options.add(new SymbolOptions()
+                    .withLatLng(new LatLng(s.getLatitude(), s.getLongitude()))
+                    .withIconImage("marker"+s.getNumber())
+                    //set the below attributes according to your requirements
+                    .withIconSize(0.15f)
+                    .withIconOffset(new Float[]{0f, -1.5f})
+                    .withTextHaloColor("rgba(255, 255, 255, 100)")
+                    .withTextHaloWidth(5.0f)
+                    .withTextAnchor("top")
+                    .withTextOffset(new Float[]{0f, 1.5f}));
+
+            symbols = symbolManager.create(options);
         }
     }
 

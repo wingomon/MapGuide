@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.plugins.annotation.Symbol;
@@ -92,6 +93,8 @@ public class StationAdapter extends RecyclerView.Adapter<StationAdapter.StationV
                 stationList.remove(position);
                 updateStationNumbers();
                 notifyDataSetChanged();
+                Toast.makeText(mContext, "Station wurde gelöscht. Bitte aktualisiere die Ansicht.",
+                        Toast.LENGTH_SHORT).show();
             }
         });
 

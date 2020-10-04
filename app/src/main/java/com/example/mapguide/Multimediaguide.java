@@ -13,7 +13,6 @@ public class Multimediaguide implements Serializable {
     public int km;
     public String location;
     public String category;
-   // public ArrayList<pointOfInterest> poiList;
     public String imgPath;
    public List<Station> stationList;
    public String userId;
