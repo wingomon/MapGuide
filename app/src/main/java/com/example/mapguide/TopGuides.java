@@ -47,7 +47,7 @@ public class TopGuides extends AppCompatActivity {
         //initializing the productlist
         multimediaguideList = new ArrayList<>();
 
-       // multimediaguideList.add(new Multimediaguide("Rom bei Nacht", "Erleben Sie Roms wunderschönes Nachtleben", "https://www.travelbook.de/data/uploads/2017/06/17978759_95907d892c.jpg", 5, "Sightseeing"));
+
 
     }
 
@@ -71,10 +71,9 @@ public class TopGuides extends AppCompatActivity {
                    desc= desc.substring(0,47) + "...";
                }
                holder.setImage(model.getImgPath());
-               //holder.setDescription(desc);
                holder.setTitle(model.getName());
                holder.setKilometer(model.getKm());
-               holder.getmView().setOnClickListener(new View.OnClickListener() {
+               holder.imageView.setOnClickListener(new View.OnClickListener() {
                    @Override
                    public void onClick(View v) {
                        Intent intent = new Intent(getApplicationContext(), GuideViewActivity.class);

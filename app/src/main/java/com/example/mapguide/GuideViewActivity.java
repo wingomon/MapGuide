@@ -87,13 +87,10 @@ public class GuideViewActivity extends AppCompatActivity {
             guideImage.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    AlertDialog.Builder mBuilder = new AlertDialog.Builder(GuideViewActivity.this);
-                    View mView = getLayoutInflater().inflate(R.layout.photoview, null);
-                    PhotoView photoView = mView.findViewById(R.id.imageView);
-                    Picasso.get().load(imgPath).placeholder(R.drawable.image_progress).into(photoView);
-                    mBuilder.setView(mView);
-                    AlertDialog mDialog = mBuilder.create();
-                    mDialog.show();
+                    //Leite Image Path an die Photo View Activity weiter, um sie dort anzuzeigen
+                    Intent intent = new Intent(getBaseContext(), PhotoViewActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.putExtra("imagePath",imgPath);
+                    startActivity(intent);
                 }
             });
 

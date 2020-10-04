@@ -68,7 +68,7 @@ public class CategoryActivity extends AppCompatActivity {
         } else if(category.equals("museum")){
             textCategory.setText("Museum");
         } else if(category.equals("adventure")){
-            textCategory.setText("Sonstige");
+            textCategory.setText("Abenteuer");
         } else {
             textCategory.setText("Sonstige");
         }

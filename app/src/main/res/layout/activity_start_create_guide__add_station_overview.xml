@@ -85,7 +85,24 @@
                 android:layout_marginLeft="20dp"
                 android:layout_marginBottom="10dp"/>
 
-            <androidx.recyclerview.widget.RecyclerView
+            <LinearLayout
+                android:id="@+id/emptyView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:fontFamily="@font/airbnbcereallight"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:text="Füge Stationen hinzu, in dem du du eine Position auf der Karte länger gedrückt hältst. "/>
+
+            </LinearLayout>
+
+            <com.example.mapguide.EmptyRecyclerView
                 android:id="@+id/stationRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

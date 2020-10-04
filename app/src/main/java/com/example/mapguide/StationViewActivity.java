@@ -115,14 +115,12 @@ public class StationViewActivity extends AppCompatActivity {
             image.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    AlertDialog.Builder mBuilder = new AlertDialog.Builder(StationViewActivity.this);
-                    View mView = getLayoutInflater().inflate(R.layout.photoview, null);
-                    PhotoView photoView = mView.findViewById(R.id.imageView);
-                    //photoView.setImageURI(Uri.parse(station.getImgSrcPath()));
-                    Picasso.get().load(station.getImgSrcPath()).placeholder(R.drawable.image_progress).into(photoView);
-                    mBuilder.setView(mView);
-                    AlertDialog mDialog = mBuilder.create();
-                    mDialog.show();
+
+                    //Leite Image Path an die Photo View Activity weiter, um sie dort anzuzeigen
+                    Intent intent = new Intent(getBaseContext(), PhotoViewActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.putExtra("imagePath",station.getImgSrcPath());
+                    startActivity(intent);
+
                 }
             });
             Log.d("Station-View","Img Source of this station:" + station.getImgSrcPath());
@@ -140,50 +138,54 @@ public class StationViewActivity extends AppCompatActivity {
         mHandler = new Handler();
         seekbar.setMax(100);
 
-        playButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        if(tempAudioPath != null && !(tempAudioPath.equals("null"))) {
 
-                if(tempAudioPath != null && !(tempAudioPath.equals("null"))) {
-                    //MediaPlayer
-                    if (mPlayer.isPlaying()) {
-                        mHandler.removeCallbacks(updater);
-                        mPlayer.pause();
-                        //playButton.setImageResource(R.drawable.ic_baseline_play_arrow_24);
-                    } else {
+            playButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
 
-                        try {
-                            mPlayer.reset();
-                            mPlayer.setDataSource(context, Uri.parse(tempAudioPath));
-                            mPlayer.prepare();
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                        //MediaPlayer
+                        if (mPlayer.isPlaying()) {
+                            mHandler.removeCallbacks(updater);
+                            mPlayer.pause();
+                            //playButton.setImageResource(R.drawable.ic_baseline_play_arrow_24);
+                        } else {
+
+                            try {
+                                mPlayer.reset();
+                                mPlayer.setDataSource(context, Uri.parse(tempAudioPath));
+                                mPlayer.prepare();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+                            mPlayer.start();
+
+
+                            mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                                @Override
+                                public void onCompletion(MediaPlayer mp) {
+                                    seekbar.setProgress(0);
+                                    // playButton.setImageResource(R.drawable.ic_baseline_play_arrow_24);
+                                    mPlayer.reset();
+                                    prepareMediaPlayer();
+                                    Log.d("MediaPlayer", "Completed");
+
+                                }
+                            });
+
+                            //playButton.setImageResource(R.drawable.ic_baseline_pause_24);
+                            updateSeekBar();
                         }
 
-                        mPlayer.start();
-
-
-                        mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                            @Override
-                            public void onCompletion(MediaPlayer mp) {
-                                seekbar.setProgress(0);
-                                // playButton.setImageResource(R.drawable.ic_baseline_play_arrow_24);
-                                mPlayer.reset();
-                                prepareMediaPlayer();
-                                Log.d("MediaPlayer", "Completed");
-
-                            }
-                        });
-
-                        //playButton.setImageResource(R.drawable.ic_baseline_pause_24);
-                        updateSeekBar();
-                    }
-                } else {
-                    Toast.makeText(StationViewActivity.this, "Keine Audiodatei verfügbar.",
-                            Toast.LENGTH_SHORT).show();
                 }
-            }
-        });
+            }); //endOnCLickListener
+        } else {
+            seekbar.setVisibility(View.GONE);
+            playButton.setVisibility(View.INVISIBLE);
+            playButton.setEnabled(false);
+
+        }
 
         //Listener für die Seekbar initialisieren
         seekbar.setOnTouchListener(new View.OnTouchListener(){
@@ -241,8 +243,14 @@ public class StationViewActivity extends AppCompatActivity {
 
     private void setVisibilityOfControl(){
         if(station.getNumber()==1){
-            backButton.setVisibility(View.INVISIBLE);
-            backButton.setEnabled(false);
+            if(stationList.size()==1){
+                LinearLayout controllerView = findViewById(R.id.controllerView);
+                controllerView.setVisibility(View.GONE);
+            } else {
+                backButton.setVisibility(View.INVISIBLE);
+                backButton.setEnabled(false);
+            }
+
         } else {
             backButton.setVisibility(View.VISIBLE);
             backButton.setEnabled(true);
@@ -283,13 +291,10 @@ public class StationViewActivity extends AppCompatActivity {
                             imgView.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    AlertDialog.Builder mBuilder = new AlertDialog.Builder(StationViewActivity.this);
-                                    View mView = getLayoutInflater().inflate(R.layout.photoview, null);
-                                    PhotoView photoView = mView.findViewById(R.id.imageView);
-                                    Picasso.get().load(imagePath).placeholder(R.drawable.image_progress).into(photoView);
-                                    mBuilder.setView(mView);
-                                    AlertDialog mDialog = mBuilder.create();
-                                    mDialog.show();
+                                    //Leite Image Path an die Photo View Activity weiter, um sie dort anzuzeigen
+                                    Intent intent = new Intent(getBaseContext(), PhotoViewActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    intent.putExtra("imagePath",imagePath);
+                                    startActivity(intent);
                                 }
                             });
 

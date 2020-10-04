@@ -95,7 +95,7 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
 
     //Liste der Stationen | RecyclerView Variablen
     List<Station> stationList;
-    RecyclerView recyclerView;
+    EmptyRecyclerView recyclerView;
     StationAdapter stationAdapter;
     Station tempStation;
     SymbolManager symbolManager;
@@ -152,12 +152,19 @@ public class StartCreateGuide_AddStationOverview extends AppCompatActivity imple
         //StationListe initialisieren
         stationList = new ArrayList<Station>();
 
-        recyclerView = (RecyclerView) findViewById(R.id.stationRecyclerView);
+        recyclerView = (EmptyRecyclerView) findViewById(R.id.stationRecyclerView);
         stationAdapter =new StationAdapter(stationList,this);
         RecyclerView.LayoutManager sLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(sLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(stationAdapter);
+
+
+        // Fetch the empty view from the layout and set it on
+        // the new recycler view
+        View emptyView = findViewById(R.id.emptyView);
+        recyclerView.setEmptyView(emptyView);
+
 
         List<Station> stationListTemp = (List<Station>) getIntent().getSerializableExtra("stationList");
         if (stationListTemp != null){

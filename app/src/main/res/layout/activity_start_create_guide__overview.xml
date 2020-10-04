@@ -64,7 +64,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:maxLines="1"
-        android:maxLength="35"
+        android:maxLength="30"
+        android:inputType="text"
         android:background="@drawable/edit_text_rounded"
         android:textSize="16dp"
         android:hint="Titel des Guides"
@@ -160,7 +161,24 @@
 
 
             </LinearLayout>
-            <androidx.recyclerview.widget.RecyclerView
+
+            <LinearLayout
+                android:id="@+id/emptyView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:fontFamily="@font/airbnbcereallight"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:text="Noch keine Stationen hinzugefügt."/>
+
+            </LinearLayout>
+
+
+            <com.example.mapguide.EmptyRecyclerView
                 android:id="@+id/stationRecyclerView1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

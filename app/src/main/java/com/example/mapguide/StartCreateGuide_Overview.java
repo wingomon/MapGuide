@@ -86,7 +86,7 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
 
     //Liste der Stationen | RecyclerView Variablen
     List<Station> stationList;
-    RecyclerView recyclerView;
+    EmptyRecyclerView recyclerView;
     StationAdapter_noEdit stationAdapter;
     Station tempStation;
     Context mContext;
@@ -121,12 +121,17 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
         //StationListe initialisieren
         stationList = new ArrayList<Station>();
 
-        recyclerView = (RecyclerView) findViewById(R.id.stationRecyclerView1);
+        recyclerView = (EmptyRecyclerView) findViewById(R.id.stationRecyclerView1);
         stationAdapter =new StationAdapter_noEdit(stationList,this);
         RecyclerView.LayoutManager sLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(sLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(stationAdapter);
+
+        // Fetch the empty view from the layout and set it on
+        // the new recycler view
+        View emptyView = findViewById(R.id.emptyView);
+        recyclerView.setEmptyView(emptyView);
 
        //Spinner
         spinner = (Spinner) findViewById(R.id.spinner);
@@ -218,113 +223,140 @@ public class StartCreateGuide_Overview extends AppCompatActivity {
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(stationList.size()<1){
+                    Toast.makeText(StartCreateGuide_Overview.this, "Bitte füge zuerst Stationen hinzu.",
+                            Toast.LENGTH_SHORT).show();
+                } else {
 
-                //ALertDialog for Loading with Loading circle
-                AlertDialog.Builder loadingBuilder = new AlertDialog.Builder(StartCreateGuide_Overview.this, R.style.CustomAlertDialog);
-                loadingBuilder.setView(R.layout.my_progress_view);
-                loadingBuilder.setCancelable(false);
-                loadingBuilder.show();
-
-
-                for(Station s: stationList) {
-                    //Upload of Picture and Audio of Station
-                    if(s.getImgSrcPath() != null){
-                        uploadStationFilesToFirebaseStorage(s.getImgSrcPath(), s, "image");
-                    }
-                    if(s.getAudioSrcPath() != null) {
-                        uploadStationFilesToFirebaseStorage(s.getAudioSrcPath(), s, "audio");
-                    }
-
-                    //Upload of "More Media"-List Images
-                    if(s.getMediaElementList() != null) {
-                        if (s.getMediaElementList().size() > 0) {
-                            for (int i = 0; i < s.getMediaElementList().size(); i++) {
-                                if (s.getMediaElementList().get(i).getType().equals("IMAGE")) {
-                                    if(s.getMediaElementList().get(i).getStore() != null) {
-                                        uploadStationMediaListImagesToFirebaseStorage(s, i);
-                                    }
-                                }
-                            }
+                    AlertDialog.Builder publishBuilder = new AlertDialog.Builder(StartCreateGuide_Overview.this, R.style.CustomAlertDialog);
+                    publishBuilder.setTitle("Veröffentlichen");
+                    publishBuilder.setMessage("Möchtest du deinen Guide veröffentlichen?");
+                    publishBuilder.setCancelable(true);
+                    publishBuilder.setPositiveButton("Veröffentlichen", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            publishGuide();
                         }
-                    }
+                    });
+                    publishBuilder.setNeutralButton("Abbrechen", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    });
+                    publishBuilder.show();
 
-                }
-
-                String title_ = title.getText().toString();
-                String description_ = description.getText().toString();
-
-
-                //Upload picture to FirebaseStorage
-                //But compressing before
-                //But ONLY if imgPath does not contain "https://firebasestorage.googleapis.com/" --> no upload needed then
-                FirebaseUser currentUser = mAuth.getCurrentUser();
-                String userId = currentUser.getUid();
-                String id = ref.push().getKey();
-
-                if(!(imgPath.contains(urlNoUploadPrefix))) {
-
-                    File origfile = new File(imgPath);
-                    try {
-                        // Bitmap bitmap = BitmapFactory.decodeFile (origfile.getPath());
-                        Bitmap bitmap = bitmapResizer.transform(BitmapFactory.decodeFile(origfile.getPath()));
-                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, new FileOutputStream(origfile));
-                    } catch (Throwable t) {
-                        Log.e("--ERROR--", "Error compressing file." + t.toString());
-                        t.printStackTrace();
-                    }
-
-                    Uri file = Uri.fromFile(origfile);
-                    Log.d("--DOWNLOAD--", "imgpath:" + imgPath);
-                    StorageReference riversRef = mStorageRef.child("images").child(System.currentTimeMillis() + ".jpg");
-
-                    riversRef.putFile(file)
-                            .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                                @Override
-                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                    // Get a URL to the uploaded content
-                                    Task<Uri> downloadUrl = taskSnapshot.getStorage().getDownloadUrl()
-                                            .addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                                @Override
-                                                public void onSuccess(Uri uri) {
-
-                                                    if (currentUser != null) {
-
-                                                        Multimediaguide m = new Multimediaguide(id, title_, description_, uri.toString(), 5, spinner.getSelectedItem().toString(), stationList, userId, location);
-                                                        ref.push().setValue(m);
-
-                                                        Intent intent = new Intent(getApplicationContext(), UserPage.class);
-                                                        startActivity(intent);
-                                                        finish();
-
-                                                        Toast.makeText(StartCreateGuide_Overview.this, "Dein Guide wurde erfolgreich hochgeladen.",
-                                                                Toast.LENGTH_SHORT).show();
-                                                    }
-
-
-                                                }
-                                            });
-
-                                }
-                            })
-                            .addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception exception) {
-                                    // Handle unsuccessful uploads
-                                    // ...
-                                    Toast.makeText(StartCreateGuide_Overview.this, "Beim Upload deines Guides ist etwas schiefgelaufen. Bitte versuche es nochmal.",
-                                            Toast.LENGTH_SHORT).show();
-                                    Log.d("--DOWNLOAD--", "FAILED");
-                                }
-                            });
-                } else if(imgPath.contains(urlNoUploadPrefix)){
-                    if(tempGuide != null) {
-                        ref.child(id).setValue(new Multimediaguide(id, title_, description_, tempGuide.getImgPath(), 5, spinner.getSelectedItem().toString(), stationList, userId, location));
-                    }
                 }
             }//End onClick
         });//End onClickListener of Save Button
 
     }
+
+    private void publishGuide(){
+
+        //ALertDialog for Loading with Loading circle
+        AlertDialog.Builder loadingBuilder = new AlertDialog.Builder(StartCreateGuide_Overview.this, R.style.CustomAlertDialog);
+        loadingBuilder.setView(R.layout.my_progress_view);
+        loadingBuilder.setCancelable(false);
+        loadingBuilder.show();
+
+
+        for(Station s: stationList) {
+            //Upload of Picture and Audio of Station
+            if(s.getImgSrcPath() != null){
+                uploadStationFilesToFirebaseStorage(s.getImgSrcPath(), s, "image");
+            }
+            if(s.getAudioSrcPath() != null) {
+                uploadStationFilesToFirebaseStorage(s.getAudioSrcPath(), s, "audio");
+            }
+
+            //Upload of "More Media"-List Images
+            if(s.getMediaElementList() != null) {
+                if (s.getMediaElementList().size() > 0) {
+                    for (int i = 0; i < s.getMediaElementList().size(); i++) {
+                        if (s.getMediaElementList().get(i).getType().equals("IMAGE")) {
+                            if(s.getMediaElementList().get(i).getStore() != null) {
+                                uploadStationMediaListImagesToFirebaseStorage(s, i);
+                            }
+                        }
+                    }
+                }
+            }
+
+        }
+
+        String title_ = title.getText().toString();
+        String description_ = description.getText().toString();
+
+
+        //Upload picture to FirebaseStorage
+        //But compressing before
+        //But ONLY if imgPath does not contain "https://firebasestorage.googleapis.com/" --> no upload needed then
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        String userId = currentUser.getUid();
+        String id = ref.push().getKey();
+
+        if(!(imgPath.contains(urlNoUploadPrefix))) {
+
+            File origfile = new File(imgPath);
+            try {
+                // Bitmap bitmap = BitmapFactory.decodeFile (origfile.getPath());
+                Bitmap bitmap = bitmapResizer.transform(BitmapFactory.decodeFile(origfile.getPath()));
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, new FileOutputStream(origfile));
+            } catch (Throwable t) {
+                Log.e("--ERROR--", "Error compressing file." + t.toString());
+                t.printStackTrace();
+            }
+
+            Uri file = Uri.fromFile(origfile);
+            Log.d("--DOWNLOAD--", "imgpath:" + imgPath);
+            StorageReference riversRef = mStorageRef.child("images").child(System.currentTimeMillis() + ".jpg");
+
+            riversRef.putFile(file)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            // Get a URL to the uploaded content
+                            Task<Uri> downloadUrl = taskSnapshot.getStorage().getDownloadUrl()
+                                    .addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                        @Override
+                                        public void onSuccess(Uri uri) {
+
+                                            if (currentUser != null) {
+
+                                                Multimediaguide m = new Multimediaguide(id, title_, description_, uri.toString(), 5, spinner.getSelectedItem().toString(), stationList, userId, location);
+                                                ref.push().setValue(m);
+
+                                                Intent intent = new Intent(getApplicationContext(), UserPage.class);
+                                                startActivity(intent);
+                                                finish();
+
+                                                Toast.makeText(StartCreateGuide_Overview.this, "Dein Guide wurde erfolgreich hochgeladen.",
+                                                        Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                    });
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            // Handle unsuccessful uploads
+                            // ...
+                            Toast.makeText(StartCreateGuide_Overview.this, "Beim Upload deines Guides ist etwas schiefgelaufen. Bitte versuche es nochmal.",
+                                    Toast.LENGTH_SHORT).show();
+                            Log.d("--DOWNLOAD--", "FAILED");
+                        }
+                    });
+        } else if(imgPath.contains(urlNoUploadPrefix)){
+            if(tempGuide != null) {
+                ref.child(id).setValue(new Multimediaguide(id, title_, description_, tempGuide.getImgPath(), 5, spinner.getSelectedItem().toString(), stationList, userId, location));
+            }
+        }
+
+    }
+
+
+
 
     private void uploadStationFilesToFirebaseStorage(String filePath, Station station, String type){
 

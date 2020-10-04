@@ -49,7 +49,7 @@ public class HomeScreen extends AppCompatActivity {
     private int showMultimediaguideLimit = 30;
 
 
-    TextView cityCategory, natureCategory, museumCategory, adventureCategory, defaultCategory;
+    TextView cityCategory, natureCategory, museumCategory, adventureCategory, otherCategory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,6 +118,15 @@ public class HomeScreen extends AppCompatActivity {
             }
         });
 
+        otherCategory = (TextView) findViewById(R.id.textViewCategoryOther);
+        otherCategory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), CategoryActivity.class).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                intent.putExtra("category","sonstige");
+                startActivity(intent);
+            }
+        });
 
         //Navigation related
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
@@ -161,7 +170,20 @@ public class HomeScreen extends AppCompatActivity {
                             overridePendingTransition(0,0);
                             return true;
 
-                        } else {
+                        }
+
+                    case R.id.info:
+                        if(currentUser != null){
+
+                            //Jump Activity "Start Create Guide"
+                            Intent intent = new Intent(getBaseContext(), InformationActivity.class);
+                            startActivity(intent);
+                            overridePendingTransition(0,0);
+                            return true;
+
+                        }
+
+                        else {
                             //Jump to Login Screen
                             Intent intent = new Intent(getBaseContext(), LoginActivity.class);
                             startActivity(intent);
